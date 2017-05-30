@@ -18,6 +18,7 @@ android {
         android.libraryVariants.all { outputs.all {
             outputFileName = outputFileName.replace("$archivesBaseName", "$archivesBaseName-$version") }
         }
+		consumerProguardFile('proguard-rules.pro')
     }
 
     buildTypes {
@@ -33,6 +34,12 @@ android {
 }
 
 dependencies {
+    testImplementation('junit:junit:4.12') {
+        exclude group: 'org.hamcrest'
+    }
+    testImplementation 'org.hamcrest:hamcrest:2.1'
+    testImplementation 'org.mockito:mockito-core:2.25.1'
+	testImplementation 'org.robolectric:android-all:8.1.0-robolectric-r4458339'
 }
 
 task javadoc(type: Javadoc) {
