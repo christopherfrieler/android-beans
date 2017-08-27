@@ -15,7 +15,7 @@ import rocks.frieler.android.facades.AssetManagerFacade;
  */
 public class BeanRegistryApplication extends Application {
     private final ForegroundActivityHolder foregroundActivityHolder = new ForegroundActivityHolder();
-    private final BeanRegistry beanRegistry = new BeanRegistry();
+    private final BeanRegistry beanRegistry = new BeanRegistry(foregroundActivityHolder);
 
     @Override
     public void onCreate() {

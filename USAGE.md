@@ -98,3 +98,36 @@ public class MyBeanConfiguration implements BeanConfiguration {
     }
 }
 ```
+
+
+## Bean scopes
+
+### Singleton scope
+
+By default all beans are singletons, i.e. there exists one instance for the entire app.
+
+### Activity scope
+
+Beans can also be Activity-scoped. This means a new instance will be constructed for each `Activity`. (Note: Currently
+the `Activity` must be a `FragmentActivity`.)
+The bean will survive configuration changes of the `Activity` such as device-rotation, just like Android's `ViewModel`s.
+(The implementation of Activity-scoped beans is actually based on them.) However, an Activity-scoped bean does not have
+to extend `ViewModel`.
+
+The consumer will always see the instance bound to the `Activity` which is currently in the foreground.
+
+Activity-scoped beans are defined through an `ActivityScopedFactoryBean` instead of registering the actual
+bean-instance:
+```java
+public class ActivityScopeBeanConfiguration implements BeanConfiguration {
+    @Override
+    public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {
+        beansCollector.defineBean(new SimpleActivityScopedFactoryBean(MyBean.class, MyBean::new));
+    }
+}
+```
+
+Activity-scoped beans may also implement the `ActivityAware`-interface. This interface defines a single method
+`void setActivity(Activity)`, which will be invoked with the `Activity` instance whenever it changes, e.g. after a
+configuration change of the `Activity`. At the and of the `Activity`'s lifecycle it will be invoked with `null`. Make
+sure to clear all references to the `Activity`, otherwise the stale references would cause a memory-leak.
