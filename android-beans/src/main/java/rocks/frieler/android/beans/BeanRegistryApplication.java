@@ -14,11 +14,13 @@ import rocks.frieler.android.facades.AssetManagerFacade;
  * @author Christopher Frieler
  */
 public class BeanRegistryApplication extends Application {
+    private final ForegroundActivityHolder foregroundActivityHolder = new ForegroundActivityHolder();
     private final BeanRegistry beanRegistry = new BeanRegistry();
 
     @Override
     public void onCreate() {
         super.onCreate();
+        registerActivityLifecycleCallbacks(foregroundActivityHolder);
         initializeBeans();
     }
 
