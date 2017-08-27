@@ -51,7 +51,7 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
-    public void testDefineBeanRegistersBeanAtTheBeanRegistry() {
+    public void testDefineBeanRegistersASingletonBeanAtTheBeanRegistry() {
         beanConfigurationsBeansCollector.defineBean(this);
 
         verify(beanRegistry).registerBean(this);

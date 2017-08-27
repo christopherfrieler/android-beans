@@ -5,8 +5,8 @@ import java.util.List;
 /**
  * Interface for classes that provide the beans of an application.
  * <p>
- * Beans are singleton simple Java objects, that get registered with a name and can be looked up either by their name or
- * type to inject the as dependencies (DI).
+ * Beans are simple Java objects, that get registered with a name and can be looked up either by their name or type to
+ * inject them as dependencies (DI).
  *
  * @author Christopher Frieler
  */
