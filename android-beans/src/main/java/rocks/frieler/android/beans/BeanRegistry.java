@@ -10,8 +10,30 @@ import java.util.Map;
  *
  * @author Christopher Frieler
  */
-class BeanRegistry implements BeansProvider {
+public class BeanRegistry implements BeansProvider {
     private final Map<String, Object> beans = new HashMap<>();
+
+    /**
+     * Registers the bean with a generated name at this {@link BeanRegistry}.
+     *
+     * @param bean the bean
+     */
+    void registerBean(Object bean) {
+        registerBean(generateBeanName(bean), bean);
+    }
+
+    private String generateBeanName(Object bean) {
+        String preferredBeanName = getPreferredBeanName(bean.getClass());
+        if (!beans.containsKey(preferredBeanName)) {
+            return preferredBeanName;
+        }
+
+        int i = 2;
+        while (beans.containsKey(preferredBeanName + i)) {
+            i++;
+        }
+        return preferredBeanName + i;
+    }
 
     /**
      * Registers the bean with the given name at this {@link BeanRegistry}.
@@ -38,6 +60,12 @@ class BeanRegistry implements BeansProvider {
 
     @Override
     public <T> T lookUpBean(Class<T> type) {
+        Object beanCandidateByPreferredName = beans.get(getPreferredBeanName(type));
+        if (beanCandidateByPreferredName != null && type.isAssignableFrom(beanCandidateByPreferredName.getClass())) {
+            //noinspection unchecked
+            return (T) beanCandidateByPreferredName;
+        }
+
         for (Object bean : beans.values()) {
             if (type.isAssignableFrom(bean.getClass())) {
                 //noinspection unchecked
@@ -57,5 +85,9 @@ class BeanRegistry implements BeansProvider {
             }
         }
         return matchingBeans;
+    }
+
+    private static String getPreferredBeanName(Class<?> beanClass) {
+        return beanClass.getName();
     }
 }

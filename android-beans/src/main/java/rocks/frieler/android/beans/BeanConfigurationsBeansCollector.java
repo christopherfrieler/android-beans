@@ -47,6 +47,18 @@ public class BeanConfigurationsBeansCollector implements BeansProvider {
     /**
      * Callback-method for {@link BeanConfiguration}s to define their beans.
      *
+     * @param bean the bean
+     */
+    public void defineBean(Object bean) {
+        beanRegistry.registerBean(bean);
+    }
+
+    /**
+     * Callback-method for {@link BeanConfiguration}s to define their beans with an explicit name.
+     * <p>
+     * Defining a bean with an explicit name allows to override a bean with the same name. Additionally defining an
+     * explicit name can speed-up the lookup of the bean if the lookup is done by name.
+     *
      * @param name the name of the bean
      * @param bean the bean
      */

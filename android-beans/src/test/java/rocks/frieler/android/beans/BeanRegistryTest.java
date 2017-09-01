@@ -7,6 +7,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 public class BeanRegistryTest {
@@ -79,5 +80,26 @@ public class BeanRegistryTest {
         assertThat(numbers.size(), is(2));
         assertThat(numbers.contains(42L), is(true));
         assertThat(numbers.contains(3.14), is(true));
+    }
+
+    @Test
+    public void testRegisteredBeanWithoutExplicitNameIsRegisteredWithGeneratedName() {
+        Object bean = new Object();
+
+        beanRegistry.registerBean(bean);
+
+        assertThat(beanRegistry.lookUpBean(Object.class.getName(), Object.class), is(sameInstance(bean)));
+    }
+
+    @Test
+    public void testGeneratedBeanNameUsesAscendingNumbersToInCaseOfCollisions() {
+        Object bean1 = new Object();
+        Object bean2 = new Object();
+
+        beanRegistry.registerBean(bean1);
+        beanRegistry.registerBean(bean2);
+
+        assertThat(beanRegistry.lookUpBean(Object.class.getName(), Object.class), is(sameInstance(bean1)));
+        assertThat(beanRegistry.lookUpBean(Object.class.getName() + "2", Object.class), is(sameInstance(bean2)));
     }
 }
