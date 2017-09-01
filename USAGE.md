@@ -42,12 +42,12 @@ beans through the `BeanConfigurationsBeansCollector`.
 public class MyBeanConfiguration implements BeanConfiguration {
     @Override
     public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {
-        beansCollector.defineBean("myBean", new MyBean());
+        beansCollector.defineBean(new MyBean()); // with a generated name
+        beansCollector.defineBean("myNamedBean", new MyBean()); // with an explicit name
     }
 }
 ```
-Of course a `BeanConfiguration` can define multiple beans and you can also have multiple `BeanConfiguration`s to
-structure your code.
+Of course you can also have multiple `BeanConfiguration`s to structure your code.
 
 Now create a folder named `bean-configurations` in the assets-directory of your app and place a simple text-file in it,
 which contains the full qualified name of your `BeanConfiguration`.

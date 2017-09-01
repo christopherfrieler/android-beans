@@ -52,6 +52,13 @@ public class BeanConfigurationsBeansCollectorTest {
 
     @Test
     public void testDefineBeanRegistersBeanAtTheBeanRegistry() {
+        beanConfigurationsBeansCollector.defineBean(this);
+
+        verify(beanRegistry).registerBean(this);
+    }
+
+    @Test
+    public void testDefineBeanWithExplicitNameRegistersASingletonBeanAtTheBeanRegistry() {
         beanConfigurationsBeansCollector.defineBean("bean", this);
 
         verify(beanRegistry).registerBean("bean", this);
