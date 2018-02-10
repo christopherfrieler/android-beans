@@ -131,3 +131,12 @@ Activity-scoped beans may also implement the `ActivityAware`-interface. This int
 `void setActivity(Activity)`, which will be invoked with the `Activity` instance whenever it changes, e.g. after a
 configuration change of the `Activity`. At the and of the `Activity`'s lifecycle it will be invoked with `null`. Make
 sure to clear all references to the `Activity`, otherwise the stale references would cause a memory-leak.
+
+
+## Post-processing
+
+### BeanRegistryPostProcessor
+
+Sometimes it may be necessary to post-process the `BeanRegistry`, which holds all the beans. This can be achieved by
+implementing the `BeanRegistryPostProcessor`-interface. Once all beans are collected from the `BeanConfiguration`s, the
+`void postProcess(BeanRigistry)`-method of all `BeanRegistryPostProcessor`-beans will be invoked.
