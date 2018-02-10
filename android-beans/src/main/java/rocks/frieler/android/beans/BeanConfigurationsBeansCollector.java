@@ -35,12 +35,19 @@ public class BeanConfigurationsBeansCollector implements BeansProvider {
     void collectBeans(List<? extends BeanConfiguration> beanConfigurations) {
         remainingBeanConfigurations.addAll(beanConfigurations);
         collectRemainingBeans();
+        applyBeanRegistryPostProcessors();
     }
 
     private void collectRemainingBeans() {
         while (!remainingBeanConfigurations.isEmpty()) {
             BeanConfiguration beanConfiguration = remainingBeanConfigurations.remove(0);
             beanConfiguration.defineBeans(this);
+        }
+    }
+
+    private void applyBeanRegistryPostProcessors() {
+        for (BeanRegistryPostProcessor postProcessor : beanRegistry.lookUpBeans(BeanRegistryPostProcessor.class)) {
+            postProcessor.postProcess(beanRegistry);
         }
     }
 

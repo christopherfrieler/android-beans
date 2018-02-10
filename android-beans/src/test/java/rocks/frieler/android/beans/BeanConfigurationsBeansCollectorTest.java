@@ -51,6 +51,18 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testCollectBeansAppliesTheBeanRegistryPostProcessorBeansAfterCollectingAllBeans() {
+        final BeanRegistryPostProcessor beanRegistryPostProcessor = mock(BeanRegistryPostProcessor.class);
+        when(beanRegistry.lookUpBeans(BeanRegistryPostProcessor.class)).thenReturn(Collections.singletonList(beanRegistryPostProcessor));
+
+        beanConfigurationsBeansCollector.collectBeans(Collections.singletonList(beanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, beanRegistryPostProcessor);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanRegistryPostProcessor).postProcess(beanRegistry);
+    }
+
+    @Test
     public void testDefineBeanRegistersASingletonBeanAtTheBeanRegistry() {
         beanConfigurationsBeansCollector.defineBean(this);
 
