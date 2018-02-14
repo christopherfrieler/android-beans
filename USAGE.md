@@ -36,12 +36,12 @@ Now you're ready to define your beans as described in the following section.
 
 ## Defining beans
 
-To define beans write a class that implements `BeanConfiguration`. In its `defineBeans()`-method you can define your
-beans through the `BeanConfigurationsBeansCollector`.
+To define beans write a class that extends `BeanConfiguration`. In its `defineBeans()`-method you can define your beans
+through the `BeansCollector`.
 ```java
-public class MyBeanConfiguration implements BeanConfiguration {
+public class MyBeanConfiguration extends BeanConfiguration {
     @Override
-    public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {
+    public void defineBeans(BeansCollector beansCollector) {
         beansCollector.defineBean(new MyBean()); // with a generated name
         beansCollector.defineBean("myNamedBean", new MyBean()); // with an explicit name
     }
@@ -87,17 +87,26 @@ of `MyBean` into the consuming code.
 
 ### Dependencies between beans 
 
-You can also lookup other beans while defining one, when they depend on each other. This is done through the
-`BeanConfigurationsBeansCollector`, which offers the same three ways of lookup. Using the
-`BeanConfigurationsBeansCollector` for the lookup will handle ordering between multiple `BeanConfigurations`.
+You can also require beans from other `BeanConfiguration`s while defining a bean, that depends on them. In order to
+handle ordering between the `BeanConfiguration`s correctly, the dependency must be declared explicitly **before** the
+invocation of `defineBeans(BeansCollector)`. `BeanConfiguration` provides some methods for that. Android Beans will
+ensure, that `defineBeans(BeansCollector)` is called only after all dependencies are fulfilled.
 ```java
-public class MyBeanConfiguration implements BeanConfiguration {
+public class MyBeanConfiguration extends BeanConfiguration {
+    private final BeanDependency<MyDependency> dependency = requireBean(MyDependency.class);
+    
     @Override
-    public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {
-        beansCollector.defineBean("myBean", new MyBean(beansCollector.lookUpBean(MyDependency.class)));
+    public void defineBeans(BeansCollector beansCollector) {
+        beansCollector.defineBean("myBean", new MyBean(dependency.get()));
     }
 }
 ```
+`BeanConfiguration` provides the following methods to require other beans:
+- `requireBean(Class<T>)`: Requires a bean by type.
+- `requireBean(String, Class<T>)`: Requires a bean by name and type.
+- `requireBeans(Class<T>)`: Requires the beans of that type. Note: Since Android Beans cannot know these beans in
+advance, this dependency is always seen as fulfilled. However, the resolution of this dependency will attempt to handle
+as many `BeanConfiguration`s as possible first to allow them to define such beans.
 
 
 ## Bean scopes
@@ -119,9 +128,9 @@ The consumer will always see the instance bound to the `Activity` which is curre
 Activity-scoped beans are defined through an `ActivityScopedFactoryBean` instead of registering the actual
 bean-instance:
 ```java
-public class ActivityScopeBeanConfiguration implements BeanConfiguration {
+public class ActivityScopeBeanConfiguration extends BeanConfiguration {
     @Override
-    public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {
+    public void defineBeans(BeansCollector beansCollector) {
         beansCollector.defineBean(new SimpleActivityScopedFactoryBean(MyBean.class, MyBean::new));
     }
 }

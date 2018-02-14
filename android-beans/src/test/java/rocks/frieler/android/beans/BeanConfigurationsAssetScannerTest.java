@@ -77,20 +77,20 @@ public class BeanConfigurationsAssetScannerTest {
         beanConfigurationsAssetScanner.scan(assets);
     }
 
-    public static class ABeanConfiguration implements BeanConfiguration {
+    public static class ABeanConfiguration extends BeanConfiguration {
         @Override
-        public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {}
+        public void defineBeans(BeansCollector beansCollector) {}
     }
 
-    static class ABeanConfigurationNeedingTheContext implements BeanConfiguration {
+    static class ABeanConfigurationNeedingTheContext extends BeanConfiguration {
         public ABeanConfigurationNeedingTheContext(Context context) {}
 
         @Override
-        public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {}
+        public void defineBeans(BeansCollector beansCollector) {}
     }
 
-    public static class AnotherBeanConfiguration implements BeanConfiguration {
+    public static class AnotherBeanConfiguration extends BeanConfiguration {
         @Override
-        public void defineBeans(BeanConfigurationsBeansCollector beansCollector) {}
+        public void defineBeans(BeansCollector beansCollector) {}
     }
 }
