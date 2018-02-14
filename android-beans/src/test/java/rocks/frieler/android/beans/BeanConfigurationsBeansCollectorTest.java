@@ -4,19 +4,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -41,11 +43,56 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testCollectBeansResolvesDependenciesBetweenBeanConfigurationsAndHandlesThemInAPossibleOrder() {
+        final BeanDependency<?> dependencyOnBean1 = mock(BeanDependency.class);
+        when(dependencyOnBean1.fulfill(beanConfigurationsBeansCollector)).thenReturn(false);
+        final BeanDependency<?> dependencyOnBean2 = mock(BeanDependency.class);
+        when(dependencyOnBean2.fulfill(beanConfigurationsBeansCollector)).thenReturn(false);
+
+        when(beanConfiguration.getDependencies()).thenReturn(Collections.singletonList(dependencyOnBean1));
+        doAnswer(invocation -> {
+            assertThat(dependencyOnBean1.get(), is(notNullValue()));
+            final Object bean2 = new Object();
+            beanConfigurationsBeansCollector.defineBean("bean2", bean2);
+            when(dependencyOnBean2.fulfill(beanConfigurationsBeansCollector)).thenAnswer(fulfillInvocation -> {
+                doReturn(bean2).when(dependencyOnBean2).get();
+                return true;
+            });
+            return null;
+        }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+
+        when(anotherBeanConfiguration.getDependencies()).thenReturn(Collections.singletonList(dependencyOnBean2));
+        doAnswer(invocation -> {
+            assertThat(dependencyOnBean2.get(), is(notNullValue()));
+            return null;
+        }).when(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+
+        when(yetAnotherBeanConfiguration.getDependencies()).thenReturn(Collections.emptyList());
+        doAnswer(invocation -> {
+            final Object bean1 = new Object();
+            beanConfigurationsBeansCollector.defineBean("bean1", bean1);
+            when(dependencyOnBean1.fulfill(beanConfigurationsBeansCollector)).thenAnswer(fulfillInvocation -> {
+                doReturn(bean1).when(dependencyOnBean1).get();
+                return true;
+            });
+            return null;
+        }).when(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    }
+
+    @Test
     public void testMultipleCallsToCollectBeansDontHandleOldBeanConfigurations() {
         beanConfigurationsBeansCollector.collectBeans(Collections.singletonList(beanConfiguration));
         verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        reset(beanConfiguration);
 
-        beanConfigurationsBeansCollector.collectBeans(Collections.<BeanConfiguration>emptyList());
+        beanConfigurationsBeansCollector.collectBeans(Collections.emptyList());
 
         verifyNoMoreInteractions(beanConfiguration);
     }
@@ -86,31 +133,16 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
-    public void testLookUpBeanByNameAndTypeHandlesFurtherBeanConfigurationsUntilTheBeanIsFound() {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                when(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class))
-                        .thenReturn(BeanConfigurationsBeansCollectorTest.this);
-                return null;
-            }
-        }).when(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    public void testLookUpBeanByNameAndTypeDelegatesToTheBeanRegistryAndReturnsNullWithoutSuchABean() {
+        when(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class)).thenReturn(null);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BeanConfigurationsBeansCollectorTest bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class);
-                assertThat(bean, is(BeanConfigurationsBeansCollectorTest.this));
-                return null;
-            }
-        }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
-        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+        BeanConfigurationsBeansCollectorTest bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class);
 
-        verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        assertThat(bean, is(nullValue()));
     }
 
     @Test
-    public void testLookUpBeanByTypeDelegatesToTheBeanRegistry() {
+    public void testLookUpBeanByTypeDelegatesToTheBeanRegistryToReturnTheBean() {
         when(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest.class)).thenReturn(this);
 
         BeanConfigurationsBeansCollectorTest bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest.class);
@@ -119,27 +151,12 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
-    public void testLookUpBeanByTypeHandlesFurtherBeanConfigurationsUntilTheBeanIsFound() {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                when(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest.class))
-                        .thenReturn(BeanConfigurationsBeansCollectorTest.this);
-                return null;
-            }
-        }).when(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    public void testLookUpBeanByTypeDelegatesToTheBeanRegistryAndReturnsNullWithoutSuchABean() {
+        when(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest.class)).thenReturn(null);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                BeanConfigurationsBeansCollectorTest bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest.class);
-                assertThat(bean, is(BeanConfigurationsBeansCollectorTest.this));
-                return null;
-            }
-        }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
-        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+        BeanConfigurationsBeansCollectorTest bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest.class);
 
-        verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        assertThat(bean, is(nullValue()));
     }
 
     @Test
@@ -154,12 +171,9 @@ public class BeanConfigurationsBeansCollectorTest {
 
     @Test
     public void testLookUpBeansByTypeCollectsRemainingBeansFirst() {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest.class);
-                return null;
-            }
+        doAnswer(invocation -> {
+            beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest.class);
+            return null;
         }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration));
 

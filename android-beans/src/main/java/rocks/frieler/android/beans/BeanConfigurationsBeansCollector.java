@@ -1,6 +1,6 @@
 package rocks.frieler.android.beans;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,14 +9,14 @@ import java.util.List;
  * <p>
  * The {@link BeanConfigurationsBeansCollector} also implements the {@link BeansProvider}-interface by providing the
  * beans that are already registered in the {@link BeanRegistry}. In addition the
- * {@link BeanConfigurationsBeansCollector} will process further {@link BeanConfiguration}s to fulfill bean-lookups for
+ * {@link BeanConfigurationsBeansCollector} may process further {@link BeanConfiguration}s to fulfill bean-lookups for
  * beans that are not present yet.
  *
  * @author Christopher Frieler
  */
-public class BeanConfigurationsBeansCollector implements BeansProvider {
+public class BeanConfigurationsBeansCollector implements BeansCollector, BeansProvider {
     private final BeanRegistry beanRegistry;
-    private final List<BeanConfiguration> remainingBeanConfigurations = new ArrayList<>();
+    private final List<BeanConfiguration> remainingBeanConfigurations = new LinkedList<>();
 
     /**
      * Creates a new {@link BeanConfigurationsBeansCollector} that collects beans in the given {@link BeanRegistry}.
@@ -35,13 +35,23 @@ public class BeanConfigurationsBeansCollector implements BeansProvider {
     void collectBeans(List<? extends BeanConfiguration> beanConfigurations) {
         remainingBeanConfigurations.addAll(beanConfigurations);
         collectRemainingBeans();
+        if (!remainingBeanConfigurations.isEmpty()) {
+            throw new BeanInstantiationException("bean-configurations seem to have a cyclic dependency.");
+        }
         applyBeanRegistryPostProcessors();
     }
 
     private void collectRemainingBeans() {
-        while (!remainingBeanConfigurations.isEmpty()) {
+        int limit = remainingBeanConfigurations.size();
+        while (limit > 0) {
             BeanConfiguration beanConfiguration = remainingBeanConfigurations.remove(0);
-            beanConfiguration.defineBeans(this);
+            if (beanConfiguration.isReadyToDefineBeans(this)) {
+                beanConfiguration.defineBeans(this);
+                limit = remainingBeanConfigurations.size();
+            } else {
+                remainingBeanConfigurations.add(beanConfiguration);
+                limit--;
+            }
         }
     }
 
@@ -56,6 +66,7 @@ public class BeanConfigurationsBeansCollector implements BeansProvider {
      *
      * @param bean the bean
      */
+    @Override
     public void defineBean(Object bean) {
         beanRegistry.registerBean(bean);
     }
@@ -69,42 +80,19 @@ public class BeanConfigurationsBeansCollector implements BeansProvider {
      * @param name the name of the bean
      * @param bean the bean
      */
+    @Override
     public void defineBean(String name, Object bean) {
         beanRegistry.registerBean(name, bean);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Additionally, if no such bean can be found, but there are further {@link BeanConfiguration}s to process, they are
-     * processed until a matching bean is found. This is likely to happen when the lookup happens from a
-     * {@link BeanConfiguration} to resolve a dependency to a bean defined by another {@link BeanConfiguration}.
-     */
     @Override
     public <T> T lookUpBean(String name, Class<T> type) {
-        T bean = beanRegistry.lookUpBean(name, type);
-        while (bean == null && !remainingBeanConfigurations.isEmpty()) {
-            remainingBeanConfigurations.remove(0).defineBeans(this);
-            bean = beanRegistry.lookUpBean(name, type);
-        }
-        return bean;
+        return beanRegistry.lookUpBean(name, type);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Additionally, if no such bean can be found, but there are further {@link BeanConfiguration}s to process, they are
-     * processed until a matching bean is found. This is likely to happen when the lookup happens from a
-     * {@link BeanConfiguration} to resolve a dependency to a bean defined by another {@link BeanConfiguration}.
-     */
     @Override
     public <T> T lookUpBean(Class<T> type) {
-        T bean = beanRegistry.lookUpBean(type);
-        while (bean == null && !remainingBeanConfigurations.isEmpty()) {
-            remainingBeanConfigurations.remove(0).defineBeans(this);
-            bean = beanRegistry.lookUpBean(type);
-        }
-        return bean;
+        return beanRegistry.lookUpBean(type);
     }
 
     /**
