@@ -4,8 +4,10 @@ import android.app.Activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -17,6 +19,7 @@ import androidx.fragment.app.FragmentActivity;
 public class BeanRegistry implements BeansProvider {
     private final ForegroundActivityHolder foregroundActivityHolder;
     private final Map<String, Object> beans = new HashMap<>();
+    private final List<BeanPostProcessor> beanPostProcessors = new LinkedList<>();
 
     BeanRegistry(ForegroundActivityHolder foregroundActivityHolder) {
         this.foregroundActivityHolder = foregroundActivityHolder;
@@ -54,13 +57,35 @@ public class BeanRegistry implements BeansProvider {
     /**
      * Registers the bean with the given name at this {@link BeanRegistry}.
      * <p>
+     * The bean will be post-processed by all registered {@link BeanPostProcessor}s.
+     * <p>
      * If a bean with this name already exists, it will be replaced.
      *
      * @param name the name of the bean
      * @param bean the bean
      */
     void registerBean(String name, Object bean) {
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            bean = beanPostProcessor.postProcessBean(name, bean);
+        }
+
         beans.put(name, bean);
+    }
+
+    /**
+     * Registers the given {@link BeanPostProcessor}.
+     * <p>
+     * The {@link BeanPostProcessor} will get all beans already registered to post-process immediately and all beans
+     * registered subsequently.
+     *
+     * @param beanPostProcessor the new {@link BeanPostProcessor}
+     */
+    void registerBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.add(beanPostProcessor);
+
+        for (Entry<String, Object> beanEntry : beans.entrySet()) {
+            beanEntry.setValue(beanPostProcessor.postProcessBean(beanEntry.getKey(), beanEntry.getValue()));
+        }
     }
 
     @Override
@@ -86,7 +111,7 @@ public class BeanRegistry implements BeansProvider {
             }
         }
 
-        for (Map.Entry<String, Object> beanCandidate : beans.entrySet()) {
+        for (Entry<String, Object> beanCandidate : beans.entrySet()) {
             T bean = resolveBeanFromCandidate(beanCandidate.getKey(), type, beanCandidate.getValue());
             if (bean != null) {
                 return bean;
@@ -98,7 +123,7 @@ public class BeanRegistry implements BeansProvider {
     @Override
     public <T> List<T> lookUpBeans(Class<T> type) {
         List<T> matchingBeans = new ArrayList<>();
-        for (Map.Entry<String, Object> beanCandidate : beans.entrySet()) {
+        for (Entry<String, Object> beanCandidate : beans.entrySet()) {
             T bean = resolveBeanFromCandidate(beanCandidate.getKey(), type, beanCandidate.getValue());
             if (bean != null) {
                 matchingBeans.add(bean);
@@ -115,7 +140,11 @@ public class BeanRegistry implements BeansProvider {
                 && type.isAssignableFrom(((ActivityScopedFactoryBean) beanCandidate).getType())) {
             //noinspection unchecked
             ActivityScopedFactoryBean<T> factoryBean = (ActivityScopedFactoryBean<T>) beanCandidate;
-            return factoryBean.getBean(name, (FragmentActivity) currentActivity);
+            T bean = factoryBean.getBean(name, (FragmentActivity) currentActivity);
+            for (BeanPostProcessor postProcessor : beanPostProcessors) {
+                bean = postProcessor.postProcessBean(name, bean);
+            }
+            return bean;
         }
 
         if (type.isAssignableFrom(beanCandidate.getClass())) {

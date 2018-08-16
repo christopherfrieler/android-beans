@@ -85,6 +85,18 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
         beanRegistry.registerBean(name, bean);
     }
 
+    /**
+     * Registers the given {@link BeanPostProcessor} at the underlying {@link BeanRegistry}.
+     *
+     * @param beanPostProcessor the new {@link BeanPostProcessor}
+     *
+     * @see BeanRegistry#registerBeanPostProcessor(BeanPostProcessor)
+     */
+    @Override
+    public void registerBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        beanRegistry.registerBeanPostProcessor(beanPostProcessor);
+    }
+
     @Override
     public <T> T lookUpBean(String name, Class<T> type) {
         return beanRegistry.lookUpBean(name, type);
