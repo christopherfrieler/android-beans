@@ -25,4 +25,14 @@ public interface BeansCollector {
      * @param bean the bean to define
      */
     void defineBean(String name, Object bean);
+
+    /**
+     * Registers the given {@link BeanPostProcessor}.
+     * <p>
+     * The {@link BeanPostProcessor} will get all beans already defined to post-process immediately and all beans
+     * defined subsequently.
+     *
+     * @param beanPostProcessor the new {@link BeanPostProcessor}
+     */
+    void registerBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

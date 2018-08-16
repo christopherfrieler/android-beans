@@ -146,8 +146,18 @@ sure to clear all references to the `Activity`, otherwise the stale references w
 
 ## Post-processing
 
+### BeanPostProcessor
+
+If you need to post-process beans after their creation, this is possible by implementing the
+`BeanPostProcessor`-interface. The interface allows to manipulate or even replace beans.
+
+`BeanPostProcessor`s must be registered at the `BeanRegistry`, usually through the `BeansCollector`.
+
+When a `BeanPostProcessor` is registered, it is first invoked for all existing beans. It will then be invoked for every
+bean registered later and also for every scoped bean, when it is created by its factory.
+
 ### BeanRegistryPostProcessor
 
-Sometimes it may be necessary to post-process the `BeanRegistry`, which holds all the beans. This can be achieved by
-implementing the `BeanRegistryPostProcessor`-interface. Once all beans are collected from the `BeanConfiguration`s, the
-`void postProcess(BeanRigistry)`-method of all `BeanRegistryPostProcessor`-beans will be invoked.
+Sometimes it may be necessary to post-process the entire `BeanRegistry`, which holds all the beans. This can be achieved
+by implementing the `BeanRegistryPostProcessor`-interface. Once all beans are collected from the `BeanConfiguration`s,
+the `void postProcess(BeanRigistry)`-method of all `BeanRegistryPostProcessor`-beans will be invoked.

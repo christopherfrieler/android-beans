@@ -19,12 +19,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanRegistryTest {
     private ForegroundActivityHolder foregroundActivityHolder = mock(ForegroundActivityHolder.class);
     private BeanRegistry beanRegistry = new BeanRegistry(foregroundActivityHolder);
+
+    @Mock
+    private BeanPostProcessor beanPostProcessor;
 
     @Mock
     private FragmentActivity activity;
@@ -157,7 +161,7 @@ public class BeanRegistryTest {
         when(foregroundActivityHolder.getCurrentActivity()).thenReturn(activity);
         beanRegistry.registerBean("object", new Object());
         beanRegistry.registerBean("long", 42L);
-        ActivityScopedFactoryBean<Double> factoryBean = mock(ActivityScopedFactoryBean.class);
+        @SuppressWarnings("unchecked") ActivityScopedFactoryBean<Double> factoryBean = mock(ActivityScopedFactoryBean.class);
         when(factoryBean.getType()).thenReturn(Double.class);
         when(factoryBean.getBean("double", activity)).thenReturn(3.14);
         beanRegistry.registerBean("double", factoryBean);
@@ -200,5 +204,49 @@ public class BeanRegistryTest {
 
         assertThat(beanRegistry.lookUpBean(Object.class.getName(), Object.class), is(sameInstance(bean1)));
         assertThat(beanRegistry.lookUpBean(Object.class.getName() + "2", Object.class), is(sameInstance(bean2)));
+    }
+
+    @Test
+    public void testRegisteredBeanPostProcessorGetsNewBeansToPostProcess() {
+        Object originalBean = new Object();
+        Object replacementBean = new Object();
+        when(beanPostProcessor.postProcessBean("bean", originalBean)).thenReturn(replacementBean);
+
+        beanRegistry.registerBeanPostProcessor(beanPostProcessor);
+        beanRegistry.registerBean("bean", originalBean);
+
+        verify(beanPostProcessor).postProcessBean("bean", originalBean);
+        assertThat(beanRegistry.lookUpBean("bean", Object.class), is(replacementBean));
+    }
+
+    @Test
+    public void testRegisteredBeanPostProcessorGetsExistingBeansToPostProcess() {
+        Object originalBean = new Object();
+        Object replacementBean = new Object();
+        when(beanPostProcessor.postProcessBean("bean", originalBean)).thenReturn(replacementBean);
+
+        beanRegistry.registerBean("bean", originalBean);
+        beanRegistry.registerBeanPostProcessor(beanPostProcessor);
+
+        verify(beanPostProcessor).postProcessBean("bean", originalBean);
+        assertThat(beanRegistry.lookUpBean("bean", Object.class), is(replacementBean));
+    }
+
+    @Test
+    public void testRegisteredBeanPostProcessorGetsActivityScopedBeanToPostProcessWhenItGetsProduced() {
+        when(foregroundActivityHolder.getCurrentActivity()).thenReturn(activity);
+        @SuppressWarnings("unchecked") ActivityScopedFactoryBean<Object> factoryBean = mock(ActivityScopedFactoryBean.class);
+        when(factoryBean.getType()).thenReturn(Object.class);
+        Object originalBean = new Object();
+        when(factoryBean.getBean("bean", activity)).thenReturn(originalBean);
+        when(beanPostProcessor.postProcessBean("bean", factoryBean)).thenReturn(factoryBean);
+        Object replacementBean = new Object();
+        when(beanPostProcessor.postProcessBean("bean", originalBean)).thenReturn(replacementBean);
+
+        beanRegistry.registerBean("bean", factoryBean);
+        beanRegistry.registerBeanPostProcessor(beanPostProcessor);
+
+        assertThat(beanRegistry.lookUpBean("bean", Object.class), is(replacementBean));
+        verify(beanPostProcessor).postProcessBean("bean", originalBean);
     }
 }

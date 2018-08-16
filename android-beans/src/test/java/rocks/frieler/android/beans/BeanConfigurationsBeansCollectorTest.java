@@ -124,6 +124,15 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testRegisterBeanPostProcessorRegistersTheBeanPostProcessorAtTheBeanRegistry() {
+        BeanPostProcessor beanPostProcessor = mock(BeanPostProcessor.class);
+
+        beanConfigurationsBeansCollector.registerBeanPostProcessor(beanPostProcessor);
+
+        verify(beanRegistry).registerBeanPostProcessor(beanPostProcessor);
+    }
+
+    @Test
     public void testLookUpBeanByNameAndTypeDelegatesToTheBeanRegistry() {
         when(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class)).thenReturn(this);
 
