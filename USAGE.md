@@ -58,6 +58,12 @@ Android Beans will scan these files to find your`BeanConfiguration`s. You can de
 and also have more than one such file. Hence, you can use the merge-behaviour of the assets-directory to define beans in
 different modules and also Android libraries as long as the files have different names.
 
+### Defining a single bean
+
+Sometimes you may want to define only a single bean. For these cases Android Beans provides a convenience class, the
+`BeanDefinition`. It works like `BeanConfiguration`, but requires only to implement the actual construction of the bean
+and optionally specify the name for the bean through the constructor.
+
 
 ## Using beans
 
