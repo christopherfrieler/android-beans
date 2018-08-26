@@ -3,6 +3,8 @@ package rocks.frieler.android.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import java8.util.Optional;
+
 /**
  * Abstract super-class to define beans for the context of an application.
  * <p>
@@ -52,6 +54,19 @@ public abstract class BeanConfiguration {
      */
     protected final <T> BeanDependency<T> requireBean(Class<T> type) {
         SingleBeanDependency<T> beanDependency = new SingleBeanDependency<>(type);
+        beanDependencies.add(beanDependency);
+        return beanDependency;
+    }
+
+    /**
+     * Creates and registers a {@link BeanDependency} on a bean of the given type.
+     *
+     * @param type the type of the desired bean
+     * @param <T> the type of the desired bean
+     * @return the {@link BeanDependency} on the desired bean
+     */
+    protected final <T> BeanDependency<Optional<T>> requireOptionalBean(Class<T> type) {
+        OptionalSingleBeanDependency<T> beanDependency = new OptionalSingleBeanDependency<>(type);
         beanDependencies.add(beanDependency);
         return beanDependency;
     }

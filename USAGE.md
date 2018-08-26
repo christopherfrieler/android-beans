@@ -104,6 +104,8 @@ public class MyBeanConfiguration extends BeanConfiguration {
 `BeanConfiguration` provides the following methods to require other beans:
 - `requireBean(Class<T>)`: Requires a bean by type.
 - `requireBean(String, Class<T>)`: Requires a bean by name and type.
+- `requireOptionalBean(Class<T>)`: Declares an optional dependency on a bean by type. The dependency will be resolved
+lazily to allow other `BeanConfiguration`s to define the bean first.
 - `requireBeans(Class<T>)`: Requires the beans of that type. Note: Since Android Beans cannot know these beans in
 advance, this dependency is always seen as fulfilled. However, the resolution of this dependency will attempt to handle
 as many `BeanConfiguration`s as possible first to allow them to define such beans.
