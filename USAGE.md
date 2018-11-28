@@ -156,6 +156,19 @@ If you need to post-process beans after their creation, this is possible by impl
 When a `BeanPostProcessor` is registered, it is first invoked for all existing beans. It will then be invoked for every
 bean registered later and also for every scoped bean, when it is created by its factory.
 
+Android Beans already provides one convenient implementation, the `BeansOfTypeConsumer`, which allows to apply an action
+to all beans of a certain type. A common use-case is the registration of listeners:
+```java
+public class MyBeanConfiguration extends BeanConfiguration {
+    @Override
+    public void defineBeans(BeansCollector beansCollector) {
+        final MyBean myBean = new MyBean();
+        beansCollector.defineBean(myBean);
+        beansCollector.registerBeanPostProcessor(new BeansOfTypeConsumer(MyBeanListener.class, myBean::registerListener));
+    }
+}
+```
+
 ### BeanRegistryPostProcessor
 
 Sometimes it may be necessary to post-process the entire `BeanRegistry`, which holds all the beans. This can be achieved
