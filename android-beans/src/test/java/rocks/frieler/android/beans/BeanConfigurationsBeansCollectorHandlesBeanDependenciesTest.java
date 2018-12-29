@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
  * depend on each other.
  */
 public class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
-    private final BeanRegistry beanRegistry = new BeanRegistry(new ForegroundActivityHolder());
+    private final BeanRegistry beanRegistry = new BeanRegistry();
     private BeanConfigurationsBeansCollector beanConfigurationsBeansCollector = new BeanConfigurationsBeansCollector(beanRegistry);
 
     @Test(expected = BeanInstantiationException.class)

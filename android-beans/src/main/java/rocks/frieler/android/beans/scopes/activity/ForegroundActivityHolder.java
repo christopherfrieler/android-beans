@@ -1,4 +1,4 @@
-package rocks.frieler.android.beans;
+package rocks.frieler.android.beans.scopes.activity;
 
 import android.app.Activity;
 import android.app.Application;
@@ -7,8 +7,6 @@ import android.os.Bundle;
 /**
  * Implementation of the {@link android.app.Application.ActivityLifecycleCallbacks} that holds the {@link Activity}
  * which is currently in the foreground (if any).
- *
- * @author Christopher Frieler
  */
 public class ForegroundActivityHolder implements Application.ActivityLifecycleCallbacks {
     private Activity currentActivity = null;

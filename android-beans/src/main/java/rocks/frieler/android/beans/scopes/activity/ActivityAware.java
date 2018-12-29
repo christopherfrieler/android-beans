@@ -1,9 +1,9 @@
-package rocks.frieler.android.beans;
+package rocks.frieler.android.beans.scopes.activity;
 
 import android.app.Activity;
 
 /**
- * Interface for activity-scoped (!) beans that need to be aware of the {@link Activity} they're scoped to.
+ * Interface for activity-scoped beans that need to be aware of the {@link Activity} they're scoped to.
  */
 public interface ActivityAware {
     /**

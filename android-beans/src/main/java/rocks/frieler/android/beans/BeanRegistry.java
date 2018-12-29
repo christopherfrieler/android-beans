@@ -1,28 +1,36 @@
 package rocks.frieler.android.beans;
 
-import android.app.Activity;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
+import rocks.frieler.android.beans.scopes.ScopedFactoryBean;
+import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
+
+import static rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.decorate;
 /**
  * {@link BeansProvider} that holds and provides beans which were explicitly registered before.
- *
- * @author Christopher Frieler
  */
 public class BeanRegistry implements BeansProvider {
-    private final ForegroundActivityHolder foregroundActivityHolder;
     private final Map<String, Object> beans = new HashMap<>();
     private final List<BeanPostProcessor> beanPostProcessors = new LinkedList<>();
 
-    BeanRegistry(ForegroundActivityHolder foregroundActivityHolder) {
-        this.foregroundActivityHolder = foregroundActivityHolder;
+    private final Map<String, ScopedFactoryBeanHandler> beanScopes = new TreeMap<>();
+
+    BeanRegistry() {}
+
+    /**
+     * Adds a bean-scope expressed by the given {@link ScopedFactoryBeanHandler} to this {@link BeanRegistry}.
+     *
+     * @param scopedFactoryBeanHandler the {@link ScopedFactoryBeanHandler} to add
+     */
+    void addBeanScope(ScopedFactoryBeanHandler scopedFactoryBeanHandler) {
+        beanScopes.put(scopedFactoryBeanHandler.getName(), scopedFactoryBeanHandler);
     }
 
     /**
@@ -36,8 +44,8 @@ public class BeanRegistry implements BeansProvider {
 
     private String generateBeanName(Object bean) {
         Class<?> beanClass;
-        if (bean instanceof ActivityScopedFactoryBean) {
-            beanClass = ((ActivityScopedFactoryBean) bean).getType();
+        if (bean instanceof ScopedFactoryBean) {
+            beanClass = ((ScopedFactoryBean) bean).getBeanType();
         } else {
             beanClass = bean.getClass();
         }
@@ -65,10 +73,7 @@ public class BeanRegistry implements BeansProvider {
      * @param bean the bean
      */
     void registerBean(String name, Object bean) {
-        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            bean = beanPostProcessor.postProcessBean(name, bean);
-        }
-
+        bean = postProcessBean(name, bean);
         beans.put(name, bean);
     }
 
@@ -86,6 +91,13 @@ public class BeanRegistry implements BeansProvider {
         for (Entry<String, Object> beanEntry : beans.entrySet()) {
             beanEntry.setValue(beanPostProcessor.postProcessBean(beanEntry.getKey(), beanEntry.getValue()));
         }
+    }
+
+    private <T> T postProcessBean(String name, T bean) {
+        for (BeanPostProcessor postProcessor : beanPostProcessors) {
+            bean = postProcessor.postProcessBean(name, bean);
+        }
+        return bean;
     }
 
     @Override
@@ -134,17 +146,12 @@ public class BeanRegistry implements BeansProvider {
 
     @Nullable
     private <T> T resolveBeanFromCandidate(String name, Class<T> type, Object beanCandidate) {
-        Activity currentActivity = foregroundActivityHolder.getCurrentActivity();
-        if (beanCandidate instanceof ActivityScopedFactoryBean
-                && currentActivity instanceof FragmentActivity
-                && type.isAssignableFrom(((ActivityScopedFactoryBean) beanCandidate).getType())) {
-            //noinspection unchecked
-            ActivityScopedFactoryBean<T> factoryBean = (ActivityScopedFactoryBean<T>) beanCandidate;
-            T bean = factoryBean.getBean(name, (FragmentActivity) currentActivity);
-            for (BeanPostProcessor postProcessor : beanPostProcessors) {
-                bean = postProcessor.postProcessBean(name, bean);
+        if (beanCandidate instanceof ScopedFactoryBean && type.isAssignableFrom(((ScopedFactoryBean<?>)beanCandidate).getBeanType())) {
+            @SuppressWarnings("unchecked") final ScopedFactoryBean<T> factoryBean = (ScopedFactoryBean<T>) beanCandidate;
+            final ScopedFactoryBeanHandler scopedFactoryBeanHandler = beanScopes.get(factoryBean.getScope());
+            if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive()) {
+                return scopedFactoryBeanHandler.getBean(name, decorate(factoryBean).withPostProcessing((bean) -> postProcessBean(name, bean)));
             }
-            return bean;
         }
 
         if (type.isAssignableFrom(beanCandidate.getClass())) {

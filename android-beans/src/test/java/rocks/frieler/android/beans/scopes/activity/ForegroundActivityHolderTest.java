@@ -1,4 +1,4 @@
-package rocks.frieler.android.beans;
+package rocks.frieler.android.beans.scopes.activity;
 
 import android.app.Activity;
 
