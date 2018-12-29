@@ -133,13 +133,15 @@ to extend `ViewModel`.
 
 The consumer will always see the instance bound to the `Activity` which is currently in the foreground.
 
-Activity-scoped beans are defined through an `ActivityScopedFactoryBean` instead of registering the actual
-bean-instance:
+Activity-scoped beans are defined through an `ActivityScopedFactoryBean` (which comes with the handy static convenience
+method `activityScoped(...)`) instead of registering the actual bean-instance:
 ```java
+import static rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean.activityScoped;
+
 public class ActivityScopeBeanConfiguration extends BeanConfiguration {
     @Override
     public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean(new SimpleActivityScopedFactoryBean(MyBean.class, MyBean::new));
+        beansCollector.defineBean(activityScoped(MyBean.class, MyBean::new));
     }
 }
 ```

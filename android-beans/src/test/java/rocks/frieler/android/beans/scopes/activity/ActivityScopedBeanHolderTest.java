@@ -1,4 +1,4 @@
-package rocks.frieler.android.beans;
+package rocks.frieler.android.beans.scopes.activity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ActivityScopedBeanHolderTest {
-    private ActivityScopedFactoryBean.ActivityScopedBeanHolder<Object> beanHolder
-            = new ActivityScopedFactoryBean.ActivityScopedBeanHolder<>();
+    private ActivityScopedFactoryBeanHandler.ActivityScopedBeanHolder<Object> beanHolder
+            = new ActivityScopedFactoryBeanHandler.ActivityScopedBeanHolder<>();
 
     @Test
     public void testOnClearedIgnoresActivityUnawareBean() {
