@@ -123,6 +123,19 @@ as many `BeanConfiguration`s as possible first to allow them to define such bean
 
 By default all beans are singletons, i.e. there exists one instance for the entire app.
 
+Singleton beans can be created lazily. Therefore a bean must be defined through a `SingletonScopedFactoryBean` (which
+comes with the handy static convenience method `lazy(...)`) instead of registering the actual bean-instance:
+```java
+import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazy;
+
+public class ActivityScopeBeanConfiguration extends BeanConfiguration {
+    @Override
+    public void defineBeans(BeansCollector beansCollector) {
+        beansCollector.defineBean(lazy(MyBean.class, MyBean::new));
+    }
+}
+```
+
 ### Prototype scope
 
 In the prototype scope a new instance of the bean is created each time it is looked up. Prototype-scoped beans are

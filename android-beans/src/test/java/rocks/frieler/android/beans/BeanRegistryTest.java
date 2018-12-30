@@ -11,6 +11,7 @@ import java.util.List;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
+import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
+import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazy;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanRegistryTest {
@@ -243,6 +245,17 @@ public class BeanRegistryTest {
         beanRegistry.registerBean(factoryBean);
 
         assertThat(beanRegistry.lookUpBean(this.getClass().getName(), this.getClass()), is(sameInstance(this)));
+    }
+
+    @Test
+    public void testBeanRegistrySupportsLazyInstantiationInSingletonScope() {
+        final String name = "lazyInstantiatedBean";
+        final SingletonScopedFactoryBean<BeanRegistryTest> singletonFactory = lazy(BeanRegistryTest.class, () -> this);
+
+        beanRegistry.registerBean(name, singletonFactory);
+        final BeanRegistryTest beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest.class);
+
+        assertThat(beanInstance, is(singletonFactory.produceBean()));
     }
 
     @Test
