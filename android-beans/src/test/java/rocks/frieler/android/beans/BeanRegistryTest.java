@@ -10,6 +10,7 @@ import java.util.List;
 
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
+import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanRegistryTest {
@@ -139,7 +141,7 @@ public class BeanRegistryTest {
     }
 
     @Test
-    public void testLookUpBeanReturnsNullWhithoutSuitableScopeForScopedFactoryBean() {
+    public void testLookUpBeanReturnsNullWithoutSuitableScopeForScopedFactoryBean() {
         final String name = "bean";
         @SuppressWarnings("unchecked") ScopedFactoryBean<BeanRegistryTest> factoryBean = mock(ScopedFactoryBean.class);
         when(factoryBean.getBeanType()).thenReturn(BeanRegistryTest.class);
@@ -241,6 +243,17 @@ public class BeanRegistryTest {
         beanRegistry.registerBean(factoryBean);
 
         assertThat(beanRegistry.lookUpBean(this.getClass().getName(), this.getClass()), is(sameInstance(this)));
+    }
+
+    @Test
+    public void testBeanRegistrySupportsPrototypeScope() {
+        final String name = "prototypeBean";
+        final PrototypeScopedFactoryBean<BeanRegistryTest> prototype = prototype(BeanRegistryTest.class, () -> this);
+
+        beanRegistry.registerBean(name, prototype);
+        final BeanRegistryTest beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest.class);
+
+        assertThat(beanInstance, is(prototype.produceBean()));
     }
 
     /* tests for post-processing: */
