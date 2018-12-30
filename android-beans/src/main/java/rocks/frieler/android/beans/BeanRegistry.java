@@ -12,12 +12,14 @@ import androidx.annotation.Nullable;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBeanHandler;
+import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBeanHandler;
 
 import static rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.decorate;
 /**
  * {@link BeansProvider} that holds and provides beans which were explicitly registered before.
  * <p>
- * The {@link BeanRegistry} supports the {@value PrototypeScopedFactoryBeanHandler#PROTOTYPE_SCOPE} by default.
+ * The {@link BeanRegistry} supports the {@value SingletonScopedFactoryBeanHandler#SINGLETON_SCOPE} and
+ * {@value PrototypeScopedFactoryBeanHandler#PROTOTYPE_SCOPE} by default.
  */
 public class BeanRegistry implements BeansProvider {
     private final Map<String, Object> beans = new HashMap<>();
@@ -26,6 +28,7 @@ public class BeanRegistry implements BeansProvider {
     private final Map<String, ScopedFactoryBeanHandler> beanScopes = new TreeMap<>();
 
     BeanRegistry() {
+        addBeanScope(new SingletonScopedFactoryBeanHandler());
         addBeanScope(new PrototypeScopedFactoryBeanHandler());
     }
 
