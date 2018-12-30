@@ -123,6 +123,22 @@ as many `BeanConfiguration`s as possible first to allow them to define such bean
 
 By default all beans are singletons, i.e. there exists one instance for the entire app.
 
+### Prototype scope
+
+In the prototype scope a new instance of the bean is created each time it is looked up. Prototype-scoped beans are
+defined through a `PrototypeScopedFactoryBean` (which comes with the handy static convenience method `prototype(...)`)
+instead of registering the actual bean-instance:
+```java
+import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
+
+public class ActivityScopeBeanConfiguration extends BeanConfiguration {
+    @Override
+    public void defineBeans(BeansCollector beansCollector) {
+        beansCollector.defineBean(prototype(MyBean.class, MyBean::new));
+    }
+}
+```
+
 ### Activity scope
 
 Beans can also be Activity-scoped. This means a new instance will be constructed for each `Activity`. (Note: Currently
