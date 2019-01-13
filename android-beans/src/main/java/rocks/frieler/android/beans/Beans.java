@@ -2,6 +2,8 @@ package rocks.frieler.android.beans;
 
 import java.util.List;
 
+import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
+
 /**
  * Static facade-class to access the beans.
  */
@@ -53,5 +55,47 @@ public final class Beans {
     }
 
     private Beans() {
+    }
+
+    /**
+     * Initializer for {@link Beans}.
+     * <p>
+     * Initializes {@link Beans} with a {@link BeanRegistry} and allows to configure it.
+     */
+    public static final class Initializer {
+        private BeanRegistry beanRegistry = new BeanRegistry();
+
+        /**
+         * Adds a bean-scope expressed by the given {@link ScopedFactoryBeanHandler}.
+         *
+         * @param scopedFactoryBeanHandler the {@link ScopedFactoryBeanHandler} to add
+         * @return the {@link Initializer} itself
+         *
+         * @see BeanRegistry#addBeanScope(ScopedFactoryBeanHandler)
+         */
+        public Initializer addScope(ScopedFactoryBeanHandler scopedFactoryBeanHandler) {
+            beanRegistry.addBeanScope(scopedFactoryBeanHandler);
+            return this;
+        }
+
+        /**
+         * Collects beans from the given {@link BeanConfiguration}s.
+         *
+         * @param beanConfigurations the BeanConfigurations that define the beans
+         * @return the {@link Initializer} itself
+         *
+         * @see BeanConfigurationsBeansCollector#collectBeans(List)
+         */
+        public Initializer collectBeans(List<? extends BeanConfiguration> beanConfigurations) {
+            new BeanConfigurationsBeansCollector(beanRegistry).collectBeans(beanConfigurations);
+            return this;
+        }
+
+        /**
+         * Initializes {@link Beans} with the applied configuration.
+         */
+        public void initialize() {
+            setBeans(beanRegistry);
+        }
     }
 }

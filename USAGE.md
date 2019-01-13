@@ -19,7 +19,7 @@ dependencies {
 }
 ```
 
-Declare the BeanRegistryApplication in your AndroidManifest.xml:
+Declare the `BeanRegistryApplication` in your AndroidManifest.xml:
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="my.app.package">
@@ -28,8 +28,11 @@ Declare the BeanRegistryApplication in your AndroidManifest.xml:
     </application>
 </manifest>
 ```
-The BeanRegistryApplication will bootstrap Android Beans on startup. If you need your own Application-class for any
-further customizations, make sure it extends `BeanRegistryApplication`.
+The `BeanRegistryApplication` will bootstrap Android Beans on startup.
+
+If you need your own Application-class for any further customizations, make sure it extends `BeanRegistryApplication`,
+or, if extending `BeanRegistryApplication` is not suitable in your situation, you can use the `Beans.Initializer` to
+bootstrap Android Beans.
 
 Now you're ready to define your beans as described in the following section.
 

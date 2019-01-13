@@ -4,6 +4,7 @@ import android.app.Application;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.activity.ForegroundActivityHolder;
 import rocks.frieler.android.facades.AssetManagerFacade;
@@ -16,23 +17,26 @@ import rocks.frieler.android.facades.AssetManagerFacade;
  * The {@link BeanRegistry} supports the {@link ActivityScopedFactoryBeanHandler#ACTIVITY_SCOPE}-scope.
  */
 public class BeanRegistryApplication extends Application {
-    private final BeanRegistry beanRegistry = new BeanRegistry();
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        final ForegroundActivityHolder foregroundActivityHolder = new ForegroundActivityHolder();
-        registerActivityLifecycleCallbacks(foregroundActivityHolder);
-        beanRegistry.addBeanScope(new ActivityScopedFactoryBeanHandler(foregroundActivityHolder));
-
-        initializeBeans();
+        new Beans.Initializer()
+                .addScope(activityScope())
+                .collectBeans(scanAssetsForBeanConfigurations())
+                .initialize();
     }
 
-    private void initializeBeans() {
-        AssetManagerFacade assets = new AssetManagerFacade(getAssets());
-        List<? extends BeanConfiguration> beanConfigurations = new BeanConfigurationsAssetScanner(this).scan(assets);
-        new BeanConfigurationsBeansCollector(beanRegistry).collectBeans(beanConfigurations);
-        Beans.setBeans(beanRegistry);
+    @NonNull
+    private ActivityScopedFactoryBeanHandler activityScope() {
+        final ForegroundActivityHolder foregroundActivityHolder = new ForegroundActivityHolder();
+        registerActivityLifecycleCallbacks(foregroundActivityHolder);
+
+        return new ActivityScopedFactoryBeanHandler(foregroundActivityHolder);
+    }
+
+    private List<? extends BeanConfiguration> scanAssetsForBeanConfigurations() {
+        final AssetManagerFacade assets = new AssetManagerFacade(getAssets());
+        return new BeanConfigurationsAssetScanner(this).scan(assets);
     }
 }
