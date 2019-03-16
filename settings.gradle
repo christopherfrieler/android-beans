@@ -1,0 +1,4 @@
+rootProject.name="android-beans-parent"
+
+// remove when upgrading to gradle 5 one day:
+enableFeaturePreview('STABLE_PUBLISHING')
