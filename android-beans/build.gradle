@@ -13,9 +13,15 @@ android {
         versionCode 1
         versionName "${project.version}"
     }
+
     buildTypes {
         release {
             minifyEnabled false
+
+            // strip "-release"-qualifier from artifact file-names, because release is the default:
+            android.libraryVariants.matching { variant -> variant.name == "release" }.all { outputs.all {
+                outputFileName = outputFileName.replace("-release", "") }
+            }
         }
     }
 }
