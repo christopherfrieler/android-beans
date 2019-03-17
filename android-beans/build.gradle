@@ -12,6 +12,10 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "${project.version}"
+        // append version to android build-artifacts:
+        android.libraryVariants.all { outputs.all {
+            outputFileName = outputFileName.replace("$archivesBaseName", "$archivesBaseName-$version") }
+        }
     }
 
     buildTypes {
