@@ -26,5 +26,12 @@ before_install:
 
 script: ./gradlew clean testReleaseUnitTest assembleRelease javadocJar sourcesJar
 
+deploy:
+  provider: script
+  script: ./gradlew :android-beans:bintrayUpload
+  skip_cleanup: true
+  on:
+    tags: true
+
 notifications:
   email: false
