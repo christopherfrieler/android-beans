@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "${project.version}"
+        // append version to android build-artifacts:
+        android.libraryVariants.all { outputs.all {
+            outputFileName = outputFileName.replace("$archivesBaseName", "$archivesBaseName-$version") }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+
+            // strip "-release"-qualifier from artifact file-names, because release is the default:
+            android.libraryVariants.matching { variant -> variant.name == "release" }.all { outputs.all {
+                outputFileName = outputFileName.replace("-release", "") }
+            }
+        }
+    }
+}
+
+dependencies {
+}
+
+task javadoc(type: Javadoc) {
+	source android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    android.libraryVariants.all { variant ->
+        classpath += variant.javaCompileProvider.get().classpath
+    }
+    options.memberLevel = JavadocMemberLevel.PROTECTED
+    exclude '**/BuildConfig.class'
+    exclude '**/R.class'
+    exclude '**/R$*.class'
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	from "$buildDir/docs/javadoc"
+	classifier = 'javadoc'
+	archiveName = "${project.name}-${version}-${classifier}.jar"
+}
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
