@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * {@link BeanDependency} to express a dependency on the beans of a certain type.
  * <p>
- * Be aware that this dependency cannot guaranty to provide <i>all</i> beans of that type, because the exact runtime
+ * Be aware that this dependency cannot guarantee to provide <i>all</i> beans of that type, because the exact runtime
  * type of a bean and whether it is a subtype of the desired type cannot be determined before the bean's construction.
- * Hence this dependency always indicates to be {@link #fulfill(BeansProvider) fulfilled}. Instead the dependency will
- * gather as many beans as possible by obtaining the beans as late as possible.
+ * Hence this dependency always indicates to be {@link Fulfillment#UNFULFILLED_OPTIONAL unfulfilled, but optional}. It
+ * will gather as many beans as possible by obtaining the beans as late as possible.
  *
  * @param <T> the bean-type
  */
@@ -26,13 +26,14 @@ public class BeansOfTypeDependency<T> implements BeanDependency<List<T>> {
     }
 
     /**
-     * Always returns {@code true}, because it cannot be known if there will be any more beans of the desired type
-     * defined in the future. The given {@link BeansProvider} will be used to obtain the beans lazily when needed.
+     * Always returns {@link Fulfillment#UNFULFILLED_OPTIONAL}, because it cannot be known if there will be any more
+     * beans of the desired type defined in the future. The given {@link BeansProvider} will be used to obtain the beans
+     * lazily when needed.
      */
     @Override
-    public boolean fulfill(BeansProvider beansProvider) {
+    public Fulfillment fulfill(BeansProvider beansProvider) {
         this.beansProvider = beansProvider;
-        return true;
+        return Fulfillment.UNFULFILLED_OPTIONAL;
     }
 
     /**

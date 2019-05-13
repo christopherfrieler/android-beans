@@ -14,7 +14,7 @@ public class OptionalSingleBeanDependency<T> implements BeanDependency<Optional<
     private final String name;
     private final Class<? extends T> type;
 
-    private BeansProvider beansProvider;
+    private T bean = null;
 
     /**
      * Creates a new optional {@link BeanDependency} to a bean of the given type.
@@ -37,26 +37,23 @@ public class OptionalSingleBeanDependency<T> implements BeanDependency<Optional<
     }
 
     /**
-     * Always returns {@code true}, because the wanted bean is optional. The given {@link BeansProvider} will be used
-     * to obtain the bean lazily when requested.
+     * {@inheritDoc}
+     * <p>
+     * As long as there is no suitable bean for this dependency is available, this dependency is
+     * {@link Fulfillment#UNFULFILLED_OPTIONAL}. After a suitable bean could be obtained, this dependency is
+     * {@link Fulfillment#FULFILLED} and the {@link BeansProvider} will no linger be queried.
      */
     @Override
-    public boolean fulfill(BeansProvider beansProvider) {
-        this.beansProvider = beansProvider;
-        return true;
-    }
-
-    /**
-     * Tries to obtains the bean of the desired type and - if specified - name from the {@link BeansProvider} this
-     * dependency was {@link #fulfill(BeansProvider) fulfilled} with.
-     */
-    @Override
-    public Optional<T> get() {
-        if(beansProvider == null) {
-            throw new IllegalStateException("OptionalSingleBeanDependency has not been fulfilled yet.");
+    public Fulfillment fulfill(BeansProvider beansProvider) {
+        if (bean == null) {
+            bean = (name != null ? beansProvider.lookUpBean(name, type) : beansProvider.lookUpBean(type));
         }
 
-        T bean = name == null ? beansProvider.lookUpBean(type) : beansProvider.lookUpBean(name, type);
+        return (bean != null ? Fulfillment.FULFILLED : Fulfillment.UNFULFILLED_OPTIONAL);
+    }
+
+    @Override
+    public Optional<T> get() {
         return Optional.ofNullable(bean);
     }
 }

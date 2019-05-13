@@ -8,10 +8,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 
+import rocks.frieler.android.beans.BeanDependency.Fulfillment;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static rocks.frieler.android.beans.BeanDependency.Fulfillment.UNFULFILLED_OPTIONAL;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeansOfTypeDependencyTest {
@@ -21,11 +24,11 @@ public class BeansOfTypeDependencyTest {
     private BeansProvider beansProvider;
 
     @Test
-    public void testFulfillReturnsTrue() {
-        boolean fulfilled = beansOfTypeDependency.fulfill(beansProvider);
+    public void testFulfillReturnsUnfulfilledOptional() {
+        Fulfillment fulfillment = beansOfTypeDependency.fulfill(beansProvider);
 
         verifyZeroInteractions(beansProvider);
-        assertThat(fulfilled, is(true));
+        assertThat(fulfillment, is(UNFULFILLED_OPTIONAL));
     }
 
     @Test

@@ -16,6 +16,9 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static rocks.frieler.android.beans.BeanDependency.Fulfillment.FULFILLED;
+import static rocks.frieler.android.beans.BeanDependency.Fulfillment.UNFULFILLED;
+import static rocks.frieler.android.beans.BeanDependency.Fulfillment.UNFULFILLED_OPTIONAL;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanConfigurationTest {
@@ -95,9 +98,9 @@ public class BeanConfigurationTest {
     @Test
     public void testBeanConfigurationIsReadyToDefineBeansWhenAllDependenciesAreFulfilled() {
         BeanDependency dependency1 = mock(BeanDependency.class);
-        when(dependency1.fulfill(beansProvider)).thenReturn(true);
+        when(dependency1.fulfill(beansProvider)).thenReturn(FULFILLED);
         BeanDependency dependency2 = mock(BeanDependency.class);
-        when(dependency2.fulfill(beansProvider)).thenReturn(true);
+        when(dependency2.fulfill(beansProvider)).thenReturn(FULFILLED);
 
         BeanConfiguration beanConfiguration = new BeanConfigurationWithDefinedDependencies(dependency1, dependency2);
 
@@ -105,9 +108,21 @@ public class BeanConfigurationTest {
     }
 
     @Test
-    public void testBeanConfigurationIsNotReadyToDefineBeansWhenADependenciesIsNotFulfilled() {
+    public void testBeanConfigurationIsReadyToDefineBeansWhenAllDependenciesAreFulfilledOrOptional() {
+        BeanDependency dependency1 = mock(BeanDependency.class);
+        when(dependency1.fulfill(beansProvider)).thenReturn(FULFILLED);
+        BeanDependency dependency2 = mock(BeanDependency.class);
+        when(dependency2.fulfill(beansProvider)).thenReturn(UNFULFILLED_OPTIONAL);
+
+        BeanConfiguration beanConfiguration = new BeanConfigurationWithDefinedDependencies(dependency1, dependency2);
+
+        assertThat(beanConfiguration.isReadyToDefineBeans(beansProvider), is(true));
+    }
+
+    @Test
+    public void testBeanConfigurationIsNotReadyToDefineBeansWhenADependencyIsNotFulfilled() {
         BeanDependency dependency = mock(BeanDependency.class);
-        when(dependency.fulfill(beansProvider)).thenReturn(false);
+        when(dependency.fulfill(beansProvider)).thenReturn(UNFULFILLED);
 
         BeanConfiguration beanConfiguration = new BeanConfigurationWithDefinedDependencies(dependency);
 

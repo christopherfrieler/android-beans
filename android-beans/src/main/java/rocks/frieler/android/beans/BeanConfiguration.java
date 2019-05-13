@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java8.util.Optional;
+import rocks.frieler.android.beans.BeanDependency.Fulfillment;
 
 /**
  * Abstract super-class to define beans for the context of an application.
@@ -102,11 +103,12 @@ public abstract class BeanConfiguration {
      * {@link BeanDependency}s returned by {@link #getDependencies()}.
      *
      * @param beansProvider the {@link BeansProvider} to fulfill {@link BeanDependency}s
-     * @return {@code true}, if all {@link BeanDependency}s are fulfilled
+     * @return {@code true}, if all {@link BeanDependency}s are {@link Fulfillment#FULFILLED fulfilled} or
+     * {@link Fulfillment#UNFULFILLED_OPTIONAL optional}
      */
-    public final boolean isReadyToDefineBeans(BeansProvider beansProvider) {
+    public boolean isReadyToDefineBeans(BeansProvider beansProvider) {
         for (BeanDependency dependency : getDependencies()) {
-            if (!dependency.fulfill(beansProvider)) {
+            if (dependency.fulfill(beansProvider) == Fulfillment.UNFULFILLED) {
                 return false;
             }
         }
