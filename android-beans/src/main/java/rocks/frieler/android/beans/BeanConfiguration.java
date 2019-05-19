@@ -6,6 +6,8 @@ import java.util.List;
 import java8.util.Optional;
 import rocks.frieler.android.beans.BeanDependency.Fulfillment;
 
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.*;
+
 /**
  * Abstract super-class to define beans for the context of an application.
  * <p>
@@ -99,20 +101,41 @@ public abstract class BeanConfiguration {
     }
 
     /**
-     * Checks, if this {@link BeanConfiguration} is ready to define its beans, i.e. tries to fulfill all its
-     * {@link BeanDependency}s returned by {@link #getDependencies()}.
+     * Checks, if this {@link BeanConfiguration} is ready to define its beans.
+     * <p>
+     * Therefor it tries to {@link BeanDependency#fulfill(BeansProvider) fulfill} all its {@link BeanDependency}s
+     * returned by {@link #getDependencies()}. The {@link Readiness Readiness} is derived from the minimum
+     * {@link Fulfillment} of the {@link BeanDependency}s. If all are {@link Fulfillment#FULFILLED fulfilled} the
+     * BeanConfiguration is {@link Readiness#READY ready}, if all are at least {@link Fulfillment#UNFULFILLED_OPTIONAL
+     * unfulfilled but optional} the BeanConfiguration {@link Readiness#DELAY should be delayed} to wait for additional
+     * beans and if at least one {@link BeanDependency} is {@link Fulfillment#UNFULFILLED unfulfilled} the
+     * BeanConfiguration is {@link Readiness#UNREADY unready}.
      *
      * @param beansProvider the {@link BeansProvider} to fulfill {@link BeanDependency}s
-     * @return {@code true}, if all {@link BeanDependency}s are {@link Fulfillment#FULFILLED fulfilled} or
-     * {@link Fulfillment#UNFULFILLED_OPTIONAL optional}
+     * @return the {@link Readiness} of this {@link BeanConfiguration} to define its beans
      */
-    public boolean isReadyToDefineBeans(BeansProvider beansProvider) {
+    public Readiness isReadyToDefineBeans(BeansProvider beansProvider) {
+        Fulfillment minFulfillment = Fulfillment.FULFILLED;
         for (BeanDependency dependency : getDependencies()) {
-            if (dependency.fulfill(beansProvider) == Fulfillment.UNFULFILLED) {
-                return false;
+            minFulfillment = Fulfillment.min(dependency.fulfill(beansProvider), minFulfillment);
+            if (minFulfillment == Fulfillment.UNFULFILLED) {
+                break;
             }
         }
-        return true;
+
+        switch (minFulfillment) {
+            case FULFILLED:
+                return READY;
+            case UNFULFILLED_OPTIONAL:
+                return DELAY;
+            case UNFULFILLED:
+            default:
+                return UNREADY;
+        }
+    }
+
+    public enum Readiness {
+        READY, DELAY, UNREADY
     }
 
     /**

@@ -3,6 +3,8 @@ package rocks.frieler.android.beans;
 import java.util.LinkedList;
 import java.util.List;
 
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.UNREADY;
+
 /**
  * The {@link BeanConfigurationsBeansCollector} collects the beans defined by {@link BeanConfiguration}s in a
  * {@link BeanRegistry}.
@@ -45,7 +47,7 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
         int limit = remainingBeanConfigurations.size();
         while (limit > 0) {
             BeanConfiguration beanConfiguration = remainingBeanConfigurations.remove(0);
-            if (beanConfiguration.isReadyToDefineBeans(this)) {
+            if (beanConfiguration.isReadyToDefineBeans(this) != UNREADY) {
                 beanConfiguration.defineBeans(this);
                 limit = remainingBeanConfigurations.size();
             } else {
