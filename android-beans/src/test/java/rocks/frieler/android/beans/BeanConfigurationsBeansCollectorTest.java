@@ -20,6 +20,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.DELAY;
 import static rocks.frieler.android.beans.BeanConfiguration.Readiness.READY;
 import static rocks.frieler.android.beans.BeanConfiguration.Readiness.UNREADY;
 
@@ -66,6 +67,24 @@ public class BeanConfigurationsBeansCollectorTest {
         inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    }
+
+    @Test
+    public void testCollectBeansDelaysBeanConfigurationWaitingForAnOptionalDependency() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(DELAY);
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(UNREADY);
+        doAnswer(invocation -> {
+            when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+            return null;
+        }).when(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
     }
 
     @Test

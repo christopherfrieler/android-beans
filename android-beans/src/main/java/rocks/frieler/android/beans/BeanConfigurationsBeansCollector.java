@@ -3,7 +3,7 @@ package rocks.frieler.android.beans;
 import java.util.LinkedList;
 import java.util.List;
 
-import static rocks.frieler.android.beans.BeanConfiguration.Readiness.UNREADY;
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.*;
 
 /**
  * The {@link BeanConfigurationsBeansCollector} collects the beans defined by {@link BeanConfiguration}s in a
@@ -45,14 +45,25 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
 
     private void collectRemainingBeans() {
         int limit = remainingBeanConfigurations.size();
+        boolean includeDelayed = false;
         while (limit > 0) {
             BeanConfiguration beanConfiguration = remainingBeanConfigurations.remove(0);
-            if (beanConfiguration.isReadyToDefineBeans(this) != UNREADY) {
+
+            if (beanConfiguration.isReadyToDefineBeans(this) == READY) {
                 beanConfiguration.defineBeans(this);
+                limit = remainingBeanConfigurations.size();
+            } else if (includeDelayed && beanConfiguration.isReadyToDefineBeans(this) == DELAY) {
+                beanConfiguration.defineBeans(this);
+                includeDelayed = false;
                 limit = remainingBeanConfigurations.size();
             } else {
                 remainingBeanConfigurations.add(beanConfiguration);
                 limit--;
+            }
+
+            if (limit == 0 && !includeDelayed && !remainingBeanConfigurations.isEmpty()) {
+                includeDelayed = true;
+                limit = remainingBeanConfigurations.size();
             }
         }
     }
