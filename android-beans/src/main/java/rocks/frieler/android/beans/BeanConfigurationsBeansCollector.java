@@ -3,6 +3,8 @@ package rocks.frieler.android.beans;
 import java.util.LinkedList;
 import java.util.List;
 
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.*;
+
 /**
  * The {@link BeanConfigurationsBeansCollector} collects the beans defined by {@link BeanConfiguration}s in a
  * {@link BeanRegistry}.
@@ -34,23 +36,34 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
      */
     void collectBeans(List<? extends BeanConfiguration> beanConfigurations) {
         remainingBeanConfigurations.addAll(beanConfigurations);
-        collectRemainingBeans();
+        collectRemainingBeans(true);
         if (!remainingBeanConfigurations.isEmpty()) {
             throw new BeanInstantiationException("bean-configurations seem to have a cyclic dependency.");
         }
         applyBeanRegistryPostProcessors();
     }
 
-    private void collectRemainingBeans() {
+    private void collectRemainingBeans(final boolean mayIncludeDelayed) {
         int limit = remainingBeanConfigurations.size();
+        boolean includingDelayed = false;
         while (limit > 0) {
             BeanConfiguration beanConfiguration = remainingBeanConfigurations.remove(0);
-            if (beanConfiguration.isReadyToDefineBeans(this)) {
+
+            if (beanConfiguration.isReadyToDefineBeans(this) == READY) {
                 beanConfiguration.defineBeans(this);
+                limit = remainingBeanConfigurations.size();
+            } else if (includingDelayed && beanConfiguration.isReadyToDefineBeans(this) == DELAY) {
+                beanConfiguration.defineBeans(this);
+                includingDelayed = false;
                 limit = remainingBeanConfigurations.size();
             } else {
                 remainingBeanConfigurations.add(beanConfiguration);
                 limit--;
+            }
+
+            if (limit == 0 && mayIncludeDelayed && !includingDelayed && !remainingBeanConfigurations.isEmpty()) {
+                includingDelayed = true;
+                limit = remainingBeanConfigurations.size();
             }
         }
     }
@@ -97,25 +110,39 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
         beanRegistry.registerBeanPostProcessor(beanPostProcessor);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In order to find the bean, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
+     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
+     */
     @Override
     public <T> T lookUpBean(String name, Class<T> type) {
+        collectRemainingBeans(false);
         return beanRegistry.lookUpBean(name, type);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In order to find the bean, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
+     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
+     */
     @Override
     public <T> T lookUpBean(Class<T> type) {
+        collectRemainingBeans(false);
         return beanRegistry.lookUpBean(type);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * In order to find all beans, the {@link BeanConfigurationsBeansCollector} will try to collect all beans from
-     * remaining {@link BeanConfiguration}s first.
+     * In order to find all beans, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
+     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
      */
     @Override
     public <T> List<T> lookUpBeans(Class<T> type) {
-        collectRemainingBeans();
+        collectRemainingBeans(false);
         return beanRegistry.lookUpBeans(type);
     }
 }

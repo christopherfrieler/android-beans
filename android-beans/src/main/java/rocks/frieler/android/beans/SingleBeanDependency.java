@@ -32,11 +32,11 @@ public class SingleBeanDependency<T> implements BeanDependency<T> {
     }
 
     @Override
-    public boolean fulfill(BeansProvider beansProvider) {
+    public Fulfillment fulfill(BeansProvider beansProvider) {
         if (bean == null) {
             bean = (name == null ? beansProvider.lookUpBean(type) : beansProvider.lookUpBean(name, type));
         }
-        return (bean != null);
+        return (bean != null ? Fulfillment.FULFILLED : Fulfillment.UNFULFILLED);
     }
 
     @Override

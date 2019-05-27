@@ -10,13 +10,41 @@ package rocks.frieler.android.beans;
 public interface BeanDependency<T> {
 
     /**
-     * Tries to fulfill this {@link BeanDependency} with beans from the given {@link BeansProvider}. Returns
-     * {@code true} if the necessary beans were available, {@code false} otherwise.
+     * Tries to fulfill this {@link BeanDependency} with beans from the given {@link BeansProvider} and returns
+     * the {@link Fulfillment state of fulfillment}.
      *
      * @param beansProvider the {@link BeansProvider} to obtain beans from
-     * @return {@code true} if this {@link BeanDependency} could be fulfilled
+     * @return the {@link Fulfillment}
      */
-    boolean fulfill(BeansProvider beansProvider);
+    Fulfillment fulfill(BeansProvider beansProvider);
+
+    /**
+     * Indicates the state of a {@link BeanDependency}.
+     *
+     * @see #fulfill(BeansProvider)
+     */
+    enum Fulfillment {
+        /**
+         * Indicates that the {@link BeanDependency} could not be fulfilled with the available beans.
+         */
+        UNFULFILLED,
+
+        /**
+         * Indicates that the {@link BeanDependency} could not be fulfilled with the available beans, but is optional.
+         * Fulfilling it should be retried when there are further beans available. But if it's never fulfilled, that's
+         * ok, too.
+         */
+        UNFULFILLED_OPTIONAL,
+
+        /**
+         * Indicates that the {@link BeanDependency} was fulfilled with the available beans.
+         */
+        FULFILLED;
+
+        static Fulfillment min(Fulfillment aState, Fulfillment anotherState) {
+            return aState.ordinal() < anotherState.ordinal() ? aState : anotherState;
+        }
+    }
 
     /**
      * Returns the target of this {@link BeanDependency} after it was fulfilled.

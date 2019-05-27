@@ -11,17 +11,18 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.DELAY;
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.READY;
+import static rocks.frieler.android.beans.BeanConfiguration.Readiness.UNREADY;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BeanConfigurationsBeansCollectorTest {
@@ -37,6 +38,8 @@ public class BeanConfigurationsBeansCollectorTest {
 
     @Test
     public void testCollectBeansLetsTheBeanConfigurationsDefineTheirBeans() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+
         beanConfigurationsBeansCollector.collectBeans(Collections.singletonList(beanConfiguration));
 
         verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
@@ -44,37 +47,17 @@ public class BeanConfigurationsBeansCollectorTest {
 
     @Test
     public void testCollectBeansResolvesDependenciesBetweenBeanConfigurationsAndHandlesThemInAPossibleOrder() {
-        final BeanDependency<?> dependencyOnBean1 = mock(BeanDependency.class);
-        when(dependencyOnBean1.fulfill(beanConfigurationsBeansCollector)).thenReturn(false);
-        final BeanDependency<?> dependencyOnBean2 = mock(BeanDependency.class);
-        when(dependencyOnBean2.fulfill(beanConfigurationsBeansCollector)).thenReturn(false);
-
-        when(beanConfiguration.getDependencies()).thenReturn(Collections.singletonList(dependencyOnBean1));
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(UNREADY);
         doAnswer(invocation -> {
-            assertThat(dependencyOnBean1.get(), is(notNullValue()));
-            final Object bean2 = new Object();
-            beanConfigurationsBeansCollector.defineBean("bean2", bean2);
-            when(dependencyOnBean2.fulfill(beanConfigurationsBeansCollector)).thenAnswer(fulfillInvocation -> {
-                doReturn(bean2).when(dependencyOnBean2).get();
-                return true;
-            });
+            when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
             return null;
         }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
 
-        when(anotherBeanConfiguration.getDependencies()).thenReturn(Collections.singletonList(dependencyOnBean2));
-        doAnswer(invocation -> {
-            assertThat(dependencyOnBean2.get(), is(notNullValue()));
-            return null;
-        }).when(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(UNREADY);
 
-        when(yetAnotherBeanConfiguration.getDependencies()).thenReturn(Collections.emptyList());
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
         doAnswer(invocation -> {
-            final Object bean1 = new Object();
-            beanConfigurationsBeansCollector.defineBean("bean1", bean1);
-            when(dependencyOnBean1.fulfill(beanConfigurationsBeansCollector)).thenAnswer(fulfillInvocation -> {
-                doReturn(bean1).when(dependencyOnBean1).get();
-                return true;
-            });
+            when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
             return null;
         }).when(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
 
@@ -87,7 +70,26 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testCollectBeansDelaysBeanConfigurationWaitingForAnOptionalDependency() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(DELAY);
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(UNREADY);
+        doAnswer(invocation -> {
+            when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+            return null;
+        }).when(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    }
+
+    @Test
     public void testMultipleCallsToCollectBeansDontHandleOldBeanConfigurations() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
         beanConfigurationsBeansCollector.collectBeans(Collections.singletonList(beanConfiguration));
         verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         reset(beanConfiguration);
@@ -101,6 +103,7 @@ public class BeanConfigurationsBeansCollectorTest {
     public void testCollectBeansAppliesTheBeanRegistryPostProcessorBeansAfterCollectingAllBeans() {
         final BeanRegistryPostProcessor beanRegistryPostProcessor = mock(BeanRegistryPostProcessor.class);
         when(beanRegistry.lookUpBeans(BeanRegistryPostProcessor.class)).thenReturn(Collections.singletonList(beanRegistryPostProcessor));
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
 
         beanConfigurationsBeansCollector.collectBeans(Collections.singletonList(beanConfiguration));
 
@@ -151,6 +154,25 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testLookUpBeanByNameAndTypeCalledDirectlyWhenDefiningBeansCollectsBeansFromReadyBeanConfigurationsBeforeQueryingTheBeanRegistry() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+        doAnswer(invocation -> {
+            beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class);
+            return null;
+        }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(DELAY);
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration, beanRegistry);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanRegistry).lookUpBean("bean", BeanConfigurationsBeansCollectorTest.class);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    }
+
+    @Test
     public void testLookUpBeanByTypeDelegatesToTheBeanRegistryToReturnTheBean() {
         when(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest.class)).thenReturn(this);
 
@@ -169,6 +191,25 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
+    public void testLookUpBeanByTypeCalledDirectlyWhenDefiningBeansCollectsBeansFromReadyBeanConfigurationsBeforeQueryingTheBeanRegistry() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+        doAnswer(invocation -> {
+            beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest.class);
+            return null;
+        }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(DELAY);
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration, beanRegistry);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+        inOrder.verify(beanRegistry).lookUpBean(BeanConfigurationsBeansCollectorTest.class);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
+    }
+
+    @Test
     public void testLookUpBeansByTypeDelegatesToTheBeanRegistry() {
         when(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest.class)).thenReturn(Collections.singletonList(this));
 
@@ -179,15 +220,21 @@ public class BeanConfigurationsBeansCollectorTest {
     }
 
     @Test
-    public void testLookUpBeansByTypeCollectsRemainingBeansFirst() {
+    public void testLookUpBeansByTypeCalledDirectlyWhenDefiningBeansCollectsBeansFromReadyBeanConfigurationsBeforeQueryingTheBeanRegistry() {
+        when(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
         doAnswer(invocation -> {
             beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest.class);
             return null;
         }).when(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
-        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration));
+        when(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(READY);
+        when(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(DELAY);
 
-        InOrder inOrder = inOrder(anotherBeanConfiguration, beanRegistry);
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration));
+
+        InOrder inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration, beanRegistry);
+        inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
         inOrder.verify(beanRegistry).lookUpBeans(BeanConfigurationsBeansCollectorTest.class);
+        inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector);
     }
 }
