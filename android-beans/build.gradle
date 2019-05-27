@@ -35,7 +35,7 @@ android {
 
 dependencies {
 	implementation 'net.sourceforge.streamsupport:streamsupport:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha03'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-beta01'
 
 	testImplementation ('junit:junit:4.12') {
         exclude group: 'org.hamcrest'
