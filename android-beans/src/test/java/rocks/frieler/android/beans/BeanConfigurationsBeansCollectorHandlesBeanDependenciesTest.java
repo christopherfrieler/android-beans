@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java8.util.Optional;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -33,6 +34,33 @@ public class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
         BeanConfiguration beanConfiguration3 = new BeanConfiguration3(new SingleBeanDependency<>(BeanConfiguration2.class));
 
         beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration2, beanConfiguration3, beanConfiguration1));
+
+        assertThat(beanRegistry.lookUpBean(BeanConfiguration1.class), is(notNullValue()));
+        assertThat(beanRegistry.lookUpBean(BeanConfiguration2.class), is(notNullValue()));
+        assertThat(beanRegistry.lookUpBean(BeanConfiguration3.class), is(notNullValue()));
+    }
+
+    @Test
+    public void testCollectBeansResolvesTransitiveOptionalDependencies() {
+        final BeanConfiguration1 beanConfiguration1 = new BeanConfiguration1(new OptionalSingleBeanDependency<>(BeanConfiguration2.class)) {
+            @Override
+            public void defineBeans(BeansCollector beansCollector) {
+                //noinspection unchecked
+                assertThat(((Optional<?>) getDependencies().get(0).get()).isPresent(), is(true));
+                super.defineBeans(beansCollector);
+            }
+        };
+        final BeanConfiguration2 beanConfiguration2 = new BeanConfiguration2(new OptionalSingleBeanDependency<>(BeanConfiguration3.class)) {
+            @Override
+            public void defineBeans(BeansCollector beansCollector) {
+                //noinspection unchecked
+                assertThat(((Optional<?>) getDependencies().get(0).get()).isPresent(), is(true));
+                super.defineBeans(beansCollector);
+            }
+        };
+        final BeanConfiguration3 beanConfiguration3 = new BeanConfiguration3();
+
+        beanConfigurationsBeansCollector.collectBeans(Arrays.asList(beanConfiguration1, beanConfiguration2, beanConfiguration3));
 
         assertThat(beanRegistry.lookUpBean(BeanConfiguration1.class), is(notNullValue()));
         assertThat(beanRegistry.lookUpBean(BeanConfiguration2.class), is(notNullValue()));
