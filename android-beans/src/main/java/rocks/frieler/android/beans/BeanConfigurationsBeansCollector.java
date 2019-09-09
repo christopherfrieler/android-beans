@@ -10,9 +10,7 @@ import static rocks.frieler.android.beans.BeanConfiguration.Readiness.*;
  * {@link BeanRegistry}.
  * <p>
  * The {@link BeanConfigurationsBeansCollector} also implements the {@link BeansProvider}-interface by providing the
- * beans that are already registered in the {@link BeanRegistry}. In addition the
- * {@link BeanConfigurationsBeansCollector} may process further {@link BeanConfiguration}s to fulfill bean-lookups for
- * beans that are not present yet.
+ * beans that are already registered in the {@link BeanRegistry}.
  *
  * @author Christopher Frieler
  */
@@ -36,14 +34,14 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
      */
     void collectBeans(List<? extends BeanConfiguration> beanConfigurations) {
         remainingBeanConfigurations.addAll(beanConfigurations);
-        collectRemainingBeans(true);
+        collectRemainingBeans();
         if (!remainingBeanConfigurations.isEmpty()) {
             throw new BeanInstantiationException("bean-configurations seem to have a cyclic dependency.");
         }
         applyBeanRegistryPostProcessors();
     }
 
-    private void collectRemainingBeans(final boolean mayIncludeDelayed) {
+    private void collectRemainingBeans() {
         int limit = remainingBeanConfigurations.size();
         boolean includingDelayed = false;
         while (limit > 0) {
@@ -61,7 +59,7 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
                 limit--;
             }
 
-            if (limit == 0 && mayIncludeDelayed && !includingDelayed && !remainingBeanConfigurations.isEmpty()) {
+            if (limit == 0 && !includingDelayed && !remainingBeanConfigurations.isEmpty()) {
                 includingDelayed = true;
                 limit = remainingBeanConfigurations.size();
             }
@@ -112,37 +110,25 @@ public class BeanConfigurationsBeansCollector implements BeansCollector, BeansPr
 
     /**
      * {@inheritDoc}
-     * <p>
-     * In order to find the bean, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
-     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
      */
     @Override
     public <T> T lookUpBean(String name, Class<T> type) {
-        collectRemainingBeans(false);
         return beanRegistry.lookUpBean(name, type);
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * In order to find the bean, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
-     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
      */
     @Override
     public <T> T lookUpBean(Class<T> type) {
-        collectRemainingBeans(false);
         return beanRegistry.lookUpBean(type);
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * In order to find all beans, the {@link BeanConfigurationsBeansCollector} will attempt to collect more beans from
-     * remaining {@link BeanConfiguration.Readiness#READY ready} {@link BeanConfiguration}s first.
      */
     @Override
     public <T> List<T> lookUpBeans(Class<T> type) {
-        collectRemainingBeans(false);
         return beanRegistry.lookUpBeans(type);
     }
 }

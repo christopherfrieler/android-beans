@@ -15,7 +15,7 @@ allprojects {
 Add Android Beans to your dependencies:
 ```groovy
 dependencies {
-    implementation 'rocks.frieler.android:android-beans:0.2.0'
+    implementation 'rocks.frieler.android:android-beans:0.2.1'
 }
 ```
 
@@ -114,9 +114,9 @@ public class MyBeanConfiguration extends BeanConfiguration {
 - `requireBean(Class<T>)`: Requires a bean by type.
 - `requireBean(String, Class<T>)`: Requires a bean by name and type.
 - `requireOptionalBean(Class<T>)`: Declares an optional dependency on a bean by type. Android Beans will attempt to
-handle as many `BeanConfiguration`s as possible first to allow them to define such a bean.
-- `requireBeans(Class<T>)`: Requires the beans of that type. Android Beans will attempt to handle as many
-`BeanConfiguration`s as possible first to allow them to define such beans.
+handle other `BeanConfiguration`s first to allow them to define such a bean.
+- `requireBeans(Class<T>)`: Requires the beans of that type. Android Beans will attempt to handle other
+`BeanConfiguration`s first to allow them to define such beans.
 
 
 ## Bean scopes
