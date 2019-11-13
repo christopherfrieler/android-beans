@@ -1,6 +1,6 @@
 rootProject.name="android-beans-parent"
 
-include ':android-beans'
+include(":android-beans")
 
 // remove when upgrading to gradle 5 one day:
-enableFeaturePreview('STABLE_PUBLISHING')
+enableFeaturePreview("STABLE_PUBLISHING")
