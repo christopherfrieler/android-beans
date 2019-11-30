@@ -2,17 +2,27 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
 	id("com.android.library")
+    id("kotlin-android")
 	id("maven-publish")
 	id("com.jfrog.bintray")
 }
 
 android {
+    sourceSets {
+        maybeCreate("main").java.srcDirs("src/main/kotlin/")
+        maybeCreate("test").java.srcDirs("src/test/kotlin/")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     compileSdkVersion(29)
     buildToolsVersion("29.0.2")
+    kotlinOptions {
+        val options = this as org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+        options.jvmTarget = "1.8"
+    }
 
     defaultConfig {
         minSdkVersion(21)
@@ -40,7 +50,8 @@ android {
 }
 
 dependencies {
-	implementation("net.sourceforge.streamsupport:streamsupport:1.7.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.kotlin_version}")
+    implementation("net.sourceforge.streamsupport:streamsupport:1.7.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")
 
 	testImplementation("junit:junit:4.12") {
