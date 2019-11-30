@@ -24,7 +24,7 @@ licenses:
 before_install:
   - chmod +x gradlew
 
-script: ./gradlew clean testReleaseUnitTest assembleRelease javadocJar sourcesJar
+script: ./gradlew clean testReleaseUnitTest assembleRelease kdocJar sourcesJar
 
 deploy:
   provider: script

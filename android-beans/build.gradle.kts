@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
 	id("com.android.library")
     id("kotlin-android")
+    id("org.jetbrains.dokka-android")
 	id("maven-publish")
 	id("com.jfrog.bintray")
 }
@@ -63,20 +64,10 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.2.1")
 }
 
-val javadoc by tasks.registering(Javadoc::class) {
-    source(android.sourceSets["main"].java.srcDirs)
-    classpath += project.files(android.bootClasspath)
-    android.libraryVariants.forEach {
-        classpath += it.javaCompileProvider.get().classpath
-    }
-    options.memberLevel = JavadocMemberLevel.PROTECTED
-    exclude("**/BuildConfig.class", "**/R.class", "**/R$*.class")
-}
-
-val javadocJar by tasks.registering(Jar::class) {
-    dependsOn(javadoc)
-    from(javadoc.get().outputs)
-    archiveClassifier.set("javadoc")
+val kdocJar by tasks.registering(Jar::class) {
+    dependsOn(tasks.dokka)
+    from("${buildDir}/dokka")
+    archiveClassifier.set("kdoc")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -109,7 +100,7 @@ publishing {
             afterEvaluate {
                 artifact(tasks.getByName("bundleReleaseAar"))
                 artifact(sourcesJar.get())
-                artifact(javadocJar.get())
+                artifact(kdocJar.get())
             }
         }
     }

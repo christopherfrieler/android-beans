@@ -13,6 +13,10 @@ build the .aar-file: ``./gradlew assembleRelease``
 run the unit-tests: ``./gradlew testReleaseUnitTest`` 
 
 
+## documentation
+
+generate kdoc-documentation (includes javadoc): `./gradlew kdocJar`
+
 ## publish
 
 publish build-artifacts to your local maven-repository: ``./gradlew publishToMavenLocal``
