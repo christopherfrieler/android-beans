@@ -1,5 +1,7 @@
 package rocks.frieler.android.beans;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -8,13 +10,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import androidx.annotation.Nullable;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean;
+import rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator;
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBeanHandler;
 
-import static rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.decorate;
+
 /**
  * {@link BeansProvider} that holds and provides beans which were explicitly registered before.
  * <p>
@@ -158,7 +160,7 @@ public class BeanRegistry implements BeansProvider {
             @SuppressWarnings("unchecked") final ScopedFactoryBean<T> factoryBean = (ScopedFactoryBean<T>) beanCandidate;
             final ScopedFactoryBeanHandler scopedFactoryBeanHandler = beanScopes.get(factoryBean.getScope());
             if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive()) {
-                return scopedFactoryBeanHandler.getBean(name, decorate(factoryBean).withPostProcessing((bean) -> postProcessBean(name, bean)));
+                return scopedFactoryBeanHandler.getBean(name, ScopedFactoryBeanDecorator.Companion.decorate(factoryBean).withPostProcessing((bean) -> postProcessBean(name, bean)));
             }
         }
 
