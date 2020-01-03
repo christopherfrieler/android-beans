@@ -3,7 +3,7 @@ package rocks.frieler.android.beans
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 
 /**
- * Global facade-object to access the beans.
+ * Facade-object to access the beans in the global [BeansProvider].
  *
  * [Beans] needs to be initialized with the [Beans.Initializer] first.
  */
