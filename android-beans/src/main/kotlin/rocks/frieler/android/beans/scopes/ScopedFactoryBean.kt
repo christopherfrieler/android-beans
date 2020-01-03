@@ -6,7 +6,7 @@ import android.app.Activity
  * Interface for factory-beans, that produce the actual bean living in a limited scope, when needed.
  *
  * @param <T> the type of bean produced
-</T> */
+ */
 interface ScopedFactoryBean<T> {
 
     /**
