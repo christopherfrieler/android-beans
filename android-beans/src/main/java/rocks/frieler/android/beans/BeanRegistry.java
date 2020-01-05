@@ -20,8 +20,9 @@ import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBeanHa
 /**
  * {@link BeansProvider} that holds and provides beans which were explicitly registered before.
  * <p>
- * The {@link BeanRegistry} supports the {@value SingletonScopedFactoryBeanHandler#SINGLETON_SCOPE} and
- * {@value PrototypeScopedFactoryBeanHandler#PROTOTYPE_SCOPE} by default.
+ * The {@link BeanRegistry} supports the
+ * {@link SingletonScopedFactoryBeanHandler#SINGLETON_SCOPE singleton} and
+ * {@link PrototypeScopedFactoryBeanHandler#PROTOTYPE_SCOPE prototype} scopes by default.
  */
 public class BeanRegistry implements BeansProvider {
     private final Map<String, Object> beans = new HashMap<>();
