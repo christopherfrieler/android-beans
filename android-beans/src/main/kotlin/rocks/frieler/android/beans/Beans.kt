@@ -73,7 +73,7 @@ object Beans {
          *
          * @see BeanRegistry.addBeanScope
          */
-        fun addScope(scopedFactoryBeanHandler: ScopedFactoryBeanHandler?): Initializer {
+        fun addScope(scopedFactoryBeanHandler: ScopedFactoryBeanHandler): Initializer {
             beanRegistry.addBeanScope(scopedFactoryBeanHandler)
             return this
         }

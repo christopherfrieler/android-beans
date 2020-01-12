@@ -22,7 +22,7 @@ interface BeansProvider {
      * @param <T> the bean-type
      * @return the named bean or `null`
      */
-    fun <T> lookUpBean(name: String, type: Class<T>): T
+    fun <T :Any> lookUpBean(name: String, type: Class<T>): T?
 
     /**
      * Looks up a bean of the given type.
@@ -35,7 +35,7 @@ interface BeansProvider {
      * @param <T> the bean-type
      * @return a bean of the given type or `null`
      */
-    fun <T> lookUpBean(type: Class<T>): T
+    fun <T :Any> lookUpBean(type: Class<T>): T?
 
     /**
      * Looks up all beans of the given type in the [BeanRegistry] of this application.
@@ -44,5 +44,5 @@ interface BeansProvider {
      * @param <T> the bean-type
      * @return the beans of the given type or an empty list
      */
-    fun <T> lookUpBeans(type: Class<T>): List<T>
+    fun <T :Any> lookUpBeans(type: Class<T>): List<T>
 }
