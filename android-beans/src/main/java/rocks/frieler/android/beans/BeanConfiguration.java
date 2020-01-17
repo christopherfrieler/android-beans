@@ -1,5 +1,7 @@
 package rocks.frieler.android.beans;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,9 +84,21 @@ public abstract class BeanConfiguration {
      * @return the {@link BeanDependency} on the desired bean
      */
     protected final <T> BeanDependency<List<T>> requireBeans(Class<T> type) {
-        BeansOfTypeDependency<T> beansDependency = new BeansOfTypeDependency<>(type);
-        beanDependencies.add(beansDependency);
-        return beansDependency;
+        final BeansOfTypeDependency<T> beansDependency = new BeansOfTypeDependency<>(type);
+        BeanDependency<List<T>> javaListBeanDependency = new BeanDependency<List<T>>() {
+            @Override
+            public List<T> get() {
+                return beansDependency.get();
+            }
+
+            @NotNull
+            @Override
+            public Fulfillment fulfill(@NotNull BeansProvider beansProvider) {
+                return beansDependency.fulfill(beansProvider);
+            }
+        };
+        beanDependencies.add(javaListBeanDependency);
+        return javaListBeanDependency;
     }
 
     /**
