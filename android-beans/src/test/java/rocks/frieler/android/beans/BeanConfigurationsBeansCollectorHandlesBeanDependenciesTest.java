@@ -89,15 +89,8 @@ public class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 
 
     private static abstract class BeanConfigurationWithDefinedDependencies extends BeanConfiguration {
-        private final List<BeanDependency<?>> beanDependencies;
-
         private BeanConfigurationWithDefinedDependencies(BeanDependency<?>... beanDependencies) {
-            this.beanDependencies = Arrays.asList(beanDependencies);
-        }
-
-        @Override
-        protected List<BeanDependency<?>> getDependencies() {
-            return beanDependencies;
+            Arrays.asList(beanDependencies).forEach(this::addDependency);
         }
     }
 
