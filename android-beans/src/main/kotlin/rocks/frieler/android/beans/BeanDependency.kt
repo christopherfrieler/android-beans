@@ -39,11 +39,11 @@ interface BeanDependency<T :Any> {
 		 */
 		FULFILLED;
 
-		companion object Comparison {
-			// ToDo: implement this with operator overloading.
-			@kotlin.jvm.JvmStatic
-			fun min(aState: Fulfillment, anotherState: Fulfillment): Fulfillment {
-				return if (aState.ordinal < anotherState.ordinal) aState else anotherState
+		companion object Comparison : Comparator<Fulfillment> {
+			val MAXIMUM = FULFILLED
+
+			override fun compare(aFulfillment: Fulfillment, anotherFulfillment: Fulfillment): Int {
+				return aFulfillment.ordinal - anotherFulfillment.ordinal
 			}
 		}
 	}
