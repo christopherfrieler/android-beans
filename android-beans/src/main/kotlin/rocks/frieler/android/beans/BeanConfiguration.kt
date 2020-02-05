@@ -2,7 +2,6 @@ package rocks.frieler.android.beans
 
 import java8.util.Optional
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
-import rocks.frieler.android.beans.BeanDependency.Fulfillment.Comparison.min
 import java.util.*
 
 /**
@@ -108,13 +107,10 @@ abstract class BeanConfiguration {
 	 * @return the [Readiness] of this [BeanConfiguration] to define its beans
 	 */
 	fun isReadyToDefineBeans(beansProvider: BeansProvider): Readiness {
-		var minFulfillment = Fulfillment.FULFILLED
-		for (dependency in dependencies) {
-			minFulfillment = min(dependency.fulfill(beansProvider), minFulfillment)
-			if (minFulfillment === Fulfillment.UNFULFILLED) {
-				break
-			}
-		}
+		val minFulfillment = dependencies
+				.map { d -> d.fulfill(beansProvider) }
+				.minWith(Fulfillment.Comparison) ?: Fulfillment.MAXIMUM
+
 		return when (minFulfillment) {
 			Fulfillment.FULFILLED -> Readiness.READY
 			Fulfillment.UNFULFILLED_OPTIONAL -> Readiness.DELAY
