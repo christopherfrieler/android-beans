@@ -2,6 +2,7 @@ package rocks.frieler.android.beans
 
 import java8.util.Optional
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
+import java.util.*
 
 /**
  * [BeanDependency] to express an optional dependency on a single bean.
@@ -46,5 +47,18 @@ class OptionalSingleBeanDependency<T :Any>(
 
 	override fun get(): Optional<T> {
 		return Optional.ofNullable(bean)
+	}
+
+	override fun equals(other: Any?): Boolean {
+		return if (javaClass == other?.javaClass) {
+			other as OptionalSingleBeanDependency<*>
+			Objects.equals(name, other.name) && Objects.equals(type, other.type)
+		} else {
+			false
+		}
+	}
+
+	override fun hashCode(): Int {
+		return Objects.hash(name, type)
 	}
 }

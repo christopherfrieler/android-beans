@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
+import java.util.*
 
 /**
  * [BeanDependency] to express a dependency on the beans of a certain type.
@@ -38,5 +39,18 @@ class BeansOfTypeDependency<T :Any>(
 		}
 
 		return beansProvider.lookUpBeans(type)
+	}
+
+	override fun equals(other: Any?): Boolean {
+		return if (javaClass == other?.javaClass) {
+			other as BeansOfTypeDependency<*>
+			Objects.equals(type, other.type)
+		} else {
+			false
+		}
+	}
+
+	override fun hashCode(): Int {
+		return Objects.hash(type)
 	}
 }

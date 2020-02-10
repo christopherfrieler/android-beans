@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
+import java.util.*
 
 /**
  * [BeanDependency] to express a dependency on a single bean.
@@ -25,5 +26,18 @@ class SingleBeanDependency<T :Any>(
 
 	override fun get(): T? {
 		return bean
+	}
+
+	override fun equals(other: Any?): Boolean {
+		return if (javaClass == other?.javaClass) {
+			other as SingleBeanDependency<*>
+			Objects.equals(name, other.name) && Objects.equals(type, other.type)
+		} else {
+			false
+		}
+	}
+
+	override fun hashCode(): Int {
+		return Objects.hash(name, type)
 	}
 }
