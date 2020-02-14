@@ -86,7 +86,7 @@ object Beans {
          *
          * @see BeanConfigurationsBeansCollector.collectBeans
          */
-        fun collectBeans(beanConfigurations: List<BeanConfiguration?>?): Initializer {
+        fun collectBeans(beanConfigurations: List<BeanConfiguration>): Initializer {
             BeanConfigurationsBeansCollector(beanRegistry).collectBeans(beanConfigurations)
             return this
         }
