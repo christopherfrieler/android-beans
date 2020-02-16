@@ -10,8 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import rocks.frieler.android.facades.AssetManagerFacade;
-
 /**
  * Scans the assets for files defining {@link BeanConfiguration}s.
  * <p>
@@ -35,9 +33,10 @@ class BeanConfigurationsAssetScanner {
      * @throws BeanInstantiationException when {@value BEAN_CONFIGURATIONS_ASSET_PATH} cannot be scanned, a
      * bean-configurations-file is corrupt or instantiating a {@link BeanConfiguration} fails
      */
-    List<? extends BeanConfiguration> scan(AssetManagerFacade assets) {
+    List<? extends BeanConfiguration> scan(AssetManager assets) {
         try {
             List<BeanConfiguration> beanConfigurations = new ArrayList<>();
+            //noinspection ConstantConditions
             for (String file : assets.list(BEAN_CONFIGURATIONS_ASSET_PATH)) {
                 String filePath = BEAN_CONFIGURATIONS_ASSET_PATH + "/" + file;
                 beanConfigurations.addAll(processBeanConfigurationsFile(assets, filePath));
@@ -48,7 +47,7 @@ class BeanConfigurationsAssetScanner {
         }
     }
 
-    private List<? extends BeanConfiguration> processBeanConfigurationsFile(AssetManagerFacade assets, String filePath) {
+    private List<? extends BeanConfiguration> processBeanConfigurationsFile(AssetManager assets, String filePath) {
         try (BufferedReader beanConfigurationsReader = openBeanConfigurationsReader(filePath, assets)) {
             ArrayList<BeanConfiguration> beanConfigurations = new ArrayList<>();
             for (String line = beanConfigurationsReader.readLine(); line != null; line = beanConfigurationsReader.readLine()) {
@@ -61,7 +60,7 @@ class BeanConfigurationsAssetScanner {
         }
     }
 
-    private BufferedReader openBeanConfigurationsReader(String file, AssetManagerFacade assets) throws IOException {
+    private BufferedReader openBeanConfigurationsReader(String file, AssetManager assets) throws IOException {
         return new BufferedReader(new InputStreamReader(assets.open(file)));
     }
 

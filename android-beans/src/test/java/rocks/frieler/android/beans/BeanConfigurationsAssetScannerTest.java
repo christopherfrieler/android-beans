@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +11,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-
-import rocks.frieler.android.facades.AssetManagerFacade;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,7 +24,7 @@ public class BeanConfigurationsAssetScannerTest {
     private BeanConfigurationsAssetScanner beanConfigurationsAssetScanner = new BeanConfigurationsAssetScanner(context);
 
     @Mock
-    private AssetManagerFacade assets;
+    private AssetManager assets;
 
     @Test
     public void testScanReturnsListOfBeanConfigurations() throws IOException {

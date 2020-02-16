@@ -2,12 +2,12 @@ package rocks.frieler.android.beans;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler;
 import rocks.frieler.android.beans.scopes.activity.ForegroundActivityHolder;
-import rocks.frieler.android.facades.AssetManagerFacade;
 
 /**
  * {@link Application} that sets up a {@link BeanRegistry}, initialized by a {@link BeanConfigurationsBeansCollector}.
@@ -36,7 +36,6 @@ public class BeanRegistryApplication extends Application {
     }
 
     private List<? extends BeanConfiguration> scanAssetsForBeanConfigurations() {
-        final AssetManagerFacade assets = new AssetManagerFacade(getAssets());
-        return new BeanConfigurationsAssetScanner(this).scan(assets);
+        return new BeanConfigurationsAssetScanner(this).scan(getAssets());
     }
 }
