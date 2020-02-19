@@ -64,7 +64,7 @@ different modules and also Android libraries as long as the files have different
 
 ## Using beans
 
-To use the previously defined beans you can lookup them through the `Beans` facade-class, which offers three
+To use the previously defined beans you can look them up through the `Beans` facade-class, which offers three
 possibilities.
 
 **Lookup only by type:**
