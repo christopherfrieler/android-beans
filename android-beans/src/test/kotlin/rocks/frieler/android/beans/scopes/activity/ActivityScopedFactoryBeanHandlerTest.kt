@@ -1,7 +1,7 @@
 package rocks.frieler.android.beans.scopes.activity
 
 import android.app.Activity
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -47,9 +47,9 @@ class ActivityScopedFactoryBeanHandlerTest {
 	}
 
 	@Test
-	fun `ActivityScope is active when a FragmentActivity is in the foreground`() {
-		val fragmentActivity: FragmentActivity = mock()
-		whenever(foregroundActivityHolder.currentActivity).thenReturn(fragmentActivity)
+	fun `ActivityScope is active when a ComponentActivity is in the foreground`() {
+		val componentActivity: ComponentActivity = mock()
+		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 
 		val active = activityScopedFactoryBeanHandler.isActive
 
@@ -58,8 +58,8 @@ class ActivityScopedFactoryBeanHandlerTest {
 
 	@Test
 	fun `getBean() returns bean produced by ActivityScopedFactoryBean`() {
-		val fragmentActivity: Activity = Robolectric.buildActivity(FragmentActivity::class.java).get()
-		whenever(foregroundActivityHolder.currentActivity).thenReturn(fragmentActivity)
+		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
+		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityScopedFactoryBeanHandlerTest> = mock()
 		whenever(activityScopedFactoryBean.produceBean()).thenReturn(this)
 
@@ -70,8 +70,8 @@ class ActivityScopedFactoryBeanHandlerTest {
 
 	@Test
 	fun `getBean() returns bean already present in Activity-scope`() {
-		val fragmentActivity: Activity = Robolectric.buildActivity(FragmentActivity::class.java).get()
-		whenever(foregroundActivityHolder.currentActivity).thenReturn(fragmentActivity)
+		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
+		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityScopedFactoryBeanHandlerTest> = mock()
 		whenever(activityScopedFactoryBean.produceBean()).thenReturn(this)
 
@@ -89,15 +89,15 @@ class ActivityScopedFactoryBeanHandlerTest {
 
 	@Test
 	fun `getBean() sets Activity on ActivityAware bean`() {
-		val fragmentActivity: Activity = Robolectric.buildActivity(FragmentActivity::class.java).get()
-		whenever(foregroundActivityHolder.currentActivity).thenReturn(fragmentActivity)
+		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
+		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityAwareBean: ActivityAware = mock()
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityAware> = mock()
 		whenever(activityScopedFactoryBean.produceBean()).thenReturn(activityAwareBean)
 
 		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean)
 
-		verify(activityAwareBean).setActivity(fragmentActivity)
+		verify(activityAwareBean).setActivity(componentActivity)
 		assertThat(bean).isSameAs(activityAwareBean)
 	}
 }
