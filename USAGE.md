@@ -151,7 +151,7 @@ public class ActivityScopeBeanConfiguration extends BeanConfiguration {
 ### Activity scope
 
 Beans can also be Activity-scoped. This means a new instance will be constructed for each `Activity`. (Note: Currently
-the `Activity` must be a `FragmentActivity`.)
+the `Activity` must be a `ComponentActivity`.)
 The bean will survive configuration changes of the `Activity` such as device-rotation, just like Android's `ViewModel`s.
 (The implementation of Activity-scoped beans is actually based on them.) However, an Activity-scoped bean does not have
 to extend `ViewModel`.
