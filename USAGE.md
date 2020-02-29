@@ -15,7 +15,7 @@ allprojects {
 Add Android Beans to your dependencies:
 ```groovy
 dependencies {
-    implementation 'rocks.frieler.android:android-beans:0.2.1'
+    implementation 'rocks.frieler.android:android-beans:0.3.0'
 }
 ```
 
