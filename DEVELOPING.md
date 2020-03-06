@@ -1,23 +1,30 @@
 # Developing
 
+## Requirements
+
+Android Beans requires jdk-11 to build.
+
+
+## Development commands
+
 Android Beans uses gradle and contains the gradle-wrapper. Hence, you can use the following gradle-commands:
 
 
-## build
+### build
 
 build the .aar-file: ``./gradlew assembleRelease``
 
 
-## test
+### test
 
 run the unit-tests: ``./gradlew testReleaseUnitTest`` 
 
 
-## documentation
+### documentation
 
 generate kdoc-documentation (includes javadoc): `./gradlew kdocJar`
 
-## publish
+### publish
 
 publish build-artifacts to your local maven-repository: ``./gradlew publishToMavenLocal``
 
