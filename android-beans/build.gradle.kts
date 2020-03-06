@@ -55,13 +55,13 @@ dependencies {
     implementation("net.sourceforge.streamsupport:streamsupport:1.7.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-	testImplementation("junit:junit:4.12")
+	testImplementation("junit:junit:4.13")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.kotlin_version}") // for executing tests in IDE
-    testImplementation("org.hamcrest:hamcrest:2.1")
+    testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
     testImplementation("org.mockito:mockito-core:2.26.0")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-    testImplementation("org.robolectric:robolectric:4.3")
+    testImplementation("org.robolectric:robolectric:4.3.1")
 }
 
 val kdocJar by tasks.registering(Jar::class) {
