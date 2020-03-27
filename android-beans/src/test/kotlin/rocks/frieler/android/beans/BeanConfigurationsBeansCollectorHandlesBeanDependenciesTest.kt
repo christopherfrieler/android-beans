@@ -18,8 +18,8 @@ class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 
 	@Test(expected = BeanInstantiationException::class)
 	fun `collectBeans() fails on cyclic dependency`() {
-		val beanConfiguration1 = BeanConfiguration1(SingleBeanDependency(BeanConfiguration2::class.java))
-		val beanConfiguration2 = BeanConfiguration2(SingleBeanDependency(BeanConfiguration1::class.java))
+		val beanConfiguration1 = BeanConfiguration1(SingleBeanDependency(BeanConfiguration2::class))
+		val beanConfiguration2 = BeanConfiguration2(SingleBeanDependency(BeanConfiguration1::class))
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration1, beanConfiguration2))
 	}
@@ -27,25 +27,25 @@ class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 	@Test
 	fun `collectBeans() resolves SingleBeanDependencies between BeanConfigurations`() {
 		val beanConfiguration1 = BeanConfiguration1()
-		val beanConfiguration2 = BeanConfiguration2(SingleBeanDependency(BeanConfiguration1::class.java))
-		val beanConfiguration3 = BeanConfiguration3(SingleBeanDependency(BeanConfiguration2::class.java))
+		val beanConfiguration2 = BeanConfiguration2(SingleBeanDependency(BeanConfiguration1::class))
+		val beanConfiguration3 = BeanConfiguration3(SingleBeanDependency(BeanConfiguration2::class))
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration2, beanConfiguration3, beanConfiguration1))
 
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class.java)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class)).isNotNull()
 	}
 
 	@Test
 	fun `collectBeans() resolves transitive optional dependencies`() {
-		val beanConfiguration1 = object : BeanConfiguration1(OptionalSingleBeanDependency(BeanConfiguration2::class.java)) {
+		val beanConfiguration1 = object : BeanConfiguration1(OptionalSingleBeanDependency(BeanConfiguration2::class)) {
 			override fun defineBeans(beansCollector: BeansCollector) {
 				assertThat((dependencies[0].get() as Optional<*>)).isPresent()
 				super.defineBeans(beansCollector)
 			}
 		}
-		val beanConfiguration2 = object : BeanConfiguration2(OptionalSingleBeanDependency(BeanConfiguration3::class.java)) {
+		val beanConfiguration2 = object : BeanConfiguration2(OptionalSingleBeanDependency(BeanConfiguration3::class)) {
 			override fun defineBeans(beansCollector: BeansCollector) {
 				assertThat((dependencies[0].get() as Optional<*>)).isPresent()
 				super.defineBeans(beansCollector)
@@ -55,9 +55,9 @@ class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration1, beanConfiguration2, beanConfiguration3))
 
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class.java)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class)).isNotNull()
 	}
 
 	@Test
@@ -65,7 +65,7 @@ class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 		val beanConfigurationNeedingAllBeansOfTypeBeanConfiguration1 = BeanConfigurationNeedingAllBeansOfTypeBeanConfiguration1()
 		val beanConfiguration1 = BeanConfiguration1()
 		val beanConfiguration2: BeanConfiguration = BeanConfiguration2()
-		val beanConfiguration3DependingOn2: BeanConfiguration = BeanConfiguration3(SingleBeanDependency(BeanConfiguration2::class.java))
+		val beanConfiguration3DependingOn2: BeanConfiguration = BeanConfiguration3(SingleBeanDependency(BeanConfiguration2::class))
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(
 				beanConfigurationNeedingAllBeansOfTypeBeanConfiguration1,
@@ -73,10 +73,10 @@ class BeanConfigurationsBeansCollectorHandlesBeanDependenciesTest {
 				beanConfiguration1,
 				beanConfiguration2))
 
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class.java)).isNotNull()
-		assertThat(beanRegistry.lookUpBean(BeanConfigurationNeedingAllBeansOfTypeBeanConfiguration1::class.java)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration1::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration2::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfiguration3::class)).isNotNull()
+		assertThat(beanRegistry.lookUpBean(BeanConfigurationNeedingAllBeansOfTypeBeanConfiguration1::class)).isNotNull()
 		assertThat(beanConfigurationNeedingAllBeansOfTypeBeanConfiguration1.beanConfiguration1s).contains(beanConfiguration1)
 	}
 

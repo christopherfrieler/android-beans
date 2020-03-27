@@ -1,14 +1,14 @@
 package rocks.frieler.android.beans.scopes
 
-import java8.util.function.Supplier
+import kotlin.reflect.KClass
 
-open class GenericScopedFactoryBean<T>(
+open class GenericScopedFactoryBean<T : Any>(
         override val scope: String,
-        override val beanType: Class<T>,
-        private val producer: Supplier<T>)
+        override val beanType: KClass<T>,
+        private val producer: () -> T)
     : ScopedFactoryBean<T> {
 
     override fun produceBean(): T {
-        return producer.get()
+        return producer()
     }
 }

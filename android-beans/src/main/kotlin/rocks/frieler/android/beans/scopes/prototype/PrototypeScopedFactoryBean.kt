@@ -1,14 +1,14 @@
 package rocks.frieler.android.beans.scopes.prototype
 
-import java8.util.function.Supplier
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
+import kotlin.reflect.KClass
 
 /**
  * [ScopedFactoryBean] for beans of the [PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE]-scope.
  */
-class PrototypeScopedFactoryBean<T>
-private constructor(type: Class<T>, producer: Supplier<T>) : GenericScopedFactoryBean<T>(PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE, type, producer) {
+class PrototypeScopedFactoryBean<T : Any>
+private constructor(type: KClass<T>, producer: () -> T) : GenericScopedFactoryBean<T>(PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE, type, producer) {
 
     companion object {
         /**
@@ -20,8 +20,8 @@ private constructor(type: Class<T>, producer: Supplier<T>) : GenericScopedFactor
          * @return a new [PrototypeScopedFactoryBean]
          */
         @JvmStatic
-        fun <T> prototype(type: Class<T>, producer: Supplier<T>): PrototypeScopedFactoryBean<T> {
-            return PrototypeScopedFactoryBean(type, producer)
+        fun <T : Any> prototype(type: Class<T>, producer: () -> T): PrototypeScopedFactoryBean<T> {
+            return PrototypeScopedFactoryBean(type.kotlin, producer)
         }
     }
 }

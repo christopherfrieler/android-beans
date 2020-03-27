@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
+import kotlin.reflect.KClass
 
 /**
  * Facade-object to access the beans in the global [BeansProvider].
@@ -26,7 +27,7 @@ object Beans {
      */
     @JvmStatic
     fun <T :Any> lookUpBean(name: String, type: Class<T>): T? {
-        return beansProvider.lookUpBean(name, type)
+        return beansProvider.lookUpBean(name, type.kotlin)
     }
 
     /**
@@ -40,7 +41,7 @@ object Beans {
      */
     @JvmStatic
     fun <T :Any> lookUpBean(type: Class<T>): T? {
-        return beansProvider.lookUpBean(type)
+        return beansProvider.lookUpBean(type.kotlin)
     }
 
     /**
@@ -54,7 +55,7 @@ object Beans {
      */
     @JvmStatic
     fun <T :Any> lookUpBeans(type: Class<T>): List<T> {
-        return beansProvider.lookUpBeans(type)
+        return beansProvider.lookUpBeans(type.kotlin)
     }
 
     /**

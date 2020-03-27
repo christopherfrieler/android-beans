@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.Companion.decorate
+import kotlin.reflect.KClass
 
 @RunWith(MockitoJUnitRunner::class)
 class ScopedFactoryBeanDecoratorTest {
@@ -28,9 +29,9 @@ class ScopedFactoryBeanDecoratorTest {
 
     @Test
     fun `beanType delegates to original`() {
-        whenever(scopedFactoryBean.beanType).thenReturn(ScopedFactoryBeanDecoratorTest::class.java)
+        whenever(scopedFactoryBean.beanType).thenReturn(ScopedFactoryBeanDecoratorTest::class)
 
-        val beanType: Class<*> = decoratedFactoryBean.beanType
+        val beanType: KClass<*> = decoratedFactoryBean.beanType
 
         assertThat(beanType).isEqualTo(scopedFactoryBean.beanType)
     }

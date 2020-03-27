@@ -2,6 +2,7 @@ package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * [BeanDependency] to express a dependency on a single bean.
@@ -10,10 +11,10 @@ import java.util.*
  */
 class SingleBeanDependency<T :Any>(
 		private val name: String?,
-		private val type: Class<out T>
+		private val type: KClass<out T>
 ) : BeanDependency<T> {
 
-	constructor(type: Class<out T>) : this(null, type)
+	constructor(type: KClass<out T>) : this(null, type)
 
 	private var bean: T? = null
 

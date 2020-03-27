@@ -1,7 +1,8 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanConfiguration.Readiness
-import java.util.*
+import java.util.LinkedList
+import kotlin.reflect.KClass
 
 /**
  * The [BeanConfigurationsBeansCollector] collects the beans defined by [BeanConfiguration]s in a
@@ -60,7 +61,7 @@ internal constructor(
 	}
 
 	private fun applyBeanRegistryPostProcessors() {
-		for (postProcessor in beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class.java)) {
+		for (postProcessor in beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class)) {
 			postProcessor.postProcess(beanRegistry)
 		}
 	}
@@ -104,7 +105,7 @@ internal constructor(
 	 *
 	 * @see BeanRegistry.lookUpBean
 	 */
-	override fun <T :Any> lookUpBean(name: String, type: Class<T>): T? {
+	override fun <T :Any> lookUpBean(name: String, type: KClass<T>): T? {
 		return beanRegistry.lookUpBean(name, type)
 	}
 
@@ -114,7 +115,7 @@ internal constructor(
 	 *
 	 * @see BeanRegistry.lookUpBean
 	 */
-	override fun <T :Any> lookUpBean(type: Class<T>): T? {
+	override fun <T :Any> lookUpBean(type: KClass<T>): T? {
 		return beanRegistry.lookUpBean(type)
 	}
 
@@ -124,7 +125,7 @@ internal constructor(
 	 *
 	 * @see BeanRegistry.lookUpBeans
 	 */
-	override fun <T :Any> lookUpBeans(type: Class<T>): List<T> {
+	override fun <T :Any> lookUpBeans(type: KClass<T>): List<T> {
 		return beanRegistry.lookUpBeans(type)
 	}
 }

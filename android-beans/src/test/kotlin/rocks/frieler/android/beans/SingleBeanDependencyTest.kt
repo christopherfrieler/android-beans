@@ -19,7 +19,7 @@ class SingleBeanDependencyTest {
 
 	@Test
 	fun `fulfill() returns UNFULFILLED when the desired bean is not available`() {
-		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class.java)
+		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class)
 		val fulfillment = beanDependency.fulfill(beansProvider)
 
 		assertThat(fulfillment).isEqualTo(Fulfillment.UNFULFILLED)
@@ -27,9 +27,9 @@ class SingleBeanDependencyTest {
 
 	@Test
 	fun `fulfill() returns FULLFILLED when the desired bean by type is available`() {
-		whenever(beansProvider.lookUpBean(SingleBeanDependencyTest::class.java)).thenReturn(bean)
+		whenever(beansProvider.lookUpBean(SingleBeanDependencyTest::class)).thenReturn(bean)
 
-		val beanDependency = SingleBeanDependency(SingleBeanDependencyTest::class.java)
+		val beanDependency = SingleBeanDependency(SingleBeanDependencyTest::class)
 		val fulfillment = beanDependency.fulfill(beansProvider)
 
 		assertThat(fulfillment).isEqualTo(Fulfillment.FULFILLED)
@@ -37,9 +37,9 @@ class SingleBeanDependencyTest {
 
 	@Test
 	fun `fulfill() returns FULFILLED when the desired bean by name and type is available`() {
-		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class.java)).thenReturn(bean)
+		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class)).thenReturn(bean)
 
-		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class.java)
+		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class)
 		val fulfillment = beanDependency.fulfill(beansProvider)
 
 		assertThat(fulfillment).isEqualTo(Fulfillment.FULFILLED)
@@ -47,9 +47,9 @@ class SingleBeanDependencyTest {
 
 	@Test
 	fun `fulfill() returns FULFILLED without querying the BeansProvider after it was fulfilled already`() {
-		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class.java)).thenReturn(bean)
+		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class)).thenReturn(bean)
 
-		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class.java)
+		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class)
 		beanDependency.fulfill(beansProvider)
 		reset(beansProvider)
 		val fulfillment = beanDependency.fulfill(beansProvider)
@@ -60,9 +60,9 @@ class SingleBeanDependencyTest {
 
 	@Test
 	fun `get() returns the bean after the BeanDependency was fulfilled`() {
-		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class.java)).thenReturn(bean)
+		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class)).thenReturn(bean)
 
-		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class.java)
+		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class)
 		beanDependency.fulfill(beansProvider)
 
 		val dependency = beanDependency.get()

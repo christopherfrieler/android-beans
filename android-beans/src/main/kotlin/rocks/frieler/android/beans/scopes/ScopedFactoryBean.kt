@@ -1,13 +1,14 @@
 package rocks.frieler.android.beans.scopes
 
 import android.app.Activity
+import kotlin.reflect.KClass
 
 /**
  * Interface for factory-beans, that produce the actual bean living in a limited scope, when needed.
  *
  * @param <T> the type of bean produced
  */
-interface ScopedFactoryBean<T> {
+interface ScopedFactoryBean<T : Any> {
 
     /**
      * Returns the name of the scope, where the bean produced by this [ScopedFactoryBean] lives in.
@@ -21,7 +22,7 @@ interface ScopedFactoryBean<T> {
      *
      * @return the type of the bean
      */
-    val beanType: Class<T>
+    val beanType: KClass<T>
 
     /**
      * Produces a new bean of type [T] corresponding to the given [Activity].

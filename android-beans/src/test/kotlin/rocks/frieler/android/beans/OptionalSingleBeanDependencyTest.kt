@@ -19,9 +19,9 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testOptionalSingleBeanDependencyIsUnfulfilledOptionalWhenTheNoSuitableBeanIsAvailable() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java)).thenReturn(null)
+		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(null)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		val fulfillment = optionalSingleBeanDependency.fulfill(beansProvider)
 
 		assertThat(fulfillment).isEqualTo(Fulfillment.UNFULFILLED_OPTIONAL)
@@ -29,9 +29,9 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testOptionalSingleBeanDependencyIsFulfilledWhenASuitableBeanIsAvailable() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java)).thenReturn(this)
+		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(this)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		val fulfillment = optionalSingleBeanDependency.fulfill(beansProvider)
 
 		assertThat(fulfillment).isEqualTo(Fulfillment.FULFILLED)
@@ -39,9 +39,9 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testOptionalSingleBeanDependencyRemainsFulfilledWithoutQueryingTheBeansProviderAgainWhenItWasFulfilledEarlier() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java)).thenReturn(this)
+		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(this)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		optionalSingleBeanDependency.fulfill(beansProvider)
 		clearInvocations(beansProvider)
 		val fulfillment = optionalSingleBeanDependency.fulfill(beansProvider)
@@ -52,7 +52,7 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testGetReturnsEmptyOptionalWhenTheBeanDependencyHasNeverBeanFulfilled() {
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		val optionalBean = optionalSingleBeanDependency.get()
 
 		assertThat(optionalBean.isEmpty).isTrue()
@@ -60,9 +60,9 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testGetReturnsEmptyOptionalWhenWantedBeanWasNotAvailable() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java)).thenReturn(null)
+		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(null)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		optionalSingleBeanDependency.fulfill(beansProvider)
 		val optionalBean = optionalSingleBeanDependency.get()
 
@@ -71,25 +71,25 @@ class OptionalSingleBeanDependencyTest {
 
 	@Test
 	fun testGetReturnsBeanItWasFulfilledWithByType() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java)).thenReturn(this)
+		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(this)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
 		optionalSingleBeanDependency.fulfill(beansProvider)
 		val optionalBean = optionalSingleBeanDependency.get()
 
 		assertThat(optionalBean.isPresent).isTrue()
-		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class.java))
+		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class))
 	}
 
 	@Test
 	fun testGetReturnsBeanItWasFulfilledWithByNameAndType() {
-		whenever(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class.java)).thenReturn(this)
+		whenever(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class)).thenReturn(this)
 
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency("bean", OptionalSingleBeanDependencyTest::class.java)
+		val optionalSingleBeanDependency = OptionalSingleBeanDependency("bean", OptionalSingleBeanDependencyTest::class)
 		optionalSingleBeanDependency.fulfill(beansProvider)
 		val optionalBean = optionalSingleBeanDependency.get()
 
 		assertThat(optionalBean.isPresent).isTrue()
-		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class.java))
+		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class))
 	}
 }

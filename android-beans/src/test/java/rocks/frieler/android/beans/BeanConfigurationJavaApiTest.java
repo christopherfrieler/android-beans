@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 import java8.util.Optional;
+import kotlin.jvm.JvmClassMappingKt;
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
@@ -77,10 +78,10 @@ public class BeanConfigurationJavaApiTest {
         };
         List<BeanDependency<?>> beanDependencies = beanConfiguration.getDependencies();
 
-        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>(BeanConfigurationJavaApiTest.class))));
-        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>("bean", BeanConfigurationJavaApiTest.class))));
-        assertThat(beanDependencies, hasItem(equalTo(new OptionalSingleBeanDependency<>(BeanConfigurationJavaApiTest.class))));
-        assertThat(beanDependencies, hasItem(equalTo(new BeansOfTypeDependency<>(BeanConfigurationJavaApiTest.class))));
+        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>(JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
+        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>("bean", JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
+        assertThat(beanDependencies, hasItem(equalTo(new OptionalSingleBeanDependency<>(JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
+        assertThat(beanDependencies, hasItem(equalTo(new BeansOfTypeDependency<>(JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
     }
 
     @Test
