@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import java8.util.function.Supplier
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -13,8 +12,8 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class GenericScopedFactoryBeanTest {
     private val scope = "aScope"
-    private val producer: Supplier<GenericScopedFactoryBeanTest> = mock();
-    private val factoryBean = GenericScopedFactoryBean(scope, GenericScopedFactoryBeanTest::class.java, producer)
+    private val producer: () -> GenericScopedFactoryBeanTest = mock();
+    private val factoryBean = GenericScopedFactoryBean(scope, GenericScopedFactoryBeanTest::class, producer)
 
     @Test
     fun `getScope() returns configured scope`() {
@@ -23,12 +22,12 @@ class GenericScopedFactoryBeanTest {
 
     @Test
     fun `getType() returns configured type`() {
-        assertThat(factoryBean.beanType).isEqualTo(GenericScopedFactoryBeanTest::class.java)
+        assertThat(factoryBean.beanType).isEqualTo(GenericScopedFactoryBeanTest::class)
     }
 
     @Test
     fun `produceBean() calls configured producer`() {
-        whenever(producer.get()).thenReturn(this)
+        whenever(producer()).thenReturn(this)
 
         assertThat(factoryBean.produceBean()).isEqualTo(this)
     }

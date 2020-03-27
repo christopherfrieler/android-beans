@@ -87,7 +87,7 @@ class BeanConfigurationsBeansCollectorTest {
 	@Test
 	fun `collectBeans() applies the BeanRegistryPostProcessor beans after collecting all beans`() {
 		val beanRegistryPostProcessor : BeanRegistryPostProcessor = mock()
-		whenever(beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class.java)).thenReturn(listOf(beanRegistryPostProcessor))
+		whenever(beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class)).thenReturn(listOf(beanRegistryPostProcessor))
 		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
@@ -122,45 +122,45 @@ class BeanConfigurationsBeansCollectorTest {
 
 	@Test
 	fun `lookUpBean() by name and type delegates to the BeanRegistry`() {
-		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class.java)).thenReturn(this)
+		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class.java)
+		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(bean).isSameAs(this)
 	}
 
 	@Test
 	fun `lookUpBean() by name and type delegates to the BeanRegistry and returns null without such bean`() {
-		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class.java)).thenReturn(null)
+		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class.java)
+		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(bean).isNull()
 	}
 
 	@Test
 	fun `lookUpBean() by type delegates to the BeanRegistry to return the bean`() {
-		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class.java)).thenReturn(this)
+		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class.java)
+		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(bean).isSameAs(this)
 	}
 
 	@Test
 	fun `lookUpBean() by type delegates to the BeanRegistry and returns null without such bean`() {
-		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class.java)).thenReturn(null)
+		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class.java)
+		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(bean).isNull()
 	}
 
 	@Test
 	fun `lookUpBeans() by type delegates to the BeanRegistry`() {
-		whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class.java)).thenReturn(listOf(this))
+		whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(this))
 
-		val beans = beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest::class.java)
+		val beans = beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(beans).hasSize(1)
 		assertThat(beans).contains(this)

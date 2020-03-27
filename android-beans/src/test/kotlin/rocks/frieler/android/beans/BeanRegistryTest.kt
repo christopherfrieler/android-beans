@@ -14,7 +14,9 @@ import org.mockito.junit.MockitoJUnitRunner
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.Companion.prototype
+import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.Companion.lazy
+import kotlin.reflect.jvm.jvmName
 
 @RunWith(MockitoJUnitRunner::class)
 class BeanRegistryTest {
@@ -22,7 +24,7 @@ class BeanRegistryTest {
 
     @Test
     fun `lookUpBean() by name and type returns null without a bean with the desired name`() {
-        val bean = beanRegistry.lookUpBean("bean", Any::class.java)
+        val bean = beanRegistry.lookUpBean("bean", Any::class)
 
         assertThat(bean).isNull()
     }
@@ -33,7 +35,7 @@ class BeanRegistryTest {
         val registeredBean = Any()
 
         beanRegistry.registerBean(name, registeredBean)
-        val bean = beanRegistry.lookUpBean(name, BeanRegistryTest::class.java)
+        val bean = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
 		assertThat(bean).isNull()
     }
@@ -44,7 +46,7 @@ class BeanRegistryTest {
         val registeredBean = Any()
 
         beanRegistry.registerBean(name, registeredBean)
-        val bean = beanRegistry.lookUpBean(name, Any::class.java)
+        val bean = beanRegistry.lookUpBean(name, Any::class)
 
         assertThat(bean).isSameAs(registeredBean)
     }
@@ -52,7 +54,7 @@ class BeanRegistryTest {
     @Test
     fun `lookUpBean() by type returns null without a matching bean`() {
         beanRegistry.registerBean("bean", Any())
-        val bean = beanRegistry.lookUpBean(BeanRegistryTest::class.java)
+        val bean = beanRegistry.lookUpBean(BeanRegistryTest::class)
 
 		assertThat(bean).isNull()
     }
@@ -62,7 +64,7 @@ class BeanRegistryTest {
         val registeredBean = Any()
 
         beanRegistry.registerBean("bean", registeredBean)
-        val bean = beanRegistry.lookUpBean(Any::class.java)
+        val bean = beanRegistry.lookUpBean(Any::class)
 
 		assertThat(bean).isSameAs(registeredBean)
     }
@@ -74,7 +76,7 @@ class BeanRegistryTest {
 
 		beanRegistry.registerBean("bean1", registeredBean1)
 		beanRegistry.registerBean("bean2", registeredBean2)
-        val bean = beanRegistry.lookUpBean(Any::class.java)
+        val bean = beanRegistry.lookUpBean(Any::class)
 
 		assertThat(bean).isIn(registeredBean1, registeredBean2)
     }
@@ -84,7 +86,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean("object", Any())
         beanRegistry.registerBean("long", 42L)
         beanRegistry.registerBean("double", 3.14)
-        val numbers = beanRegistry.lookUpBeans(Number::class.java)
+        val numbers = beanRegistry.lookUpBeans(Number::class)
 
 		assertThat(numbers).containsOnly(42L, 3.14)
     }
@@ -95,7 +97,7 @@ class BeanRegistryTest {
 
         beanRegistry.registerBean(bean)
 
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class.java)).isSameAs(bean)
+		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class)).isSameAs(bean)
     }
 
     @Test
@@ -106,8 +108,8 @@ class BeanRegistryTest {
         beanRegistry.registerBean(bean1)
         beanRegistry.registerBean(bean2)
 
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class.java)).isSameAs(bean1)
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name + "2", Any::class.java)).isSameAs(bean2)
+		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class)).isSameAs(bean1)
+		assertThat(beanRegistry.lookUpBean(Any::class.java.name + "2", Any::class)).isSameAs(bean2)
     }
 
     /* tests for bean-scopes: */
@@ -123,10 +125,10 @@ class BeanRegistryTest {
     fun `lookUpBean() by name and type returns null when the ScopedFactoryBean with desired name produces the wrong type`() {
         val name = "bean"
         val factoryBean: ScopedFactoryBean<Any> = mock()
-        whenever(factoryBean.beanType).thenReturn(Any::class.java)
+        whenever(factoryBean.beanType).thenReturn(Any::class)
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean: Any? = beanRegistry.lookUpBean(name, BeanRegistryTest::class.java)
+        val bean: Any? = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
         assertThat(bean).isNull()
     }
@@ -135,7 +137,7 @@ class BeanRegistryTest {
     fun `lookUpBean() by name and type returns null without a suitable scope for a matching ScopedFactoryBean`() {
         val name = "bean"
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
-        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class.java)
+        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
         whenever(factoryBean.scope).thenReturn("otherScope")
 
         beanRegistry.registerBean(name, factoryBean)
@@ -150,7 +152,7 @@ class BeanRegistryTest {
         val name = "bean"
         val scope = beanScope.name
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
-        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class.java)
+        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
         whenever(factoryBean.scope).thenReturn(scope)
 
         beanRegistry.registerBean(name, factoryBean)
@@ -166,7 +168,7 @@ class BeanRegistryTest {
         val scope = beanScope.name
         val scopedBean = Any()
         val factoryBean: ScopedFactoryBean<Any> = mock()
-        whenever(factoryBean.beanType).thenReturn(Any::class.java)
+        whenever(factoryBean.beanType).thenReturn(Any::class)
         whenever(factoryBean.scope).thenReturn(scope)
         whenever(factoryBean.produceBean()).thenReturn(scopedBean)
 		whenever(beanScope.getBean<Any>(eq(name), any()))
@@ -184,7 +186,7 @@ class BeanRegistryTest {
         val name = "bean"
         val scope = beanScope.name
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
-        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class.java)
+        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
         whenever(factoryBean.scope).thenReturn(scope)
         whenever(factoryBean.produceBean()).thenReturn(this)
 		whenever(beanScope.getBean<Any>(eq(name), any()))
@@ -204,14 +206,14 @@ class BeanRegistryTest {
         val name = "double"
         val scope = beanScope.name
         val factoryBean: ScopedFactoryBean<Double> = mock()
-        whenever(factoryBean.beanType).thenReturn(Double::class.javaObjectType)
+        whenever(factoryBean.beanType).thenReturn(Double::class)
         whenever(factoryBean.scope).thenReturn(scope)
         whenever(factoryBean.produceBean()).thenReturn(3.14)
 		whenever(beanScope.getBean<Any>(eq(name), any()))
 				.thenAnswer { invocation -> (invocation.getArgument(1) as ScopedFactoryBean<*>).produceBean() }
 
         beanRegistry.registerBean(name, factoryBean)
-        val numbers = beanRegistry.lookUpBeans(Number::class.java)
+        val numbers = beanRegistry.lookUpBeans(Number::class)
 
 		assertThat(numbers).containsOnly(42L, 3.14)
     }
@@ -222,21 +224,21 @@ class BeanRegistryTest {
 		val scope = beanScope.name
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
 		whenever(factoryBean.scope).thenReturn(scope)
-        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class.java)
+        whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
         whenever(beanScope.getBean<BeanRegistryTest>(eq(BeanRegistryTest::class.java.name), any())).thenReturn(this)
 
         beanRegistry.registerBean(factoryBean)
 
-        assertThat(beanRegistry.lookUpBean(this.javaClass.name, this.javaClass)).isSameAs(this)
+        assertThat(beanRegistry.lookUpBean(this::class.jvmName, this::class)).isSameAs(this)
     }
 
     @Test
     fun `BeanRegistry supports lazy instantiation in singleton-scope by default`() {
         val name = "lazyInstantiatedBean"
-        val singletonFactory = lazy(BeanRegistryTest::class.java, Supplier { this })
+        val singletonFactory = lazy(BeanRegistryTest::class.java) { this }
 
         beanRegistry.registerBean(name, singletonFactory)
-        val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class.java)
+        val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
         assertThat(beanInstance).isSameAs(singletonFactory.produceBean())
     }
@@ -244,10 +246,10 @@ class BeanRegistryTest {
     @Test
     fun `BeanRegistry supports prototype-scope by default`() {
         val name = "prototypeBean"
-        val prototype = prototype(BeanRegistryTest::class.java, Supplier { this })
+        val prototype = prototype(BeanRegistryTest::class.java) { this }
 
         beanRegistry.registerBean(name, prototype)
-        val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class.java)
+        val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
 		assertThat(beanInstance).isSameAs(prototype.produceBean())
     }
@@ -265,7 +267,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean("bean", originalBean)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
-        assertThat(beanRegistry.lookUpBean("bean", Any::class.java)).isSameAs(replacementBean)
+        assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameAs(replacementBean)
     }
 
     @Test
@@ -278,7 +280,7 @@ class BeanRegistryTest {
         beanRegistry.registerBeanPostProcessor(beanPostProcessor)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
-		assertThat(beanRegistry.lookUpBean("bean", Any::class.java)).isSameAs(replacementBean)
+		assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameAs(replacementBean)
     }
 
     @Test
@@ -288,7 +290,7 @@ class BeanRegistryTest {
         val scope = beanScope.name
         val originalBean = Any()
         val factoryBean: ScopedFactoryBean<Any> = mock()
-        whenever(factoryBean.beanType).thenReturn(Any::class.java)
+        whenever(factoryBean.beanType).thenReturn(Any::class)
         whenever(factoryBean.scope).thenReturn(scope)
         whenever(factoryBean.produceBean()).thenReturn(originalBean)
 		whenever(beanScope.getBean<Any>(eq(name), any()))
@@ -299,7 +301,7 @@ class BeanRegistryTest {
 
         beanRegistry.registerBean(name, factoryBean)
         beanRegistry.registerBeanPostProcessor(beanPostProcessor)
-		val finalBean = beanRegistry.lookUpBean(name, Any::class.java)
+		val finalBean = beanRegistry.lookUpBean(name, Any::class)
 
         verify(beanPostProcessor).postProcessBean(name, originalBean)
 		assertThat(finalBean).isSameAs(replacementBean)

@@ -1,14 +1,14 @@
 package rocks.frieler.android.beans.scopes.activity
 
-import java8.util.function.Supplier
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler.Companion.ACTIVITY_SCOPE
+import kotlin.reflect.KClass
 
 /**
  * [ScopedFactoryBean] for beans of the [ActivityScopedFactoryBeanHandler.ACTIVITY_SCOPE]-scope.
  */
-class ActivityScopedFactoryBean<T> private constructor(type: Class<T>, producer: Supplier<T>) : GenericScopedFactoryBean<T>(ACTIVITY_SCOPE, type, producer) {
+class ActivityScopedFactoryBean<T : Any> private constructor(type: KClass<T>, producer: () -> T) : GenericScopedFactoryBean<T>(ACTIVITY_SCOPE, type, producer) {
 
 	companion object {
 		/**
@@ -20,8 +20,8 @@ class ActivityScopedFactoryBean<T> private constructor(type: Class<T>, producer:
 		 * @return a new [ActivityScopedFactoryBean]
 		 */
         @JvmStatic
-        fun <T> activityScoped(type: Class<T>, producer: Supplier<T>): ActivityScopedFactoryBean<T> {
-			return ActivityScopedFactoryBean(type, producer)
+        fun <T : Any> activityScoped(type: Class<T>, producer: () -> T): ActivityScopedFactoryBean<T> {
+			return ActivityScopedFactoryBean(type.kotlin, producer)
 		}
 	}
 }

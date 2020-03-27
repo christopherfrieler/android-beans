@@ -21,7 +21,7 @@ class BeansTest {
     fun `lookUpBean() by name and type delegates to the BeansProvider`() {
         val name = "bean"
         val bean = Any()
-        whenever(beansProvider.lookUpBean(name, Any::class.java)).thenReturn(bean)
+        whenever(beansProvider.lookUpBean(name, Any::class)).thenReturn(bean)
 
         val retrievedBean = Beans.lookUpBean(name, Any::class.java)
 
@@ -31,7 +31,7 @@ class BeansTest {
     @Test
     fun `lookUpBean() by name and type returns null without such bean`() {
         val name = "bean"
-        whenever(beansProvider.lookUpBean(name, Any::class.java)).thenReturn(null)
+        whenever(beansProvider.lookUpBean(name, Any::class)).thenReturn(null)
 
         val retrievedBean = Beans.lookUpBean(name, Any::class.java)
 
@@ -41,7 +41,7 @@ class BeansTest {
     @Test
     fun `lookUpBean() by type delegates to the BeansProvider`() {
         val bean = Any()
-        whenever(beansProvider.lookUpBean(Any::class.java)).thenReturn(bean)
+        whenever(beansProvider.lookUpBean(Any::class)).thenReturn(bean)
 
         val retrievedBean = Beans.lookUpBean(Any::class.java)
 
@@ -50,7 +50,7 @@ class BeansTest {
 
     @Test
     fun `lookUpBean() by type returns null without such bean`() {
-        whenever(beansProvider.lookUpBean(Any::class.java)).thenReturn(null)
+        whenever(beansProvider.lookUpBean(Any::class)).thenReturn(null)
 
         val retrievedBean = Beans.lookUpBean(Any::class.java)
 
@@ -60,7 +60,7 @@ class BeansTest {
     @Test
     fun `lookUpBeans() by type delegates to the BeansProvider`() {
         val bean = Any()
-        whenever(beansProvider.lookUpBeans(Any::class.java)).thenReturn(listOf(bean))
+        whenever(beansProvider.lookUpBeans(Any::class)).thenReturn(listOf(bean))
 
         val retrievedBeans = Beans.lookUpBeans(Any::class.java)
 

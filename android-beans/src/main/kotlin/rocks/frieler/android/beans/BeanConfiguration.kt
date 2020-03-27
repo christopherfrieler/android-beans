@@ -2,7 +2,6 @@ package rocks.frieler.android.beans
 
 import java8.util.Optional
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
-import java.util.*
 
 /**
  * Abstract super-class to define beans for the context of an application.
@@ -60,7 +59,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBean(name: String, type: Class<T>): BeanDependency<T> =
-			addDependency(SingleBeanDependency(name, type))
+			addDependency(SingleBeanDependency(name, type.kotlin))
 
 	/**
 	 * Creates and registers a [BeanDependency] on a bean of the given type.
@@ -70,7 +69,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBean(type: Class<T>): BeanDependency<T> =
-			addDependency(SingleBeanDependency(type))
+			addDependency(SingleBeanDependency(type.kotlin))
 
 	/**
 	 * Creates and registers a [BeanDependency] on a bean of the given type.
@@ -80,7 +79,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T: Any> requireOptionalBean(type: Class<T>): BeanDependency<Optional<T>> =
-			addDependency(OptionalSingleBeanDependency(type))
+			addDependency(OptionalSingleBeanDependency(type.kotlin))
 
 	/**
 	 * Creates and registers a [BeanDependency] on the beans of the given type.
@@ -90,7 +89,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBeans(type: Class<T>): BeanDependency<List<T>> =
-			addDependency(BeansOfTypeDependency(type))
+			addDependency(BeansOfTypeDependency(type.kotlin))
 
 	/**
 	 * Checks, if this [BeanConfiguration] is ready to define its beans.

@@ -14,7 +14,7 @@ import rocks.frieler.android.beans.BeanDependency.Fulfillment
 
 @RunWith(MockitoJUnitRunner::class)
 class BeansOfTypeDependencyTest {
-	private val beansOfTypeDependency = BeansOfTypeDependency(BeansOfTypeDependencyTest::class.java)
+	private val beansOfTypeDependency = BeansOfTypeDependency(BeansOfTypeDependencyTest::class)
 
 	private val beansProvider: BeansProvider = mock()
 
@@ -28,12 +28,12 @@ class BeansOfTypeDependencyTest {
 
 	@Test
 	fun `get() obtains beans from BeansProvider`() {
-		whenever(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class.java)).thenReturn(listOf(this))
+		whenever(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class)).thenReturn(listOf(this))
 
 		beansOfTypeDependency.fulfill(beansProvider)
 		val beans = beansOfTypeDependency.get()
 
-		assertThat(beans).isEqualTo(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class.java))
+		assertThat(beans).isEqualTo(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class))
 	}
 
 	@Test

@@ -6,7 +6,11 @@ import rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.Companion.d
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBeanHandler
-import java.util.*
+import java.util.LinkedList
+import java.util.TreeMap
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.jvm.jvmName
 
 /**
  * [BeansProvider] that holds and provides beans which were explicitly registered before.
@@ -46,7 +50,7 @@ class BeanRegistry internal constructor() : BeansProvider {
     }
 
     private fun generateBeanName(bean: Any): String {
-        val beanClass: Class<*> = if (bean is ScopedFactoryBean<*>) bean.beanType else bean.javaClass
+        val beanClass: KClass<*> = if (bean is ScopedFactoryBean<*>) bean.beanType else bean::class
 
         var beanName = getPreferredBeanName(beanClass)
         if (beans.containsKey(beanName)) {
@@ -101,7 +105,7 @@ class BeanRegistry internal constructor() : BeansProvider {
         return postProcessedBean
     }
 
-    override fun <T :Any> lookUpBean(name: String, type: Class<T>): T? {
+    override fun <T :Any> lookUpBean(name: String, type: KClass<T>): T? {
         val beanCandidate = beans[name]
 		if (beanCandidate == null) {
 			return null
@@ -110,7 +114,7 @@ class BeanRegistry internal constructor() : BeansProvider {
 		}
 	}
 
-    override fun <T :Any> lookUpBean(type: Class<T>): T? {
+    override fun <T :Any> lookUpBean(type: KClass<T>): T? {
         val preferredBeanName = getPreferredBeanName(type)
         val beanCandidateByPreferredName = beans[preferredBeanName]
         if (beanCandidateByPreferredName != null) {
@@ -130,7 +134,7 @@ class BeanRegistry internal constructor() : BeansProvider {
         return null
     }
 
-    override fun <T :Any> lookUpBeans(type: Class<T>): List<T> {
+    override fun <T :Any> lookUpBeans(type: KClass<T>): List<T> {
         val matchingBeans: MutableList<T> = ArrayList()
         for ((key, value) in beans) {
             val bean = resolveBeanFromCandidate(key, type, value)
@@ -141,8 +145,8 @@ class BeanRegistry internal constructor() : BeansProvider {
         return matchingBeans
     }
 
-	private fun <T :Any> resolveBeanFromCandidate(name: String, type: Class<T>, beanCandidate: Any): T? {
-        if (beanCandidate is ScopedFactoryBean<*> && type.isAssignableFrom(beanCandidate.beanType)) {
+	private fun <T :Any> resolveBeanFromCandidate(name: String, type: KClass<T>, beanCandidate: Any): T? {
+		if (beanCandidate is ScopedFactoryBean<*> && beanCandidate.beanType.isSubclassOf(type)) {
 			@Suppress("UNCHECKED_CAST") val factoryBean = beanCandidate as ScopedFactoryBean<T>
             val scopedFactoryBeanHandler = beanScopes[factoryBean.scope]
             if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive) {
@@ -151,12 +155,12 @@ class BeanRegistry internal constructor() : BeansProvider {
         }
 
 		@Suppress("UNCHECKED_CAST")
-		return if (type.isAssignableFrom(beanCandidate.javaClass)) beanCandidate as T? else null
+		return if (type.isInstance(beanCandidate)) beanCandidate as T else null
 	}
 
     private companion object BeanNaming {
-        fun getPreferredBeanName(beanClass: Class<*>): String {
-            return beanClass.name
+		fun getPreferredBeanName(beanClass: KClass<*>): String {
+			return beanClass.jvmName
         }
     }
 }

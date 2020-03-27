@@ -1,8 +1,8 @@
 package rocks.frieler.android.beans.scopes.singleton
 
-import java8.util.function.Supplier
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
+import kotlin.reflect.KClass
 
 /**
  * [ScopedFactoryBean] for beans of the [singleton][SingletonScopedFactoryBeanHandler.name]-scope.
@@ -11,8 +11,8 @@ import rocks.frieler.android.beans.scopes.ScopedFactoryBean
  * There will be only a single instance of that bean, just as it would when defined without any
  * factory except that the bean will be instantiated lazily by the factory.
  */
-class SingletonScopedFactoryBean<T>
-private constructor(type: Class<T>, producer: Supplier<T>) : GenericScopedFactoryBean<T>(SingletonScopedFactoryBeanHandler.SINGLETON_SCOPE, type, producer) {
+class SingletonScopedFactoryBean<T : Any>
+private constructor(type: KClass<T>, producer: () -> T) : GenericScopedFactoryBean<T>(SingletonScopedFactoryBeanHandler.SINGLETON_SCOPE, type, producer) {
 
     companion object {
         /**
@@ -27,8 +27,8 @@ private constructor(type: Class<T>, producer: Supplier<T>) : GenericScopedFactor
          * @return a new [SingletonScopedFactoryBean]
          */
         @JvmStatic
-        fun <T> lazy(type: Class<T>, producer: Supplier<T>): SingletonScopedFactoryBean<T> {
-            return SingletonScopedFactoryBean(type, producer)
+        fun <T : Any> lazy(type: Class<T>, producer: () -> T): SingletonScopedFactoryBean<T> {
+            return SingletonScopedFactoryBean(type.kotlin, producer)
         }
     }
 }

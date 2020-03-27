@@ -1,7 +1,8 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
-import java.util.*
+import java.util.Objects
+import kotlin.reflect.KClass
 
 /**
  * [BeanDependency] to express a dependency on the beans of a certain type.
@@ -15,7 +16,7 @@ import java.util.*
  * @param <T> the bean-type
  */
 class BeansOfTypeDependency<T :Any>(
-		private val type: Class<T>
+		private val type: KClass<T>
 ) : BeanDependency<List<T>> {
 
 	private lateinit var beansProvider: BeansProvider

@@ -2,7 +2,8 @@ package rocks.frieler.android.beans
 
 import java8.util.Optional
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
-import java.util.*
+import java.util.Objects
+import kotlin.reflect.KClass
 
 /**
  * [BeanDependency] to express an optional dependency on a single bean.
@@ -15,7 +16,7 @@ import java.util.*
  */
 class OptionalSingleBeanDependency<T :Any>(
 		private val name: String?,
-		private val type: Class<out T>
+		private val type: KClass<out T>
 ) : BeanDependency<Optional<T>> {
 
 	private var bean: T? = null
@@ -25,7 +26,7 @@ class OptionalSingleBeanDependency<T :Any>(
 	 *
 	 * @param type the type of the bean
 	 */
-	constructor(type: Class<out T>) : this(null, type) {}
+	constructor(type: KClass<out T>) : this(null, type) {}
 
 	/**
 	 * Tries to fulfill this [BeanDependency] with beans from the given [BeansProvider] and returns
