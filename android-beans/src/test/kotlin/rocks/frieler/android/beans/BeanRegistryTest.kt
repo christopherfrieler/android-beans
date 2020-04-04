@@ -258,12 +258,12 @@ class BeanRegistryTest {
     private val beanPostProcessor: BeanPostProcessor = mock()
 
     @Test
-    fun `registered BeanPostProcessor gets new beans to post-process`() {
+    fun `bean implementing BeanPostProcessor gets detected and receives new beans to post-process`() {
         val originalBean = Any()
         val replacementBean = Any()
         whenever(beanPostProcessor.postProcessBean("bean", originalBean)).thenReturn(replacementBean)
 
-        beanRegistry.registerBeanPostProcessor(beanPostProcessor)
+        beanRegistry.registerBean(beanPostProcessor)
         beanRegistry.registerBean("bean", originalBean)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
@@ -271,20 +271,20 @@ class BeanRegistryTest {
     }
 
     @Test
-    fun `registered BeanPostProcessor gets existing beans to post-process`() {
+    fun `bean implementing BeanPostProcessor gets detected and receives existing beans to post-process`() {
         val originalBean = Any()
         val replacementBean = Any()
         whenever(beanPostProcessor.postProcessBean("bean", originalBean)).thenReturn(replacementBean)
 
         beanRegistry.registerBean("bean", originalBean)
-        beanRegistry.registerBeanPostProcessor(beanPostProcessor)
+        beanRegistry.registerBean(beanPostProcessor)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
 		assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameAs(replacementBean)
     }
 
     @Test
-    fun `registered BeanPostProcessor gets scoped bean to post-process when it is produced`() {
+    fun `bean implementing BeanPostProcessor receives scoped bean to post-process when it is produced`() {
         whenever(beanScope.isActive).thenReturn(true)
         val name = "bean"
         val scope = beanScope.name
@@ -300,7 +300,7 @@ class BeanRegistryTest {
         whenever(beanPostProcessor.postProcessBean(name, originalBean)).thenReturn(replacementBean)
 
         beanRegistry.registerBean(name, factoryBean)
-        beanRegistry.registerBeanPostProcessor(beanPostProcessor)
+        beanRegistry.registerBean(beanPostProcessor)
 		val finalBean = beanRegistry.lookUpBean(name, Any::class)
 
         verify(beanPostProcessor).postProcessBean(name, originalBean)

@@ -13,7 +13,7 @@ import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -82,20 +82,5 @@ public class BeanConfigurationJavaApiTest {
         assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>("bean", JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
         assertThat(beanDependencies, hasItem(equalTo(new OptionalSingleBeanDependency<>(JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
         assertThat(beanDependencies, hasItem(equalTo(new BeansOfTypeDependency<>(JvmClassMappingKt.getKotlinClass(BeanConfigurationJavaApiTest.class)))));
-    }
-
-    @Test
-    public void testBeanConfigurationCanRegisterABeanPostProcessor() {
-        BeanConfiguration beanConfiguration = new BeanConfiguration() {
-            @Override
-            public void defineBeans(@NotNull BeansCollector beansCollector) {
-                beansCollector.registerBeanPostProcessor(mock(BeanPostProcessor.class));
-            }
-        };
-
-        BeansCollector beansCollector = mock(BeansCollector.class);
-        beanConfiguration.defineBeans(beansCollector);
-
-        verify(beansCollector).registerBeanPostProcessor(any(BeanPostProcessor.class));
     }
 }

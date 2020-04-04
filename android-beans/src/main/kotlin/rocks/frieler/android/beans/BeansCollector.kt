@@ -27,15 +27,4 @@ interface BeansCollector {
 	 * @param bean the bean to define
 	 */
 	fun defineBean(name: String, bean: Any)
-
-	/**
-	 * Registers the given [BeanPostProcessor].
-	 *
-	 *
-	 * The [BeanPostProcessor] will get all beans already defined to post-process immediately and
-	 * all beans defined subsequently.
-	 *
-	 * @param beanPostProcessor the new [BeanPostProcessor]
-	 */
-	fun registerBeanPostProcessor(beanPostProcessor: BeanPostProcessor)
 }

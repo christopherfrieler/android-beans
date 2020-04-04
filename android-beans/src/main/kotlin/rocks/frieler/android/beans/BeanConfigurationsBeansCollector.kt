@@ -90,17 +90,6 @@ internal constructor(
 	}
 
 	/**
-	 * Registers the given [BeanPostProcessor] at the underlying [BeanRegistry].
-	 *
-	 * @param beanPostProcessor the new [BeanPostProcessor]
-	 *
-	 * @see BeanRegistry.registerBeanPostProcessor
-	 */
-	override fun registerBeanPostProcessor(beanPostProcessor: BeanPostProcessor) {
-		beanRegistry.registerBeanPostProcessor(beanPostProcessor)
-	}
-
-	/**
 	 * Delegates to the underlying [BeanRegistry].
 	 *
 	 * @see BeanRegistry.lookUpBean

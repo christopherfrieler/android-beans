@@ -112,15 +112,6 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `registerBeanPostProcessor() registers the BeanPostProcessor at the BeanRegistry`() {
-		val beanPostProcessor : BeanPostProcessor = mock()
-
-		beanConfigurationsBeansCollector.registerBeanPostProcessor(beanPostProcessor)
-
-		verify(beanRegistry).registerBeanPostProcessor(beanPostProcessor)
-	}
-
-	@Test
 	fun `lookUpBean() by name and type delegates to the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
