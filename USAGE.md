@@ -181,12 +181,12 @@ sure to clear all references to the `Activity`, otherwise the stale references w
 
 ### BeanPostProcessor
 
-If you need to post-process beans after their creation, this is possible by implementing the
+If you want to post-process beans after their creation, this is possible by implementing the
 `BeanPostProcessor`-interface. The interface allows to manipulate or even replace beans.
 
-`BeanPostProcessor`s must be registered at the `BeanRegistry`, usually through the `BeansCollector`.
+A bean implementing `BeanPostProcessor`s is detected by the `BeanRegistry`.
 
-When a `BeanPostProcessor` is registered, it is first invoked for all existing beans. It will then be invoked for every
+When a `BeanPostProcessor` is detected, it is first invoked for all existing beans. It will then be invoked for every
 bean registered later and also for every scoped bean, when it is created by its factory.
 
 Android Beans already provides one convenient implementation, the `BeansOfTypeConsumer`, which allows to apply an action

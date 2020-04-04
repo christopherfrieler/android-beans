@@ -68,7 +68,9 @@ class BeanRegistry internal constructor() : BeansProvider {
      * Registers the bean with the given name at this [BeanRegistry].
      *
      *
-     * The bean will be post-processed by all registered [BeanPostProcessor]s.
+     * The bean will be post-processed by all registered [BeanPostProcessor]s. If the bean is a
+	 * [BeanPostProcessor] itself, it will receive all beans already registered to post-process
+	 * immediately and all beans registered subsequently, but never the bean itself.
      *
      *
      * If a bean with this name already exists, it will be replaced.
@@ -77,19 +79,16 @@ class BeanRegistry internal constructor() : BeansProvider {
      * @param bean the bean
      */
     fun registerBean(name: String, bean: Any) {
-        beans[name] = postProcessBean(name, bean)
+		val effectiveBean = postProcessBean(name, bean)
+
+		if (effectiveBean is BeanPostProcessor) {
+			registerBeanPostProcessor(effectiveBean)
+		}
+
+		beans[name] = effectiveBean
     }
 
-    /**
-     * Registers the given [BeanPostProcessor].
-     *
-     *
-     * The [BeanPostProcessor] will get all beans already registered to post-process immediately and all beans
-     * registered subsequently.
-     *
-     * @param beanPostProcessor the new [BeanPostProcessor]
-     */
-    fun registerBeanPostProcessor(beanPostProcessor: BeanPostProcessor) {
+    private fun registerBeanPostProcessor(beanPostProcessor: BeanPostProcessor) {
         beanPostProcessors.add(beanPostProcessor)
 
         for (beanEntry in beans.entries) {
