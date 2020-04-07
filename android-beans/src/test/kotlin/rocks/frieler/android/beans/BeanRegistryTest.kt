@@ -5,17 +5,19 @@ import assertk.assertions.containsOnly
 import assertk.assertions.isIn
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.*
-import java8.util.function.Supplier
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
-import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.Companion.prototype
+import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean
-import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.Companion.lazy
 import kotlin.reflect.jvm.jvmName
 
 @RunWith(MockitoJUnitRunner::class)
@@ -235,7 +237,7 @@ class BeanRegistryTest {
     @Test
     fun `BeanRegistry supports lazy instantiation in singleton-scope by default`() {
         val name = "lazyInstantiatedBean"
-        val singletonFactory = lazy(BeanRegistryTest::class.java) { this }
+        val singletonFactory = SingletonScopedFactoryBean(BeanRegistryTest::class) { this }
 
         beanRegistry.registerBean(name, singletonFactory)
         val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
@@ -246,7 +248,7 @@ class BeanRegistryTest {
     @Test
     fun `BeanRegistry supports prototype-scope by default`() {
         val name = "prototypeBean"
-        val prototype = prototype(BeanRegistryTest::class.java) { this }
+        val prototype = PrototypeScopedFactoryBean(BeanRegistryTest::class) { this }
 
         beanRegistry.registerBean(name, prototype)
         val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)

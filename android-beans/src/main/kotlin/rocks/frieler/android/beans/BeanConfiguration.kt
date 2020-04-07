@@ -28,6 +28,9 @@ import rocks.frieler.android.beans.BeanDependency.Fulfillment
  *
  * @author Christopher Frieler
  */
+@Deprecated(
+		"BeanConfiguration will be replaced by [DeclarativeBeanConfiguration]",
+		level = DeprecationLevel.WARNING)
 abstract class BeanConfiguration {
 
 	private val beanDependencies: MutableList<BeanDependency<*>> = ArrayList()
