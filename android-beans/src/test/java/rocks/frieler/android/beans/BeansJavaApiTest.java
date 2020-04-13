@@ -1,15 +1,18 @@
 package rocks.frieler.android.beans;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 
+import kotlin.jvm.JvmClassMappingKt;
+
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 public class BeansJavaApiTest {
@@ -17,9 +20,14 @@ public class BeansJavaApiTest {
     public void initializeBeans() {
         new Beans.Initializer()
                 .collectBeans(Collections.singletonList(new BeanConfiguration() {
+                    @NotNull
                     @Override
-                    public void defineBeans(BeansCollector beansCollector) {
-                        beansCollector.defineBean("beansJavaApiTest", BeansJavaApiTest.this);
+                    public List<BeanDefinition<?>> getBeanDefinitions() {
+                        BeanDefinition<BeansJavaApiTest> aBeanDefinition = new BeanDefinition<>(
+                                "beansJavaApiTest",
+                                JvmClassMappingKt.getKotlinClass(BeansJavaApiTest.class),
+                                () -> BeansJavaApiTest.this);
+                        return Collections.singletonList(aBeanDefinition);
                     }
                 }))
                 .initialize();

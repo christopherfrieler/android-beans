@@ -111,6 +111,8 @@ class BeanConfigurationTest {
 			}
 		}
 
-		override fun defineBeans(beansCollector: BeansCollector) {}
+		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+			return emptyList()
+		}
 	}
 }
