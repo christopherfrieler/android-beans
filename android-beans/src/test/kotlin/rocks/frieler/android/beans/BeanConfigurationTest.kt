@@ -27,7 +27,7 @@ class BeanConfigurationTest {
 	fun `BeanConfiguration depends on bean required by name and type`() {
 		val beanConfiguration: BeanConfiguration = BeanConfigurationWithDefinedDependencies()
 
-		val dependency = beanConfiguration.requireBean("name", BeanConfigurationTest::class.java)
+		val dependency = beanConfiguration.requireBean("name", BeanConfigurationTest::class)
 
 		assertThat(beanConfiguration.dependencies).contains(dependency)
 	}
@@ -36,7 +36,7 @@ class BeanConfigurationTest {
 	fun `BeanConfiguration depends on bean required by type`() {
 		val beanConfiguration: BeanConfiguration = BeanConfigurationWithDefinedDependencies()
 
-		val dependency = beanConfiguration.requireBean(BeanConfigurationTest::class.java)
+		val dependency = beanConfiguration.requireBean(type = BeanConfigurationTest::class)
 
 		assertThat(beanConfiguration.dependencies).contains(dependency)
 	}
@@ -45,7 +45,7 @@ class BeanConfigurationTest {
 	fun `BeanConfiguration depends on optional bean required by type`() {
 		val beanConfiguration: BeanConfiguration = BeanConfigurationWithDefinedDependencies()
 
-		val dependency = beanConfiguration.requireOptionalBean(BeanConfigurationTest::class.java)
+		val dependency = beanConfiguration.requireOptionalBean(type = BeanConfigurationTest::class)
 
 		assertThat(beanConfiguration.dependencies).contains(dependency)
 	}
@@ -54,7 +54,7 @@ class BeanConfigurationTest {
 	fun `BeanConfiguration depends on beans required by type`() {
 		val beanConfiguration: BeanConfiguration = BeanConfigurationWithDefinedDependencies()
 
-		val dependency = beanConfiguration.requireBeans(BeanConfigurationTest::class.java)
+		val dependency = beanConfiguration.requireBeans(BeanConfigurationTest::class)
 
 		assertThat(beanConfiguration.dependencies).contains(dependency)
 	}
