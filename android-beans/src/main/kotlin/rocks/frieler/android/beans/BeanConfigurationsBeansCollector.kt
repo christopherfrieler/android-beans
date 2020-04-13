@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 class BeanConfigurationsBeansCollector
 internal constructor(
 	private val beanRegistry: BeanRegistry
-) : BeansCollector, BeansProvider {
+) : BeansProvider {
 
 	private val remainingBeanConfigurations: MutableList<BeanConfiguration> = LinkedList()
 
@@ -43,10 +43,10 @@ internal constructor(
 		while (limit > 0) {
 			val beanConfiguration = remainingBeanConfigurations.removeAt(0)
 			if (beanConfiguration.isReadyToDefineBeans(this) === Readiness.READY) {
-				beanConfiguration.defineBeans(this)
+				produceBeans(beanConfiguration)
 				limit = remainingBeanConfigurations.size
 			} else if (includingDelayed && beanConfiguration.isReadyToDefineBeans(this) === Readiness.DELAY) {
-				beanConfiguration.defineBeans(this)
+				produceBeans(beanConfiguration)
 				includingDelayed = false
 				limit = remainingBeanConfigurations.size
 			} else {
@@ -60,33 +60,20 @@ internal constructor(
 		}
 	}
 
+	private fun produceBeans(beanConfiguration: BeanConfiguration) {
+		beanConfiguration.getBeanDefinitions().forEach {
+			if (it.getName() != null) {
+				this.beanRegistry.registerBean(it.getName()!!, it.produceBean())
+			} else {
+				this.beanRegistry.registerBean(it.produceBean())
+			}
+		}
+	}
+
 	private fun applyBeanRegistryPostProcessors() {
 		for (postProcessor in beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class)) {
 			postProcessor.postProcess(beanRegistry)
 		}
-	}
-
-	/**
-	 * Callback-method for [BeanConfiguration]s to define their beans.
-	 *
-	 * @param bean the bean
-	 */
-	override fun defineBean(bean: Any) {
-		beanRegistry.registerBean(bean)
-	}
-
-	/**
-	 * Callback-method for [BeanConfiguration]s to define their beans with an explicit name.
-	 *
-	 *
-	 * Defining a bean with an explicit name allows to override a bean with the same name. Additionally defining an
-	 * explicit name can speed-up the lookup of the bean if the lookup is done by name.
-	 *
-	 * @param name the name of the bean
-	 * @param bean the bean
-	 */
-	override fun defineBean(name: String, bean: Any) {
-		beanRegistry.registerBean(name, bean)
 	}
 
 	/**

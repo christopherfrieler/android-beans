@@ -68,14 +68,20 @@ class BeanConfigurationsAssetScannerTest {
 	}
 
 	class ABeanConfiguration : BeanConfiguration() {
-		override fun defineBeans(beansCollector: BeansCollector) {}
+		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+			return emptyList()
+		}
 	}
 
 	internal class ABeanConfigurationNeedingTheContext(context: Context?) : BeanConfiguration() {
-		override fun defineBeans(beansCollector: BeansCollector) {}
+		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+			return emptyList()
+		}
 	}
 
 	class AnotherBeanConfiguration : BeanConfiguration() {
-		override fun defineBeans(beansCollector: BeansCollector) {}
+		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+			return emptyList()
+		}
 	}
 }

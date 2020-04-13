@@ -24,50 +24,64 @@ class BeanConfigurationsBeansCollectorTest {
 	private val anotherBeanConfiguration: BeanConfiguration = mock()
 	private val yetAnotherBeanConfiguration: BeanConfiguration = mock()
 
+	private val beanDefinitionWithoutName: BeanDefinition<*> = mock()
+	private val beanDefinitionWithName: BeanDefinition<*> = mock()
+
 	@Test
 	fun `collectBeans() let's the BeanConfigurations define their beans`() {
 		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
+		whenever(beanConfiguration.getBeanDefinitions())
+				.thenReturn(listOf(beanDefinitionWithoutName, beanDefinitionWithName))
+		whenever(beanDefinitionWithoutName.getName()).thenReturn(null)
+		whenever(beanDefinitionWithoutName.produceBean()).thenReturn(Any())
+		whenever(beanDefinitionWithName.getName()).thenReturn("bean")
+		whenever(beanDefinitionWithName.produceBean()).thenReturn(Any())
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		verify(beanConfiguration).getBeanDefinitions()
+		verify(beanRegistry).registerBean(beanDefinitionWithoutName.produceBean())
+		verify(beanRegistry).registerBean(beanDefinitionWithName.getName()!!, beanDefinitionWithName.produceBean())
 	}
 
 	@Test
 	fun `collectBeans() resolves dependencies between BeanConfigurations and handles them in a possible order`() {
 		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
-		doAnswer {
+		whenever(beanConfiguration.getBeanDefinitions()).thenAnswer {
 			whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		}.whenever(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+			emptyList<BeanDefinition<*>>()
+		}
 		whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
 		whenever(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		doAnswer {
+		whenever(yetAnotherBeanConfiguration.getBeanDefinitions()).thenAnswer {
 			whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		}.whenever(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+			emptyList<BeanDefinition<*>>()
+		}
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration))
 
 		val inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration)
-		inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
-		inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
-		inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		inOrder.verify(yetAnotherBeanConfiguration).getBeanDefinitions()
+		inOrder.verify(beanConfiguration).getBeanDefinitions()
+		inOrder.verify(anotherBeanConfiguration).getBeanDefinitions()
 	}
 
 	@Test
 	fun `collectBeans() delays BeanConfiguration waiting for an optional dependency`() {
 		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.DELAY)
 		whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
-		doAnswer {
-			Mockito.`when`(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		}.whenever(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		whenever(yetAnotherBeanConfiguration.getBeanDefinitions()).thenAnswer {
+			whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
+			emptyList<BeanDefinition<*>>()
+		}
 		whenever(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration))
 
 		val inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration)
-		inOrder.verify(yetAnotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
-		inOrder.verify(anotherBeanConfiguration).defineBeans(beanConfigurationsBeansCollector)
-		inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		inOrder.verify(yetAnotherBeanConfiguration).getBeanDefinitions()
+		inOrder.verify(anotherBeanConfiguration).getBeanDefinitions()
+		inOrder.verify(beanConfiguration).getBeanDefinitions()
 	}
 
 	@Test
@@ -76,7 +90,7 @@ class BeanConfigurationsBeansCollectorTest {
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		verify(beanConfiguration).getBeanDefinitions()
 		reset(beanConfiguration)
 
 		beanConfigurationsBeansCollector.collectBeans(emptyList())
@@ -93,22 +107,8 @@ class BeanConfigurationsBeansCollectorTest {
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
 		val inOrder = inOrder(beanConfiguration, beanRegistryPostProcessor)
-		inOrder.verify(beanConfiguration).defineBeans(beanConfigurationsBeansCollector)
+		inOrder.verify(beanConfiguration).getBeanDefinitions()
 		inOrder.verify(beanRegistryPostProcessor).postProcess(beanRegistry)
-	}
-
-	@Test
-	fun `defineBean() registers a singleton bean at the BeanRegistry`() {
-		beanConfigurationsBeansCollector.defineBean(this)
-
-		verify(beanRegistry).registerBean(this)
-	}
-
-	@Test
-	fun `defineBean() with explicit name registers a singleton bean at the BeanRegistry`() {
-		beanConfigurationsBeansCollector.defineBean("bean", this)
-
-		verify(beanRegistry).registerBean("bean", this)
 	}
 
 	@Test

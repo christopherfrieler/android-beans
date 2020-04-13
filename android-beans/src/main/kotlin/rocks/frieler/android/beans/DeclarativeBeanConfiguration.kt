@@ -3,18 +3,39 @@ package rocks.frieler.android.beans
 import androidx.annotation.VisibleForTesting
 import kotlin.reflect.KClass
 
+/**
+ * Abstract super-class for [BeanConfiguration]s to define their beans in a declarative fashion.
+ *
+ *
+ * Usage example:
+ * ```kotlin
+ * // 1. extend BeanConfiguration:
+ * class MyBeanConfiguration : DeclarativeBeanConfiguration() {
+ *
+ *   // 2. declare dependencies to other beans using the require-methods:
+ *   private val anotherBean = requireBean(type = AnotherBean::class)
+ *
+ *   // 3. define beans:
+ *   override fun beans() {
+ *     bean("my_bean") {
+ *       MyBean(anotherBean.get())
+ *     }
+ *   }
+ * }
+ * ```
+ */
 abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	private val beanDefinitions: MutableList<BeanDefinition<*>> = ArrayList()
 
-	final override fun defineBeans(beansCollector: BeansCollector) {
-		beans()
-		beanDefinitions.forEach {
-			if (it.getName() != null) {
-				beansCollector.defineBean(it.getName()!!, it.produceBean())
-			} else {
-				beansCollector.defineBean(it.produceBean())
-			}
+	private var hasDeclaredBeans = false
+
+	final override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+		if (!hasDeclaredBeans) {
+			hasDeclaredBeans = true
+			beans()
 		}
+
+		return beanDefinitions
 	}
 
 	abstract fun beans()

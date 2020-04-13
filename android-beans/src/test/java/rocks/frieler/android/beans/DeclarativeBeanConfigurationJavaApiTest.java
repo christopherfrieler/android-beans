@@ -12,11 +12,9 @@ import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean.activityScoped;
 import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
 import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazyInstantiated;
@@ -33,11 +31,11 @@ public class DeclarativeBeanConfigurationJavaApiTest {
             }
         };
 
-        BeansCollector beansCollector = mock(BeansCollector.class);
-        beanConfiguration.defineBeans(beansCollector);
+        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
 
-        verify(beansCollector).defineBean(any(DeclarativeBeanConfigurationJavaApiTest.class));
-        verify(beansCollector).defineBean(anyString(), any());
+        assertThat(beanDefinitions.size(), is(equalTo(2)));
+        assertThat(beanDefinitions.get(0).getName(), is(nullValue()));
+        assertThat(beanDefinitions.get(1).getName(), is("named_bean"));
     }
 
     @Test
@@ -59,12 +57,11 @@ public class DeclarativeBeanConfigurationJavaApiTest {
             }
         };
 
-        BeansCollector beansCollector = mock(BeansCollector.class);
-        beanConfiguration.defineBeans(beansCollector);
+        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
 
-        verify(beansCollector).defineBean(any(SingletonScopedFactoryBean.class));
-        verify(beansCollector).defineBean(any(PrototypeScopedFactoryBean.class));
-        verify(beansCollector).defineBean(any(ActivityScopedFactoryBean.class));
+        assertThat(beanDefinitions.get(0).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(SingletonScopedFactoryBean.class))));
+        assertThat(beanDefinitions.get(1).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(PrototypeScopedFactoryBean.class))));
+        assertThat(beanDefinitions.get(2).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(ActivityScopedFactoryBean.class))));
     }
 
     @Test
@@ -77,11 +74,11 @@ public class DeclarativeBeanConfigurationJavaApiTest {
             }
         };
 
-        BeansCollector beansCollector = mock(BeansCollector.class);
-        beanConfiguration.defineBeans(beansCollector);
+        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
 
-        verify(beansCollector).defineBean(any(DeclarativeBeanConfigurationJavaApiTest.class));
-        verify(beansCollector).defineBean(any(String.class));
+        assertThat(beanDefinitions.size(), is(2));
+        final Object aBean = beanDefinitions.get(0).produceBean();
+        assertThat(beanDefinitions.get(1).produceBean(), is(equalTo(aBean.toString())));
     }
 
     @Test

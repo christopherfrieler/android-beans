@@ -12,26 +12,8 @@ import kotlin.reflect.KClass
  * or no arguments, to be instantiated.
  *
  *
- * Usage example:
- * ```java
- * // 1. extend BeanConfiguration:
- * public class MyBeanConfiguration extends BeanConfiguration {
- *
- * 	// 2. declare dependencies to other beans using the require-methods:
- * 	private final BeanDependency&lt;AnotherBean&gt; dependency = requireBean(AnotherBean.class);
- *
- * 	// 3. define beans:
- * 	public void defineBeans(BeansCollector beansCollector) {
- * 		beansCollector.defineBean(new MyBean(dependency.get()));
- * 	}
- * }
- *```
- *
  * @author Christopher Frieler
  */
-@Deprecated(
-		"BeanConfiguration will be replaced by [DeclarativeBeanConfiguration]",
-		level = DeprecationLevel.WARNING)
 abstract class BeanConfiguration {
 
 	private val beanDependencies: MutableList<BeanDependency<*>> = ArrayList()
@@ -158,22 +140,9 @@ abstract class BeanConfiguration {
 	}
 
 	/**
-	 * Defines beans for the context of this application by calling
-	 * [BeanConfigurationsBeansCollector.defineBean].
+	 * Returns [BeanDefinition]s for the beans defined by this [BeanConfiguration].
 	 *
-	 *
-	 * Other beans can by obtained by declaring [BeanDependency]s to satisfy dependencies of the defined beans
-	 * through [dependencies]. Hence, the require-methods that register [BeanDependency]s must not be
-	 * called inside this method; this must be done earlier. And take care not to create cyclic dependencies between
-	 * [BeanConfiguration]s which are unresolvable.
-	 *
-	 *
-	 * This method must not be called before [.isReadyToDefineBeans] returned
-	 * `true`.
-	 *
-	 * @param beansCollector the [BeanConfigurationsBeansCollector] that collects the beans
-	 *
-	 * @see BeanConfigurationsBeansCollector.defineBean
+	 * @return a list of [BeanDefinition]s
 	 */
-	abstract fun defineBeans(beansCollector: BeansCollector)
+	abstract fun getBeanDefinitions() : List<BeanDefinition<*>>
 }

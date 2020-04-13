@@ -1,14 +1,11 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.isNotNull
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
+import assertk.assertions.isSameAs
 import org.junit.Test
-import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
 class DeclarativeBeanConfigurationTest {
 	@Test
@@ -25,11 +22,13 @@ class DeclarativeBeanConfigurationTest {
 			}
 		}
 
-		val beansCollector : BeansCollector = mock()
-		aBeanConfiguration.defineBeans(beansCollector)
+		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
 
-		verify(beansCollector, times(1)).defineBean(this)
-		verify(beansCollector, times(1)).defineBean("named_bean", this)
+		assertThat(beanDefinitions).hasSize(2)
+		assertThat(beanDefinitions[0].getName()).isNull()
+		assertThat(beanDefinitions[0].produceBean()).isSameAs(this)
+		assertThat(beanDefinitions[1].getName()).isEqualTo("named_bean")
+		assertThat(beanDefinitions[1].produceBean()).isSameAs(this)
 	}
 
 	@Test
@@ -42,10 +41,12 @@ class DeclarativeBeanConfigurationTest {
 			}
 		}
 
-		val beansCollector : BeansCollector = mock()
-		aBeanConfiguration.defineBeans(beansCollector)
+		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
 
-		verify(beansCollector, times(1)).defineBean("bean", this)
+		assertThat(beanDefinitions).hasSize(1)
+		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
+		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
+		assertThat(beanDefinitions[0].produceBean()).isSameAs(this)
 	}
 
 	@Test
@@ -56,10 +57,12 @@ class DeclarativeBeanConfigurationTest {
 			}
 		}
 
-		val beansCollector : BeansCollector = mock()
-		aBeanConfiguration.defineBeans(beansCollector)
+		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
 
-		verify(beansCollector, times(1)).defineBean("bean", this)
+		assertThat(beanDefinitions).hasSize(1)
+		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
+		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
+		assertThat(beanDefinitions[0].produceBean()).isSameAs(this)
 	}
 
 	@Test
@@ -76,9 +79,12 @@ class DeclarativeBeanConfigurationTest {
 			}
 		}
 
-		val beansCollector : BeansCollector = mock()
-		aBeanConfiguration.defineBeans(beansCollector)
+		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
 
-		verify(beansCollector).defineBean("anotherBean", this)
+		assertThat(beanDefinitions).hasSize(2)
+		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
+		assertThat(beanDefinitions[0].produceBean()).isSameAs(this)
+		assertThat(beanDefinitions[1].getName()).isEqualTo("anotherBean")
+		assertThat(beanDefinitions[1].produceBean()).isSameAs(this)
 	}
 }
