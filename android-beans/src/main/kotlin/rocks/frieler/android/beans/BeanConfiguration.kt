@@ -2,6 +2,7 @@ package rocks.frieler.android.beans
 
 import java8.util.Optional
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
+import kotlin.reflect.KClass
 
 /**
  * Abstract super-class to define beans for the context of an application.
@@ -54,6 +55,17 @@ abstract class BeanConfiguration {
 	}
 
 	/**
+	 * Creates and registers a [BeanDependency] on a bean.
+	 *
+	 * @param name the name of the desired bean (optional)
+	 * @param type the type of the desired bean
+	 * @param <T> the type of the desired bean
+	 * @return the [BeanDependency] on the desired bean
+	 */
+	fun <T :Any> requireBean(name: String? = null, type: KClass<T>): BeanDependency<T> =
+			addDependency(SingleBeanDependency(name, type))
+
+	/**
 	 * Creates and registers a [BeanDependency] on a bean with the given name and of the given type.
 	 *
 	 * @param name the name of the desired bean
@@ -62,7 +74,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBean(name: String, type: Class<T>): BeanDependency<T> =
-			addDependency(SingleBeanDependency(name, type.kotlin))
+			requireBean(name, type.kotlin)
 
 	/**
 	 * Creates and registers a [BeanDependency] on a bean of the given type.
@@ -72,7 +84,18 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBean(type: Class<T>): BeanDependency<T> =
-			addDependency(SingleBeanDependency(type.kotlin))
+			requireBean(type = type.kotlin)
+
+	/**
+	 * Creates and registers a [BeanDependency] on a bean of the given type.
+	 *
+	 * @param name the name of the desired bean (optional)
+	 * @param type the type of the desired bean
+	 * @param <T> the type of the desired bean
+	 * @return the [BeanDependency] on the desired bean
+	 */
+	fun <T: Any> requireOptionalBean(name: String? = null, type: KClass<T>): BeanDependency<Optional<T>> =
+			addDependency(OptionalSingleBeanDependency(name, type))
 
 	/**
 	 * Creates and registers a [BeanDependency] on a bean of the given type.
@@ -82,7 +105,17 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T: Any> requireOptionalBean(type: Class<T>): BeanDependency<Optional<T>> =
-			addDependency(OptionalSingleBeanDependency(type.kotlin))
+			requireOptionalBean(type = type.kotlin)
+
+	/**
+	 * Creates and registers a [BeanDependency] on the beans of the given type.
+	 *
+	 * @param type the type of the desired bean
+	 * @param <T> the type of the desired bean
+	 * @return the [BeanDependency] on the desired bean
+	 */
+	fun <T :Any> requireBeans(type: KClass<T>): BeanDependency<List<T>> =
+			addDependency(BeansOfTypeDependency(type))
 
 	/**
 	 * Creates and registers a [BeanDependency] on the beans of the given type.
@@ -92,7 +125,7 @@ abstract class BeanConfiguration {
 	 * @return the [BeanDependency] on the desired bean
 	 */
 	fun <T :Any> requireBeans(type: Class<T>): BeanDependency<List<T>> =
-			addDependency(BeansOfTypeDependency(type.kotlin))
+			requireBeans(type.kotlin)
 
 	/**
 	 * Checks, if this [BeanConfiguration] is ready to define its beans.
