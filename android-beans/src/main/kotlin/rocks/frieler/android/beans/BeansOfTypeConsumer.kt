@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans
 
 import java8.util.function.Consumer
+import kotlin.reflect.KClass
 
 /**
  * [BeanPostProcessor] to consume all beans of a certain type (including all its subtypes).
@@ -10,12 +11,14 @@ import java8.util.function.Consumer
  *
  * @param <Type> the type of beans to post-process
  */
-class BeansOfTypeConsumer<Type>(private val type: Class<Type>, private val consumer: Consumer<Type>) : BeanPostProcessor {
+class BeansOfTypeConsumer<Type : Any>(private val type: KClass<Type>, private val consumer: (Type) -> Unit) : BeanPostProcessor {
+
+    constructor(type: Class<Type>, consumer: Consumer<Type>) : this(type.kotlin, consumer::accept)
 
     override fun <T :Any> postProcessBean(name: String, bean: T): T {
-        if (type.isAssignableFrom(bean.javaClass)) {
+        if (type.isInstance(bean)) {
             @Suppress("UNCHECKED_CAST")
-            consumer.accept(bean as Type)
+            consumer(bean as Type)
         }
         return bean
     }

@@ -12,8 +12,8 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class BeansOfTypeConsumerTest {
-    private val consumer: Consumer<BeansOfTypeConsumerTest> = mock()
-    private val beansOfTypeConsumer = BeansOfTypeConsumer(BeansOfTypeConsumerTest::class.java, consumer)
+    private val consumer: (BeansOfTypeConsumerTest) -> Unit = mock()
+    private val beansOfTypeConsumer = BeansOfTypeConsumer(BeansOfTypeConsumerTest::class, consumer)
 
     @Test
     fun `postProcessBean() ignores bean that is not of specified type`() {
@@ -27,6 +27,17 @@ class BeansOfTypeConsumerTest {
 
     @Test
     fun `postProcessBean() consumes bean of specified type and returns it`() {
+        val processedBean = beansOfTypeConsumer.postProcessBean("bean", this)
+
+        verify(consumer)(this)
+        assertThat(processedBean).isSameAs(this)
+    }
+
+    @Test
+    fun `BeansOfTypeConsumer can be used with java-type and -Consumer`() {
+        val consumer: Consumer<BeansOfTypeConsumerTest> = mock()
+
+        val beansOfTypeConsumer = BeansOfTypeConsumer(BeansOfTypeConsumerTest::class.java, consumer)
         val processedBean = beansOfTypeConsumer.postProcessBean("bean", this)
 
         verify(consumer).accept(this)
