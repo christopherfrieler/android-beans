@@ -3,8 +3,8 @@
 
 ## Integrating Android Beans into an app
 
-Make sure you have 'jcenter' added to your repositories in your build.gradle file:
-```groovy
+Make sure you have 'jcenter' added to your repositories in your build.gradle.kts file:
+```kotlin
 allprojects {
     repositories {
         jcenter()
@@ -13,9 +13,9 @@ allprojects {
 ```
 
 Add Android Beans to your dependencies:
-```groovy
+```kotlin
 dependencies {
-    implementation 'rocks.frieler.android:android-beans:0.3.0'
+    implementation("rocks.frieler.android:android-beans:0.3.0")
 }
 ```
 
