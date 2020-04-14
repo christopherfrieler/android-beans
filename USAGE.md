@@ -39,21 +39,31 @@ Now you're ready to define your beans as described in the following section.
 
 ## Defining beans
 
-To define beans write a class that extends `BeanConfiguration`. In its `defineBeans()`-method you can define your beans
-through the `BeansCollector`.
+To define beans write a class that extends `BeanConfiguration`. The most convenient way is to extend its subclass
+`DeclarativeBeanConfiguration`. In its `beans()`-method you can define your beans in a declarative fashion with the
+various `bean()`-methods:
+```kotlin
+class MyBeanConfiguration : DeclarativeBeanConfiguration() {
+    override fun beans() {
+        bean { MyBean() } // with a generated name
+        bean("myNamedBean") { MyBean() } // with an explicit name
+    }
+}
+```
+Or in Java:
 ```java
-public class MyBeanConfiguration extends BeanConfiguration {
+public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean(new MyBean()); // with a generated name
-        beansCollector.defineBean("myNamedBean", new MyBean()); // with an explicit name
+    public void beans() {
+        bean(MyBean.class, MyBean::new); // with a generated name
+        bean("myNamedBean", MyBean.class, MyBean::new); // with an explicit name
     }
 }
 ```
 Of course you can also have multiple `BeanConfiguration`s to structure your code.
 
-Now create a folder named `bean-configurations` in the assets-directory of your app and place a simple text-file in it,
-which contains the full qualified name of your `BeanConfiguration`.
+Now create a folder named `bean-configurations` in the assets-directory of your app and place a simple text-file with the
+name of your choice  in it, which contains the full qualified name of your `BeanConfiguration`.
 ```text
 my.app.package.MyBeanConfiguration
 ```
@@ -64,10 +74,14 @@ different modules and also Android libraries as long as the files have different
 
 ## Using beans
 
-To use the previously defined beans you can look them up through the `Beans` facade-class, which offers three
+To use the previously defined beans you can look them up through the `Beans` facade-object, which offers three
 possibilities.
 
 **Lookup only by type:**
+```kotlin
+val myBean: MyBean = Beans.lookUpBean()
+```
+Or in Java:
 ```java
 MyBean myBean = Beans.lookUpBean(MyBean.class);
 ```
@@ -76,12 +90,20 @@ or even which implementation of an interface or abstract class it uses, since th
 of the desired type. 
 
 **Lookup by name and type:**
+```kotlin
+val myBean: MyBean = Beans.lookUpBean("myBean")
+```
+Or in Java:
 ```java
 MyBean myBean = Beans.lookUpBean("myBean", MyBean.class);
 ```
 This can be useful if there could be more than one bean of that type and you want a specific one.
 
 **Lookup of all beans of a type**
+```kotlin
+val myBeans: List<MyBean> = Beans.lookUpBeans()
+```
+Or in Java:
 ```java
 List<MyBean> myBeans = Beans.lookUpBeans(MyBean.class);
 ```
@@ -90,28 +112,38 @@ of `MyBean` into the consuming code.
 
 ### Dependencies between beans 
 
-You can also require beans from other `BeanConfiguration`s while defining a bean, that depends on them. In order to
-handle ordering between the `BeanConfiguration`s correctly, the dependency must be declared explicitly **before** the
-invocation of `defineBeans(BeansCollector)`. `BeanConfiguration` provides some methods for that. Android Beans will
-ensure, that `defineBeans(BeansCollector)` is called only after all dependencies are fulfilled.
+You can also require beans from other `BeanConfiguration`s to define a bean, that depends on them. In order to handle
+ordering between the `BeanConfiguration`s correctly, the dependency must be declared explicitly **before** the
+invocation of `beans()`. `BeanConfiguration` provides some methods for that. Android Beans will ensure, that `beans()`
+is called only after all dependencies are fulfilled.
+```kotlin
+class MyBeanConfiguration : DeclarativeBeanConfiguration() {
+    private val dependency = requireBean(type = MyDependency::class)
+    
+    override fun beans() {
+        bean("myBean") { MyBean(dependency.get()) }
+    }
+}
+```
+Or in Java:
 ```java
-public class MyBeanConfiguration extends BeanConfiguration {
+public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
     private final BeanDependency<MyDependency> dependency = requireBean(MyDependency.class);
     
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean("myBean", new MyBean(dependency.get()));
+    public void beans() {
+        bean("myBean", MyBean.class, () -> new MyBean(dependency.get()));
     }
 }
 ```
 `BeanConfiguration` provides the following methods to require other beans:
-- `requireBean(Class<T>)`: Requires a bean by type.
-- `requireBean(String, Class<T>)`: Requires a bean by name and type.
-- `requireOptionalBean(Class<T>)`: Declares an optional dependency on a bean by type. Android Beans will attempt to
-handle other `BeanConfiguration`s first to allow them to define such a bean.
-- `requireBeans(Class<T>)`: Requires the beans of that type. Android Beans will attempt to handle other
+- `requireBean(String?, KClass<T>)`: Requires a bean by name (optionally, if not `null`) and type.
+- `requireOptionalBean(String?, KClass<T>)`: Declares an optional dependency on a bean by name (optionally, if not
+`null`) and type. Android Beans will attempt to handle other `BeanConfiguration`s first to allow them to define such a
+bean.
+- `requireBeans(KClass<T>)`: Requires the beans of that type. Android Beans will attempt to handle other
 `BeanConfiguration`s first to allow them to define such beans.
-
+For convenient usage from Java there are also overloads with Java-`Class`es as arguments.
 
 ## Bean scopes
 
@@ -120,14 +152,24 @@ handle other `BeanConfiguration`s first to allow them to define such a bean.
 By default all beans are singletons, i.e. there exists one instance for the entire app.
 
 Singleton beans can be created lazily. Therefore a bean must be defined through a `SingletonScopedFactoryBean` (which
-comes with the handy static convenience method `lazy(...)`) instead of registering the actual bean-instance:
-```java
-import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazy;
+comes with handy convenience methods for Kotlin and Java) instead of registering the actual bean-instance:
+```kotlin
+import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
-public class ActivityScopeBeanConfiguration extends BeanConfiguration {
+class SingletonScopeBeanConfiguration : DeclarativeBeanConfiguration() {
+    override fun beans() {
+        lazyInstantiatedBean { MyBean() }
+    }
+}
+```
+Or in Java:
+```java
+import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazyInstantiated;
+
+public class SingletonScopeBeanConfiguration extends DeclarativeBeanConfiguration {
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean(lazy(MyBean.class, MyBean::new));
+    public void beans() {
+        bean(lazyInstantiated(MyBean.class, MyBean::new));
     }
 }
 ```
@@ -135,15 +177,25 @@ public class ActivityScopeBeanConfiguration extends BeanConfiguration {
 ### Prototype scope
 
 In the prototype scope a new instance of the bean is created each time it is looked up. Prototype-scoped beans are
-defined through a `PrototypeScopedFactoryBean` (which comes with the handy static convenience method `prototype(...)`)
+defined through a `PrototypeScopedFactoryBean` (which comes with handy convenience methods for Kotlin and Java)
 instead of registering the actual bean-instance:
+```kotlin
+import rocks.frieler.android.beans.scopes.prototype.prototypeBean
+
+class PrototypeScopeBeanConfiguration : DeclarativeBeanConfiguration() {
+    override fun beans() {
+        prototypeBean { MyBean() }
+    }
+}
+```
+Or in Java:
 ```java
 import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
 
-public class ActivityScopeBeanConfiguration extends BeanConfiguration {
+public class PrototypeScopeBeanConfiguration extends DeclarativeBeanConfiguration {
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean(prototype(MyBean.class, MyBean::new));
+    public void beans() {
+        bean(prototype(MyBean.class, MyBean::new));
     }
 }
 ```
@@ -158,23 +210,33 @@ to extend `ViewModel`.
 
 The consumer will always see the instance bound to the `Activity` which is currently in the foreground.
 
-Activity-scoped beans are defined through an `ActivityScopedFactoryBean` (which comes with the handy static convenience
-method `activityScoped(...)`) instead of registering the actual bean-instance:
+Activity-scoped beans are defined through an `ActivityScopedFactoryBean` (which comes with handy convenience methods
+for Kotlin and Java) instead of registering the actual bean-instance:
+```kotlin
+import rocks.frieler.android.beans.scopes.activity.activityScopedBean
+
+class ActivityScopeBeanConfiguration : DeclarativeBeanConfiguration() {
+    override fun beans() {
+        activityScopedBean { MyBean() }
+    }
+}
+```
+Or in Java:
 ```java
 import static rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean.activityScoped;
 
-public class ActivityScopeBeanConfiguration extends BeanConfiguration {
+public class ActivityScopeBeanConfiguration extends DeclarativeBeanConfiguration {
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        beansCollector.defineBean(activityScoped(MyBean.class, MyBean::new));
+    public void beans() {
+        bean(activityScoped(MyBean.class, MyBean::new));
     }
 }
 ```
 
-Activity-scoped beans may also implement the `ActivityAware`-interface. This interface defines a single method
-`void setActivity(Activity)`, which will be invoked with the `Activity` instance whenever it changes, e.g. after a
-configuration change of the `Activity`. At the and of the `Activity`'s lifecycle it will be invoked with `null`. Make
-sure to clear all references to the `Activity`, otherwise the stale references would cause a memory-leak.
+Activity-scoped beans may also implement the `ActivityAware`-interface. This interface defines a single function
+`setActivity(activity: Activity?)`, which will be invoked with the `Activity` instance whenever it changes, e.g. after a
+configuration change of the `Activity`. At the end of the `Activity`'s lifecycle it will be invoked with `null`. Make
+sure to clear all references to the `Activity`, otherwise the stale references could cause a memory-leak.
 
 
 ## Post-processing
@@ -184,20 +246,31 @@ sure to clear all references to the `Activity`, otherwise the stale references w
 If you want to post-process beans after their creation, this is possible by implementing the
 `BeanPostProcessor`-interface. The interface allows to manipulate or even replace beans.
 
-A bean implementing `BeanPostProcessor`s is detected by the `BeanRegistry`.
+A bean implementing `BeanPostProcessor`s is detected by the `BeanRegistry` automatically.
 
 When a `BeanPostProcessor` is detected, it is first invoked for all existing beans. It will then be invoked for every
 bean registered later and also for every scoped bean, when it is created by its factory.
 
 Android Beans already provides one convenient implementation, the `BeansOfTypeConsumer`, which allows to apply an action
 to all beans of a certain type. A common use-case is the registration of listeners:
+```kotlin
+class MyBeanConfiguration : DeclarativeBeanConfiguration() {
+     private val myBean = requireBean(MyBean::class)
+ 
+     override fun beans() {
+         bean { BeansOfTypeConsumer(MyBeanListener::class, myBean.get()!!::registerListener) }
+     }
+ }
+```
+Or in Java:
 ```java
-public class MyBeanConfiguration extends BeanConfiguration {
+public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
+    private final BeanDependency<MyBean> myBean = requireBean(MyBean.class);
+
     @Override
-    public void defineBeans(BeansCollector beansCollector) {
-        final MyBean myBean = new MyBean();
-        beansCollector.defineBean(myBean);
-        beansCollector.registerBeanPostProcessor(new BeansOfTypeConsumer(MyBeanListener.class, myBean::registerListener));
+    public void beans() {
+        bean(BeansOfTypeConsumer.class, () -> 
+            new BeansOfTypeConsumer(MyBeanListener.class, myBean.get()::registerListener));
     }
 }
 ```
@@ -206,4 +279,4 @@ public class MyBeanConfiguration extends BeanConfiguration {
 
 Sometimes it may be necessary to post-process the entire `BeanRegistry`, which holds all the beans. This can be achieved
 by implementing the `BeanRegistryPostProcessor`-interface. Once all beans are collected from the `BeanConfiguration`s,
-the `void postProcess(BeanRigistry)`-method of all `BeanRegistryPostProcessor`-beans will be invoked.
+the `postProcess(beanRegistry: BeanRegistry)`-function of all `BeanRegistryPostProcessor`-beans will be invoked.
