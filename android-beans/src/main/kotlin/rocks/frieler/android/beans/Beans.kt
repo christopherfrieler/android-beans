@@ -16,33 +16,59 @@ object Beans {
     }
 
     /**
-     * Looks up the bean with the given name and type in the [BeansProvider] of this application.
+     * Looks up the bean with the inferred type and given name (if not `null`) in the
+     * [BeansProvider] of this application.
      *
-     * @param name the name of the desired bean
+     * @param name the name of the desired bean (optional)
+     * @param <T> the desired bean-type
+     * @return the bean or `null`
+     *
+     * @see lookUpBean
+     */
+    inline fun <reified T : Any> lookUpBean(name: String? = null) = lookUpBean(name, T::class)
+
+    /**
+     * Looks up the bean with the given name (if not `null`) and type in the [BeansProvider] of this
+     * application.
+     *
+     * @param name the name of the desired bean (optional)
+     * @param type the type of the desired bean
+     * @param <T> the bean-type
+     * @return the bean or `null`
+     *
+     * @see BeansProvider.lookUpBean
+     */
+    fun <T : Any> lookUpBean(name: String? = null, type: KClass<T>): T? {
+        return if (name == null)
+            beansProvider.lookUpBean(type)
+        else
+            beansProvider.lookUpBean(name, type)
+    }
+
+    /**
+     * Looks up the bean with the given name (if not `null`) and type in the [BeansProvider] of this
+     * application.
+     *
+     * @param name the name of the desired bean (optional)
      * @param type the type of the desired bean
      * @param <T> the bean-type
      * @return the named bean or `null`
      *
-     * @see BeansProvider.lookUpBean
+     * @see lookUpBean
      */
     @JvmStatic
-    fun <T :Any> lookUpBean(name: String, type: Class<T>): T? {
-        return beansProvider.lookUpBean(name, type.kotlin)
-    }
+    @JvmOverloads
+    fun <T :Any> lookUpBean(name: String? = null, type: Class<T>) = lookUpBean(name, type.kotlin)
 
     /**
-     * Looks up a bean of the given type in the [BeansProvider] of this application.
+     * Looks up all beans of the inferred type in the [BeansProvider] of this application.
      *
-     * @param type the type of the desired bean
-     * @param <T> the bean-type
-     * @return a bean of the given type or `null`
+     * @param <T> the desired bean-type
+     * @return the beans of the given type or an empty list
      *
-     * @see BeansProvider.lookUpBean
+     * @see BeansProvider.lookUpBeans
      */
-    @JvmStatic
-    fun <T :Any> lookUpBean(type: Class<T>): T? {
-        return beansProvider.lookUpBean(type.kotlin)
-    }
+    inline fun <reified T : Any> lookUpBeans() = lookUpBeans(T::class)
 
     /**
      * Looks up all beans of the given type in the [BeansProvider] of this application.
@@ -53,10 +79,21 @@ object Beans {
      *
      * @see BeansProvider.lookUpBeans
      */
-    @JvmStatic
-    fun <T :Any> lookUpBeans(type: Class<T>): List<T> {
-        return beansProvider.lookUpBeans(type.kotlin)
+    fun <T : Any> lookUpBeans(type: KClass<T>): List<T> {
+        return beansProvider.lookUpBeans(type)
     }
+
+    /**
+     * Looks up all beans of the given type in the [BeansProvider] of this application.
+     *
+     * @param type the type of the desired beans
+     * @param <T> the bean-type
+     * @return the beans of the given type or an empty list
+     *
+     * @see lookUpBeans
+     */
+    @JvmStatic
+    fun <T :Any> lookUpBeans(type: Class<T>) = lookUpBeans(type.kotlin)
 
     /**
      * Initializer for [Beans].
