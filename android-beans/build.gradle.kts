@@ -94,6 +94,14 @@ publishing {
                     dependencyNode.appendNode("groupId", this.group)
                     dependencyNode.appendNode("artifactId", this.name)
                     dependencyNode.appendNode("version", this.version)
+                    dependencyNode.appendNode("scope", "compile")
+                }
+                configurations.getByName("implementation").allDependencies.configureEach {
+                    val dependencyNode = dependenciesNode.appendNode("dependency")
+                    dependencyNode.appendNode("groupId", this.group)
+                    dependencyNode.appendNode("artifactId", this.name)
+                    dependencyNode.appendNode("version", this.version)
+                    dependencyNode.appendNode("scope", "runtime")
                 }
             }
 
