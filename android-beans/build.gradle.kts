@@ -35,7 +35,7 @@ android {
 		libraryVariants.all { outputs.all { this as BaseVariantOutputImpl
 			outputFileName = outputFileName.replace(base.archivesBaseName, "${base.archivesBaseName}-${version}")
 		}}
-		consumerProguardFile("proguard-rules.pro")
+		fileTree("proguard/").forEach(defaultConfig::consumerProguardFile)
     }
 
     buildTypes {
