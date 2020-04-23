@@ -1,3 +1,3 @@
 object Dependencies {
-    const val kotlin_version = "1.3.70"
+    const val kotlin_version = "1.3.72"
 }
