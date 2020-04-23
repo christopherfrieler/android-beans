@@ -3,6 +3,7 @@ package rocks.frieler.android.beans
 import android.content.Context
 import android.content.res.AssetManager
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isInstanceOf
 import com.nhaarman.mockitokotlin2.mock
@@ -32,6 +33,17 @@ class BeanConfigurationsAssetScannerTest {
 		assertThat(beanConfigurations[0]).isInstanceOf(ABeanConfiguration::class.java)
 		assertThat(beanConfigurations[1]).isInstanceOf(ABeanConfigurationNeedingTheContext::class.java)
 		assertThat(beanConfigurations[2]).isInstanceOf(AnotherBeanConfiguration::class.java)
+	}
+
+	@Test
+	fun `scan() can use a BeanConfiguration defined as object`() {
+		whenever(assets.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(arrayOf("beans.txt"))
+		whenever(assets.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt"))
+				.thenReturn(ByteArrayInputStream(("rocks.frieler.android.beans.BeanConfigurationsAssetScannerTest\$ABeanConfigurationObject\n").toByteArray()))
+
+		val beanConfigurations = beanConfigurationsAssetScanner.scan(assets)
+
+		assertThat(beanConfigurations).contains(ABeanConfigurationObject)
 	}
 
 	@Test(expected = BeanInstantiationException::class)
@@ -73,13 +85,19 @@ class BeanConfigurationsAssetScannerTest {
 		}
 	}
 
-	internal class ABeanConfigurationNeedingTheContext(context: Context?) : BeanConfiguration() {
+	internal class ABeanConfigurationNeedingTheContext(context: Context) : BeanConfiguration() {
 		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
 			return emptyList()
 		}
 	}
 
 	class AnotherBeanConfiguration : BeanConfiguration() {
+		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
+			return emptyList()
+		}
+	}
+
+	object ABeanConfigurationObject : BeanConfiguration() {
 		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
 			return emptyList()
 		}

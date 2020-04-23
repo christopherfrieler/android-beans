@@ -6,19 +6,25 @@ import rocks.frieler.android.beans.BeanConfigurationsAssetScanner.Companion.BEAN
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.util.*
+import java.util.ArrayList
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.isSupertypeOf
+import kotlin.reflect.jvm.jvmName
 
 /**
  * Scans the assets for files defining [BeanConfiguration]s.
  *
  *
  * The files must reside in the directory [BEAN_CONFIGURATIONS_ASSET_PATH] and contain the full-qualified name of an
- * implementation of [BeanConfiguration] per line.
+ * implementation of [BeanConfiguration] per line, either a class or an object.
  */
 internal class BeanConfigurationsAssetScanner(private val context: Context) {
 
 	companion object {
 		const val BEAN_CONFIGURATIONS_ASSET_PATH = "bean-configurations"
+	    val ANDROID_CONTEXT_TYPE = Context::class.createType()
 	}
 
 	/**
@@ -64,33 +70,44 @@ internal class BeanConfigurationsAssetScanner(private val context: Context) {
 
 	private fun getBeanConfiguration(className: String): BeanConfiguration {
 		val beanConfigurationClass = try {
-			Class.forName(className)
+			Class.forName(className).kotlin
 		} catch (e: ClassNotFoundException) {
 			throw BeanInstantiationException("failed to instantiate BeanConfiguration $className.", e)
 		}
 
-		if (BeanConfiguration::class.java.isAssignableFrom(beanConfigurationClass)) {
-			return instantiateBeanConfiguration(beanConfigurationClass)
+		if (beanConfigurationClass.isSubclassOf(BeanConfiguration::class)) {
+			@Suppress("UNCHECKED_CAST")
+			return instantiateBeanConfiguration(beanConfigurationClass as KClass<out BeanConfiguration>)
 		} else {
 			throw BeanInstantiationException("$className does not implement BeanConfiguration.")
 		}
 	}
 
-	private fun instantiateBeanConfiguration(beanConfigurationClass: Class<*>): BeanConfiguration {
-		try {
-			return beanConfigurationClass.getConstructor(Context::class.java).newInstance(context) as BeanConfiguration
-		} catch (e: NoSuchMethodException) {
-			// no constructor with Context-parameter, try next one...
-		} catch (e: Exception) {
-			throw BeanInstantiationException("failed to instantiate BeanConfiguration " + beanConfigurationClass.name + ".", e)
+	private fun instantiateBeanConfiguration(beanConfigurationClass: KClass<out BeanConfiguration>): BeanConfiguration {
+		if (beanConfigurationClass.objectInstance != null) {
+			return beanConfigurationClass.objectInstance!!
 		}
 
-		return try {
-			beanConfigurationClass.getConstructor().newInstance() as BeanConfiguration
-		} catch (e: NoSuchMethodException) {
-			throw BeanInstantiationException(beanConfigurationClass.name + " does not provide a suitable constructor.")
-		} catch (e: Exception) {
-			throw BeanInstantiationException("failed to instantiate BeanConfiguration " + beanConfigurationClass.name + ".", e)
+		beanConfigurationClass.constructors.find {
+			it.parameters.size == 1 && it.parameters[0].type.isSupertypeOf(ANDROID_CONTEXT_TYPE)
+		}?.apply {
+			try {
+				return call(context)
+			} catch (e: Exception) {
+				throw BeanInstantiationException("failed to instantiate BeanConfiguration " + beanConfigurationClass.jvmName + ".", e)
+			}
 		}
+
+		beanConfigurationClass.constructors.find {
+			it.parameters.isEmpty()
+		}?.apply {
+			try {
+				return call()
+			} catch (e: Exception) {
+				throw BeanInstantiationException("failed to instantiate BeanConfiguration " + beanConfigurationClass.jvmName + ".", e)
+			}
+		}
+
+		throw BeanInstantiationException(beanConfigurationClass.jvmName + " does not provide a suitable constructor.")
 	}
 }

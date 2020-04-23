@@ -39,11 +39,11 @@ Now you're ready to define your beans as described in the following section.
 
 ## Defining beans
 
-To define beans write a class that extends `BeanConfiguration`. The most convenient way is to extend its subclass
-`DeclarativeBeanConfiguration`. In its `beans()`-method you can define your beans in a declarative fashion with the
-various `bean()`-methods:
+To define beans write an object or a class that extends `BeanConfiguration`. The most convenient way is to extend its
+subclass `DeclarativeBeanConfiguration`. In its `beans()`-method you can define your beans in a declarative fashion with
+the various `bean()`-methods:
 ```kotlin
-class MyBeanConfiguration : DeclarativeBeanConfiguration() {
+object MyBeanConfiguration : DeclarativeBeanConfiguration() {
     override fun beans() {
         bean { MyBean() } // with a generated name
         bean("myNamedBean") { MyBean() } // with an explicit name
