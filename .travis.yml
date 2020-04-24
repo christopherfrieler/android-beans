@@ -19,7 +19,7 @@ jdk:
 android:
   components:
     - android-29
-    - build-tools-29.0.2
+    - build-tools-29.0.3
 licenses:
   - 'android-sdk-license-.+'
 
