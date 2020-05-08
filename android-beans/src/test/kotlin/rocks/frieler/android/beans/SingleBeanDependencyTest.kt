@@ -2,7 +2,6 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -56,16 +55,5 @@ class SingleBeanDependencyTest {
 
 		verifyZeroInteractions(beansProvider)
 		assertThat(fulfillment).isEqualTo(Fulfillment.FULFILLED)
-	}
-
-	@Test
-	fun `get() returns the bean after the BeanDependency was fulfilled`() {
-		whenever(beansProvider.lookUpBean("bean", SingleBeanDependencyTest::class)).thenReturn(bean)
-
-		val beanDependency = SingleBeanDependency("bean", SingleBeanDependencyTest::class)
-		beanDependency.fulfill(beansProvider)
-
-		val dependency = beanDependency.get()
-		assertThat(dependency).isSameAs(bean)
 	}
 }

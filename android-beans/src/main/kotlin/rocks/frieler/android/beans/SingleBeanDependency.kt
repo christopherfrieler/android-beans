@@ -1,7 +1,7 @@
 package rocks.frieler.android.beans
 
 import rocks.frieler.android.beans.BeanDependency.Fulfillment
-import java.util.*
+import java.util.Objects
 import kotlin.reflect.KClass
 
 /**
@@ -23,10 +23,6 @@ class SingleBeanDependency<T :Any>(
 			bean = if (name == null) beansProvider.lookUpBean(type) else beansProvider.lookUpBean(name, type)
 		}
 		return if (bean != null) Fulfillment.FULFILLED else Fulfillment.UNFULFILLED
-	}
-
-	override fun get(): T? {
-		return bean
 	}
 
 	override fun equals(other: Any?): Boolean {

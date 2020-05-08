@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import java8.util.Optional;
 import kotlin.jvm.JvmClassMappingKt;
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
@@ -15,6 +14,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -124,17 +124,21 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     @Test
     public void testBeanConfigurationCanRequireDependencies() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
-            private BeanDependency<DeclarativeBeanConfigurationJavaApiTest> beanDependency = requireBean(DeclarativeBeanConfigurationJavaApiTest.class);
-            private BeanDependency<DeclarativeBeanConfigurationJavaApiTest> namedBeanDependency = requireBean("bean", DeclarativeBeanConfigurationJavaApiTest.class);
-            private BeanDependency<Optional<DeclarativeBeanConfigurationJavaApiTest>> optionalBeanDependency = requireOptionalBean(DeclarativeBeanConfigurationJavaApiTest.class);
-            private BeanDependency<List<DeclarativeBeanConfigurationJavaApiTest>> beansOfTypeDependency = requireBeans(DeclarativeBeanConfigurationJavaApiTest.class);
+            {
+                requireBean(DeclarativeBeanConfigurationJavaApiTest.class);
+                requireBean("bean", DeclarativeBeanConfigurationJavaApiTest.class);
+                requireOptionalBean(DeclarativeBeanConfigurationJavaApiTest.class);
+                requireBeans(DeclarativeBeanConfigurationJavaApiTest.class);
+            }
 
             @Override
             public void beans() {
-                beanDependency.get();
-                namedBeanDependency.get();
-                optionalBeanDependency.get();
-                beansOfTypeDependency.get();
+                bean("beanWithDependencies", Object.class, (dependencies) -> {
+                    assertThat(dependencies.lookUpBean(DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
+                    assertThat(dependencies.lookUpBean("bean", DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
+                    assertThat(dependencies.lookUpBeans(DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
+                    return new Object();
+                });
             }
         };
         List<BeanDependency<?>> beanDependencies = beanConfiguration.getDependencies();

@@ -30,18 +30,6 @@ class BeansOfTypeDependency<T :Any>(
 		return Fulfillment.UNFULFILLED_OPTIONAL
 	}
 
-	/**
-	 * Obtains all beans of the desired type from the [BeansProvider] this dependency was
-	 * [fulfilled][.fulfill] with.
-	 */
-	override fun get(): List<T> {
-		if (!::beansProvider.isInitialized) {
-			throw IllegalStateException("BeansOfTypeDependency has not been fulfilled yet.")
-		}
-
-		return beansProvider.lookUpBeans(type)
-	}
-
 	override fun equals(other: Any?): Boolean {
 		return if (javaClass == other?.javaClass) {
 			other as BeansOfTypeDependency<*>

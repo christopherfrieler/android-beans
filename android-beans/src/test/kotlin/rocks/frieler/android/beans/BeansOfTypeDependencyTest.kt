@@ -1,12 +1,9 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFailure
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -24,24 +21,5 @@ class BeansOfTypeDependencyTest {
 
 		verifyZeroInteractions(beansProvider)
 		assertThat(fulfillment).isEqualTo(Fulfillment.UNFULFILLED_OPTIONAL)
-	}
-
-	@Test
-	fun `get() obtains beans from BeansProvider`() {
-		whenever(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class)).thenReturn(listOf(this))
-
-		beansOfTypeDependency.fulfill(beansProvider)
-		val beans = beansOfTypeDependency.get()
-
-		assertThat(beans).isEqualTo(beansProvider.lookUpBeans(BeansOfTypeDependencyTest::class))
-	}
-
-	@Test
-	fun `get() fails when not yet fulfilled`() {
-		assertThat {
-			beansOfTypeDependency.get()
-
-		}.isFailure()
-				.hasClass(IllegalStateException::class)
 	}
 }

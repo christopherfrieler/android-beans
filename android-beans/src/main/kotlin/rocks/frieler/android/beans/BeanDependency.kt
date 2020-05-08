@@ -47,11 +47,4 @@ interface BeanDependency<T :Any> {
 			}
 		}
 	}
-
-	/**
-	 * Returns the target of this [BeanDependency] after it was fulfilled.
-	 *
-	 * @return the target of this [BeanDependency]
-	 */
-	fun get(): T?
 }
