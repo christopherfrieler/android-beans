@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import rocks.frieler.android.beans.BeansProvider
 
 @RunWith(MockitoJUnitRunner::class)
 class PrototypeScopedFactoryBeanHandlerTest {
@@ -31,24 +32,26 @@ class PrototypeScopedFactoryBeanHandlerTest {
 
     @Test
     fun `getBean() lets FactoryBean produce the bean on invocation`() {
+        val dependencies: BeansProvider = mock()
         val bean = Any()
-        whenever(scopedFactoryBean.produceBean()).thenReturn(bean)
+        whenever(scopedFactoryBean.produceBean(dependencies)).thenReturn(bean)
 
-        val beanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean)
+        val beanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean, dependencies)
 
         assertThat(beanInstance).isSameAs(bean)
     }
 
     @Test
     fun `getBean() produces a new bean instance every time`() {
+        val beansProvider: BeansProvider = mock()
         val firstBean = Any()
         val secondBean = Any()
-        whenever(scopedFactoryBean.produceBean()).thenReturn(firstBean, secondBean)
+        whenever(scopedFactoryBean.produceBean(beansProvider)).thenReturn(firstBean, secondBean)
 
-        val firstBeanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean)
-        val secondBeanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean)
+        val firstBeanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean, beansProvider)
+        val secondBeanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean, beansProvider)
 
-        verify(scopedFactoryBean, Mockito.times(2)).produceBean()
+        verify(scopedFactoryBean, Mockito.times(2)).produceBean(beansProvider)
         assertThat(firstBeanInstance).isSameAs(firstBean)
         assertThat(secondBeanInstance).isSameAs(secondBean)
     }

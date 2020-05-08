@@ -10,7 +10,8 @@ import kotlin.reflect.KClass
  *
  *
  * The [BeanConfigurationsBeansCollector] also implements the [BeansProvider]-interface by providing
- * the beans that are already registered in the [BeanRegistry].
+ * the beans that are already registered in the [BeanRegistry] to provide them as dependencies for
+ * further beans.
  *
  * @author Christopher Frieler
  */
@@ -63,9 +64,9 @@ internal constructor(
 	private fun produceBeans(beanConfiguration: BeanConfiguration) {
 		beanConfiguration.getBeanDefinitions().forEach {
 			if (it.getName() != null) {
-				this.beanRegistry.registerBean(it.getName()!!, it.produceBean())
+				this.beanRegistry.registerBean(it.getName()!!, it.produceBean(this))
 			} else {
-				this.beanRegistry.registerBean(it.produceBean())
+				this.beanRegistry.registerBean(it.produceBean(this))
 			}
 		}
 	}

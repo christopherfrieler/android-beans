@@ -10,13 +10,12 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.Companion.lazyInstantiated
 
 class SingletonScopedFactoryBeanTest {
-    private val producer: () -> SingletonScopedFactoryBeanTest = mock()
+    private val producer: BeansProvider.() -> SingletonScopedFactoryBeanTest = mock()
     private val factoryBean = SingletonScopedFactoryBean(SingletonScopedFactoryBeanTest::class, producer)
 
     @Test
@@ -31,40 +30,58 @@ class SingletonScopedFactoryBeanTest {
 
     @Test
     fun `produceBean() calls the configured producer`() {
-        whenever(producer()).thenReturn(this)
+        val dependencies = mock<BeansProvider>()
+        whenever(producer(dependencies)).thenReturn(this)
 
-        val producedBean = factoryBean.produceBean()
+        val producedBean = factoryBean.produceBean(dependencies)
 
-        verify(producer)()
+        verify(producer).invoke(dependencies)
         assertThat(producedBean).isSameAs(this)
     }
 
     @Test
+    fun `lazyInstantiated() provides a Pair of java-type and definition without dependencies for a SingletonScopedFactoryBean`() {
+        val dependencies = mock<BeansProvider>()
+        val producerWithoutDependencies: () -> SingletonScopedFactoryBeanTest = mock()
+        whenever(producerWithoutDependencies()).thenReturn(this)
+
+        val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producerWithoutDependencies)
+
+        assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
+        val definedFactoryBean = lazyInstantiatedBeanDefinition.second(dependencies)
+        assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
+        assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
+        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+    }
+
+    @Test
     fun `lazyInstantiated() provides a Pair of java-type and definition for a SingletonScopedFactoryBean`() {
-        whenever(producer()).thenReturn(this)
+        val dependencies = mock<BeansProvider>()
+        whenever(producer(dependencies)).thenReturn(this)
 
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producer)
 
         assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
-        val definedFactoryBean = lazyInstantiatedBeanDefinition.second()
+        val definedFactoryBean = lazyInstantiatedBeanDefinition.second(dependencies)
         assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
         assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean()).isSameAs(this)
+        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
     }
 
     @Test
     fun `DeclarativeBeanConfiguration_lazyInstantiatedBean() declares a SingletonScopedFactoryBean`() {
+        val dependencies = mock<BeansProvider>()
         val beanConfiguration : DeclarativeBeanConfiguration = mock()
         val beanName = "aLazyInstantiatedBean"
-        whenever(producer()).thenReturn(this)
+        whenever(producer(dependencies)).thenReturn(this)
 
         beanConfiguration.lazyInstantiatedBean(beanName) { producer() }
 
-        val factoryBeanDefinitionCaptor = argumentCaptor<() -> SingletonScopedFactoryBean<*>>()
+        val factoryBeanDefinitionCaptor = argumentCaptor<BeansProvider.() -> SingletonScopedFactoryBean<*>>()
         verify(beanConfiguration).addBeanDefinition(eq(beanName), eq(SingletonScopedFactoryBean::class), factoryBeanDefinitionCaptor.capture())
-        val definedFactoryBean = factoryBeanDefinitionCaptor.firstValue()
+        val definedFactoryBean = factoryBeanDefinitionCaptor.firstValue(dependencies)
         assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
         assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean()).isSameAs(this)
+        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
     }
 }

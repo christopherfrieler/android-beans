@@ -15,9 +15,11 @@ import org.junit.Test
 class BeanDefinitionTest {
 	private val beanName = "name"
 	private val beanType = BeanDefinitionTest::class
-	private val beanCreator: () -> BeanDefinitionTest = mock()
+	private val beanCreator: BeansProvider.() -> BeanDefinitionTest = mock()
 
 	private val beanDefinition = BeanDefinition(beanName, beanType, beanCreator)
+
+	private val dependencyProvider: BeansProvider = mock()
 
 	@Test
 	fun `getName() returns the bean-name`() {
@@ -31,21 +33,21 @@ class BeanDefinitionTest {
 
 	@Test
 	fun `produceBean() invokes the creator and returns the produced bean`() {
-		whenever(beanCreator.invoke()).thenReturn(this)
+		whenever(beanCreator.invoke(dependencyProvider)).thenReturn(this)
 
-		val bean = beanDefinition.produceBean()
+		val bean = beanDefinition.produceBean(dependencyProvider)
 
-		verify(beanCreator).invoke()
+		verify(beanCreator).invoke(dependencyProvider)
 		assertThat(bean).isSameAs(this)
 	}
 
 	@Test
 	fun `produceBean() cannot be invoked twice`() {
-		whenever(beanCreator.invoke()).thenReturn(this)
+		whenever(beanCreator.invoke(dependencyProvider)).thenReturn(this)
 
-		beanDefinition.produceBean()
+		beanDefinition.produceBean(dependencyProvider)
 		assertThat {
-			beanDefinition.produceBean()
+			beanDefinition.produceBean(dependencyProvider)
 		}.isFailure().all {
 			hasClass(IllegalStateException::class)
 			hasMessage("the bean was already produced.")
@@ -64,9 +66,9 @@ class BeanDefinitionTest {
 
 	@Test
 	fun `use() returns the produced bean`() {
-		whenever(beanCreator.invoke()).thenReturn(this)
+		whenever(beanCreator.invoke(dependencyProvider)).thenReturn(this)
 
-		val producedBean = beanDefinition.produceBean()
+		val producedBean = beanDefinition.produceBean(dependencyProvider)
 		val bean = beanDefinition.use()
 
 		assertThat(bean).isSameAs(producedBean)

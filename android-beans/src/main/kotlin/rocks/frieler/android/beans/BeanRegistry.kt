@@ -149,7 +149,7 @@ class BeanRegistry internal constructor() : BeansProvider {
 			@Suppress("UNCHECKED_CAST") val factoryBean = beanCandidate as ScopedFactoryBean<T>
             val scopedFactoryBeanHandler = beanScopes[factoryBean.scope]
             if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive) {
-                return scopedFactoryBeanHandler.getBean(name, decorate(factoryBean).withPostProcessing(Function { bean: T -> postProcessBean(name, bean) }))
+                return scopedFactoryBeanHandler.getBean(name, decorate(factoryBean).withPostProcessing(Function { bean: T -> postProcessBean(name, bean) }), this)
             }
         }
 

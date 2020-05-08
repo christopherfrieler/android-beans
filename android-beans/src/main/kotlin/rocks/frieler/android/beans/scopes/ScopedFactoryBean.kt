@@ -1,6 +1,6 @@
 package rocks.frieler.android.beans.scopes
 
-import android.app.Activity
+import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
 /**
@@ -25,9 +25,10 @@ interface ScopedFactoryBean<T : Any> {
     val beanType: KClass<T>
 
     /**
-     * Produces a new bean of type [T] corresponding to the given [Activity].
+     * Produces a new bean of type [T].
      *
-     * @return a new bean of type [T] corresponding to the given [Activity]
+     * @param dependencies a [BeansProvider] to obtain dependencies
+     * @return a new bean of type [T]
      */
-    fun produceBean(): T
+    fun produceBean(dependencies: BeansProvider): T
 }
