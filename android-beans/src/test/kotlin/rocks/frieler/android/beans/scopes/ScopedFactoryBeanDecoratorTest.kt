@@ -12,13 +12,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import rocks.frieler.android.beans.BeansProvider
-import rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.Companion.decorate
 import kotlin.reflect.KClass
 
 @RunWith(MockitoJUnitRunner::class)
 class ScopedFactoryBeanDecoratorTest {
     private val scopedFactoryBean: ScopedFactoryBean<ScopedFactoryBeanDecoratorTest> = mock()
-    private val decoratedFactoryBean = decorate(scopedFactoryBean)
+    private val decoratedFactoryBean = scopedFactoryBean.decorate()
 
     @Test
     fun `scope delegates to original`() {

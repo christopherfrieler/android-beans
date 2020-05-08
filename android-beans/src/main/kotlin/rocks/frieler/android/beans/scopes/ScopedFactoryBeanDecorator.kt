@@ -4,18 +4,14 @@ import java8.util.function.Function
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
+fun <T : Any> ScopedFactoryBean<T>.decorate(): ScopedFactoryBeanDecorator<T> = ScopedFactoryBeanDecorator(this)
+
 /**
  * Decorator for [ScopedFactoryBean]s to enhance their behaviour.
  *
  * @param <T> the type of bean produced
  */
-class ScopedFactoryBeanDecorator<T : Any> private constructor(private val delegate: ScopedFactoryBean<T>) : ScopedFactoryBean<T> {
-    companion object {
-        fun <T : Any> decorate(scopedFactoryBean: ScopedFactoryBean<T>): ScopedFactoryBeanDecorator<T> {
-            return ScopedFactoryBeanDecorator(scopedFactoryBean)
-        }
-    }
-
+class ScopedFactoryBeanDecorator<T : Any> constructor(private val delegate: ScopedFactoryBean<T>) : ScopedFactoryBean<T> {
     override val scope: String
         get() = delegate.scope
 
