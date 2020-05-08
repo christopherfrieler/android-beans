@@ -112,27 +112,32 @@ of `MyBean` into the consuming code.
 
 ### Dependencies between beans 
 
-You can also require beans from other `BeanConfiguration`s to define a bean, that depends on them. In order to handle
+You can also use beans from other `BeanConfiguration`s to define a bean, that depends on them. In order to handle
 ordering between the `BeanConfiguration`s correctly, the dependency must be declared explicitly **before** the
 invocation of `beans()`. `BeanConfiguration` provides some methods for that. Android Beans will ensure, that `beans()`
-is called only after all dependencies are fulfilled.
+is called only after all dependencies are fulfilled. When you define the bean, you have access to a [BeansProvider] to
+obtain the dependencies.
 ```kotlin
 class MyBeanConfiguration : DeclarativeBeanConfiguration() {
-    private val dependency = requireBean(type = MyDependency::class)
-    
+    init {
+        requireBean(type = MyDependency::class)
+    }
+
     override fun beans() {
-        bean("myBean") { MyBean(dependency.get()) }
+        bean("myBean") { MyBean(lookUpBean(MyDependency::class)) }
     }
 }
 ```
 Or in Java:
 ```java
 public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
-    private final BeanDependency<MyDependency> dependency = requireBean(MyDependency.class);
+    {
+    	requireBean(MyDependency.class);
+    }
     
     @Override
     public void beans() {
-        bean("myBean", MyBean.class, () -> new MyBean(dependency.get()));
+        bean("myBean", MyBean.class, (dependencies) -> new MyBean(dependencies.lookUpBean(MyDependency.class)));
     }
 }
 ```

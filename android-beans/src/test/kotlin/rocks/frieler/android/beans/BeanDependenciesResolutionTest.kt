@@ -1,11 +1,9 @@
 package rocks.frieler.android.beans
 
-import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isNotNull
 import assertk.assertions.isSameAs
-import assertk.assertions.support.expected
-import java8.util.Optional
 import org.junit.Test
 
 /**
@@ -80,16 +78,20 @@ class BeanDependenciesResolutionTest {
 		val beanConfiguration1 = object : SingleBeanConfiguration() {
 			val dependencyToBean2 = requireOptionalBean("bean2", Any::class)
 			override fun beans() {
-				assertThat((dependencyToBean2.get() as Optional<*>)).isPresent()
-				bean("bean1") { theBean }
+				bean("bean1") {
+					assertThat(lookUpBean("bean2", Any::class)).isNotNull()
+					theBean
+				}
 			}
 		}
 
 		val beanConfiguration2 = object : SingleBeanConfiguration() {
 			val dependencyToBean3 = requireOptionalBean("bean3", Any::class)
 			override fun beans() {
-				assertThat((dependencyToBean3.get() as Optional<*>)).isPresent()
-				bean("bean2") { theBean }
+				bean("bean2") {
+					assertThat(lookUpBean("bean3", Any::class)).isNotNull()
+					theBean
+				}
 			}
 		}
 
@@ -118,7 +120,10 @@ class BeanDependenciesResolutionTest {
 			val dependency = requireBeans(BeanDependenciesResolutionTest::class)
 			lateinit var beanDependenciesResolutionTestBeans: List<BeanDependenciesResolutionTest>
 			override fun beans() {
-				beanDependenciesResolutionTestBeans = dependency.get()!!
+				bean {
+					beanDependenciesResolutionTestBeans = lookUpBeans(BeanDependenciesResolutionTest::class)
+					Unit
+				}
 			}
 		}
 
@@ -154,10 +159,4 @@ class BeanDependenciesResolutionTest {
 
 abstract class SingleBeanConfiguration : DeclarativeBeanConfiguration() {
 	val theBean = Any()
-}
-
-fun Assert<Optional<*>>.isPresent() = transform { actual ->
-	if (!actual.isPresent) {
-		expected("to be present")
-	}
 }

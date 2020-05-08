@@ -2,8 +2,6 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isSameAs
-import assertk.assertions.isTrue
 import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -48,48 +46,5 @@ class OptionalSingleBeanDependencyTest {
 
 		verifyZeroInteractions(beansProvider)
 		assertThat(fulfillment).isEqualTo(Fulfillment.FULFILLED)
-	}
-
-	@Test
-	fun testGetReturnsEmptyOptionalWhenTheBeanDependencyHasNeverBeanFulfilled() {
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
-		val optionalBean = optionalSingleBeanDependency.get()
-
-		assertThat(optionalBean.isEmpty).isTrue()
-	}
-
-	@Test
-	fun testGetReturnsEmptyOptionalWhenWantedBeanWasNotAvailable() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(null)
-
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
-		optionalSingleBeanDependency.fulfill(beansProvider)
-		val optionalBean = optionalSingleBeanDependency.get()
-
-		assertThat(optionalBean.isEmpty).isTrue()
-	}
-
-	@Test
-	fun testGetReturnsBeanItWasFulfilledWithByType() {
-		whenever(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class)).thenReturn(this)
-
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency(OptionalSingleBeanDependencyTest::class)
-		optionalSingleBeanDependency.fulfill(beansProvider)
-		val optionalBean = optionalSingleBeanDependency.get()
-
-		assertThat(optionalBean.isPresent).isTrue()
-		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean(OptionalSingleBeanDependencyTest::class))
-	}
-
-	@Test
-	fun testGetReturnsBeanItWasFulfilledWithByNameAndType() {
-		whenever(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class)).thenReturn(this)
-
-		val optionalSingleBeanDependency = OptionalSingleBeanDependency("bean", OptionalSingleBeanDependencyTest::class)
-		optionalSingleBeanDependency.fulfill(beansProvider)
-		val optionalBean = optionalSingleBeanDependency.get()
-
-		assertThat(optionalBean.isPresent).isTrue()
-		assertThat(optionalBean.get()).isSameAs(beansProvider.lookUpBean("bean", OptionalSingleBeanDependencyTest::class))
 	}
 }

@@ -46,10 +46,6 @@ class OptionalSingleBeanDependency<T :Any>(
 		return if (bean != null) Fulfillment.FULFILLED else Fulfillment.UNFULFILLED_OPTIONAL
 	}
 
-	override fun get(): Optional<T> {
-		return Optional.ofNullable(bean)
-	}
-
 	override fun equals(other: Any?): Boolean {
 		return if (javaClass == other?.javaClass) {
 			other as OptionalSingleBeanDependency<*>
