@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans.scopes
 
 import java8.util.function.Function
+import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
 /**
@@ -23,8 +24,8 @@ class ScopedFactoryBeanDecorator<T : Any> private constructor(private val delega
 
     private var postProcessing: Function<T, T>? = null
 
-    override fun produceBean(): T {
-        var bean = delegate.produceBean()
+    override fun produceBean(dependencies: BeansProvider): T {
+        var bean = delegate.produceBean(dependencies)
         postProcessing?.let { bean = it.apply(bean) }
         return bean
     }

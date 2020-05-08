@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler.Companion.ACTIVITY_SCOPE
@@ -27,12 +28,12 @@ class ActivityScopedFactoryBeanHandler(private val foregroundActivityHolder: For
 	override val isActive: Boolean
 		get() = foregroundActivityHolder.currentActivity is ComponentActivity
 
-	override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>): T {
+	override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T {
 		val activity = foregroundActivityHolder.currentActivity as ComponentActivity
 		@Suppress("UNCHECKED_CAST")
-		val beanHolder: ActivityScopedBeanHolder<T> = ViewModelProvider(activity).get<ActivityScopedBeanHolder<*>>(name, ActivityScopedBeanHolder::class.java) as ActivityScopedBeanHolder<T>
+		val beanHolder: ActivityScopedBeanHolder<T> = ViewModelProvider(activity).get(name, ActivityScopedBeanHolder::class.java) as ActivityScopedBeanHolder<T>
 		if (!beanHolder.containsBean()) {
-			beanHolder.bean = factoryBean.produceBean()
+			beanHolder.bean = factoryBean.produceBean(dependencies)
 		}
 
 		val bean = beanHolder.bean

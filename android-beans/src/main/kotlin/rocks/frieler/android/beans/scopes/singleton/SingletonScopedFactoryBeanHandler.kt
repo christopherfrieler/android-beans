@@ -1,8 +1,9 @@
 package rocks.frieler.android.beans.scopes.singleton
 
+import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
-import java.util.*
+import java.util.HashMap
 
 /**
  * [ScopedFactoryBeanHandler] for the [singleton][name]-scope.
@@ -19,10 +20,10 @@ class SingletonScopedFactoryBeanHandler : ScopedFactoryBeanHandler {
     override val isActive: Boolean
         get() = true
 
-    override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>): T {
+    override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T {
         @Suppress("UNCHECKED_CAST") var bean = beans[name] as T?
         if (bean == null) {
-            bean = factoryBean.produceBean()
+            bean = factoryBean.produceBean(dependencies)
             beans[name] = bean
         }
         return bean

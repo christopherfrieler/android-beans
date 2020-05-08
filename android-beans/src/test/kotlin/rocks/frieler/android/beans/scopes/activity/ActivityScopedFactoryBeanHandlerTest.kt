@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import rocks.frieler.android.beans.BeansProvider
 
 @RunWith(RobolectricTestRunner::class)
 class ActivityScopedFactoryBeanHandlerTest {
@@ -58,44 +59,47 @@ class ActivityScopedFactoryBeanHandlerTest {
 
 	@Test
 	fun `getBean() returns bean produced by ActivityScopedFactoryBean`() {
+		val dependencies: BeansProvider = mock()
 		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
 		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityScopedFactoryBeanHandlerTest> = mock()
-		whenever(activityScopedFactoryBean.produceBean()).thenReturn(this)
+		whenever(activityScopedFactoryBean.produceBean(dependencies)).thenReturn(this)
 
-		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean)
+		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
 		assertThat(bean).isSameAs(this)
 	}
 
 	@Test
 	fun `getBean() returns bean already present in Activity-scope`() {
+		val dependencies: BeansProvider = mock()
 		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
 		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityScopedFactoryBeanHandlerTest> = mock()
-		whenever(activityScopedFactoryBean.produceBean()).thenReturn(this)
+		whenever(activityScopedFactoryBean.produceBean(dependencies)).thenReturn(this)
 
-		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean)
+		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
-		verify(activityScopedFactoryBean).produceBean()
+		verify(activityScopedFactoryBean).produceBean(dependencies)
 		assertThat(bean).isSameAs(this)
 		clearInvocations(activityScopedFactoryBean)
 
-		val beanAgain = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean)
+		val beanAgain = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
-		verify(activityScopedFactoryBean, never()).produceBean()
+		verify(activityScopedFactoryBean, never()).produceBean(dependencies)
 		assertThat(beanAgain).isSameAs(bean)
 	}
 
 	@Test
 	fun `getBean() sets Activity on ActivityAware bean`() {
+		val dependencies: BeansProvider = mock()
 		val componentActivity: Activity = Robolectric.buildActivity(ComponentActivity::class.java).get()
 		whenever(foregroundActivityHolder.currentActivity).thenReturn(componentActivity)
 		val activityAwareBean: ActivityAware = mock()
 		val activityScopedFactoryBean: ActivityScopedFactoryBean<ActivityAware> = mock()
-		whenever(activityScopedFactoryBean.produceBean()).thenReturn(activityAwareBean)
+		whenever(activityScopedFactoryBean.produceBean(dependencies)).thenReturn(activityAwareBean)
 
-		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean)
+		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
 		verify(activityAwareBean).setActivity(componentActivity)
 		assertThat(bean).isSameAs(activityAwareBean)

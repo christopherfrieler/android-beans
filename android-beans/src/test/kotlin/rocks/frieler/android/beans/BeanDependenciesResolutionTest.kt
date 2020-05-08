@@ -42,68 +42,68 @@ class BeanDependenciesResolutionTest {
 
 	@Test
 	fun `resolves SingleBeanDependencies between BeanConfigurations`() {
-		val beanConfiguration1 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration1 = object : SingleBeanConfiguration() {
 			override fun beans() {
-				bean("bean1") { this }
+				bean("bean1") { theBean }
 			}
 		}
 
-		val beanConfiguration2 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration2 = object : SingleBeanConfiguration() {
 			init {
 				requireBean("bean1", Any::class.java)
 			}
 
 			override fun beans() {
-				bean("bean2") { this }
+				bean("bean2") { theBean }
 			}
 		}
 
-		val beanConfiguration3 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration3 = object : SingleBeanConfiguration() {
 			init {
 				requireBean("bean2", Any::class.java)
 			}
 
 			override fun beans() {
-				bean("bean3") { this }
+				bean("bean3") { theBean }
 			}
 		}
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration2, beanConfiguration3, beanConfiguration1))
 
-		assertThat(beanRegistry.lookUpBean("bean1", Any::class)).isSameAs(beanConfiguration1)
-		assertThat(beanRegistry.lookUpBean("bean2", Any::class)).isSameAs(beanConfiguration2)
-		assertThat(beanRegistry.lookUpBean("bean3", Any::class)).isSameAs(beanConfiguration3)
+		assertThat(beanRegistry.lookUpBean("bean1", Any::class)).isSameAs(beanConfiguration1.theBean)
+		assertThat(beanRegistry.lookUpBean("bean2", Any::class)).isSameAs(beanConfiguration2.theBean)
+		assertThat(beanRegistry.lookUpBean("bean3", Any::class)).isSameAs(beanConfiguration3.theBean)
 	}
 
 	@Test
 	fun `resolves transitive optional dependencies`() {
-		val beanConfiguration1 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration1 = object : SingleBeanConfiguration() {
 			val dependencyToBean2 = requireOptionalBean("bean2", Any::class)
 			override fun beans() {
 				assertThat((dependencyToBean2.get() as Optional<*>)).isPresent()
-				bean("bean1") { this }
+				bean("bean1") { theBean }
 			}
 		}
 
-		val beanConfiguration2 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration2 = object : SingleBeanConfiguration() {
 			val dependencyToBean3 = requireOptionalBean("bean3", Any::class)
 			override fun beans() {
 				assertThat((dependencyToBean3.get() as Optional<*>)).isPresent()
-				bean("bean2") { this }
+				bean("bean2") { theBean }
 			}
 		}
 
-		val beanConfiguration3 = object : DeclarativeBeanConfiguration() {
+		val beanConfiguration3 = object : SingleBeanConfiguration() {
 			override fun beans() {
-				bean("bean3") { this }
+				bean("bean3") { theBean }
 			}
 		}
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration1, beanConfiguration2, beanConfiguration3))
 
-		assertThat(beanRegistry.lookUpBean("bean1", Any::class)).isSameAs(beanConfiguration1)
-		assertThat(beanRegistry.lookUpBean("bean2", Any::class)).isSameAs(beanConfiguration2)
-		assertThat(beanRegistry.lookUpBean("bean3", Any::class)).isSameAs(beanConfiguration3)
+		assertThat(beanRegistry.lookUpBean("bean1", Any::class)).isSameAs(beanConfiguration1.theBean)
+		assertThat(beanRegistry.lookUpBean("bean2", Any::class)).isSameAs(beanConfiguration2.theBean)
+		assertThat(beanRegistry.lookUpBean("bean3", Any::class)).isSameAs(beanConfiguration3.theBean)
 	}
 
 	@Test
@@ -122,19 +122,19 @@ class BeanDependenciesResolutionTest {
 			}
 		}
 
-		val aBeanConfiguration = object : DeclarativeBeanConfiguration() {
+		val aBeanConfiguration = object : SingleBeanConfiguration() {
 			override fun beans() {
-				bean("a_bean") { this }
+				bean("a_bean") { theBean }
 			}
 		}
 
-		val anotherBeanConfiguration = object : DeclarativeBeanConfiguration() {
+		val anotherBeanConfiguration = object : SingleBeanConfiguration() {
 			init {
-				requireBean("a_bean", Any::class.java)
+				requireBean("a_bean", Any::class)
 			}
 
 			override fun beans() {
-				bean("another_bean") { this }
+				bean("another_bean") { theBean }
 			}
 		}
 
@@ -147,9 +147,13 @@ class BeanDependenciesResolutionTest {
 		assertThat(beanRegistry.lookUpBean(BeanDependenciesResolutionTest::class)).isSameAs(this)
 		assertThat(beanConfigurationNeedingAllBeanDependenciesResolutionTestBeans.beanDependenciesResolutionTestBeans)
 				.contains(this)
-		assertThat(beanRegistry.lookUpBean("a_bean", Any::class)).isSameAs(aBeanConfiguration)
-		assertThat(beanRegistry.lookUpBean("another_bean", Any::class)).isSameAs(anotherBeanConfiguration)
+		assertThat(beanRegistry.lookUpBean("a_bean", Any::class)).isSameAs(aBeanConfiguration.theBean)
+		assertThat(beanRegistry.lookUpBean("another_bean", Any::class)).isSameAs(anotherBeanConfiguration.theBean)
 	}
+}
+
+abstract class SingleBeanConfiguration : DeclarativeBeanConfiguration() {
+	val theBean = Any()
 }
 
 fun Assert<Optional<*>>.isPresent() = transform { actual ->

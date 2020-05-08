@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans.scopes.prototype
 
+import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 
@@ -16,8 +17,8 @@ class PrototypeScopedFactoryBeanHandler : ScopedFactoryBeanHandler {
     override val isActive: Boolean
         get() = true
 
-    override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>): T {
-        return factoryBean.produceBean()
+    override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T {
+        return factoryBean.produceBean(dependencies)
     }
 
     companion object {

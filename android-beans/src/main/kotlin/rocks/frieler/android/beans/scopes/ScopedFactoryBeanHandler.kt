@@ -1,5 +1,7 @@
 package rocks.frieler.android.beans.scopes
 
+import rocks.frieler.android.beans.BeansProvider
+
 /**
  * Interface for classes handling [ScopedFactoryBean]s of the corresponding scope.
  */
@@ -31,8 +33,9 @@ interface ScopedFactoryBeanHandler {
      *
      * @param name the name of the bean, which is equal to the name of the [factory bean][ScopedFactoryBean]
      * @param factoryBean the [factory bean][ScopedFactoryBean] to produce the desired bean
+     * @param dependencies a [BeansProvider] to obtain dependencies
      * @param <T> the type of the bean
      * @return the existing bean in this scope or a new one
     </T> */
-    fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>): T
+    fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T
 }

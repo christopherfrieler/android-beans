@@ -3,6 +3,7 @@ package rocks.frieler.android.beans.scopes
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameAs
+import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -10,6 +11,7 @@ import java8.util.function.Function
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanDecorator.Companion.decorate
 import kotlin.reflect.KClass
 
@@ -37,23 +39,31 @@ class ScopedFactoryBeanDecoratorTest {
     }
 
     @Test
-    fun `produceBean() delegates to original`() {
-        whenever(scopedFactoryBean.produceBean()).thenReturn(this)
+    fun `produceBean() delegates to the original`() {
+        val dependencies: BeansProvider = mock()
+        whenever(scopedFactoryBean.produceBean(dependencies)).thenReturn(this)
 
-        val bean = decoratedFactoryBean.produceBean()
+        val bean = decoratedFactoryBean.produceBean(dependencies)
 
-        assertThat(bean).isSameAs(scopedFactoryBean.produceBean())
+        verify(scopedFactoryBean).produceBean(dependencies)
+        assertThat(bean).isSameAs(this)
     }
 
     @Test
     fun `produceBean() applies postProcessing when configured`() {
-        whenever(scopedFactoryBean.produceBean()).thenReturn(this)
+        val dependencies: BeansProvider = mock()
+        val bean = this
+        whenever(scopedFactoryBean.produceBean(dependencies)).thenReturn(bean)
         val postProcessing: Function<ScopedFactoryBeanDecoratorTest, ScopedFactoryBeanDecoratorTest> = mock()
-        whenever(postProcessing.apply(scopedFactoryBean.produceBean())).thenReturn(ScopedFactoryBeanDecoratorTest())
+        val beanAfterPostProcessing = ScopedFactoryBeanDecoratorTest()
+        whenever(postProcessing.apply(bean)).thenReturn(beanAfterPostProcessing)
 
-        val bean = decoratedFactoryBean.withPostProcessing(postProcessing).produceBean()
+        val finalBean = decoratedFactoryBean.withPostProcessing(postProcessing).produceBean(dependencies)
 
-        verify(postProcessing).apply(scopedFactoryBean.produceBean())
-        assertThat(bean).isSameAs(postProcessing.apply(scopedFactoryBean.produceBean()))
+        inOrder(scopedFactoryBean, postProcessing) {
+            verify(scopedFactoryBean).produceBean(dependencies)
+            verify(postProcessing).apply(bean)
+        }
+        assertThat(finalBean).isSameAs(beanAfterPostProcessing)
     }
 }

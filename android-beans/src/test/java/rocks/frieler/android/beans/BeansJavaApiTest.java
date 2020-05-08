@@ -26,7 +26,7 @@ public class BeansJavaApiTest {
                         BeanDefinition<BeansJavaApiTest> aBeanDefinition = new BeanDefinition<>(
                                 "beansJavaApiTest",
                                 JvmClassMappingKt.getKotlinClass(BeansJavaApiTest.class),
-                                () -> BeansJavaApiTest.this);
+                                (dependencies) -> BeansJavaApiTest.this);
                         return Collections.singletonList(aBeanDefinition);
                     }
                 }))

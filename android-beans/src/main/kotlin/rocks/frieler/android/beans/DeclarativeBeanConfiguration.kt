@@ -47,7 +47,7 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @param definition the definition to construct the bean
 	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
-	inline fun <reified T : Any> bean(name: String? = null, noinline definition: () -> T): BeanReference<T> {
+	inline fun <reified T : Any> bean(name: String? = null, noinline definition: BeansProvider.() -> T): BeanReference<T> {
 		return addBeanDefinition(name, T::class, definition)
 	}
 
@@ -63,8 +63,24 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
 	@JvmOverloads
-	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: () -> T): BeanReference<T> {
+	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: BeansProvider.() -> T): BeanReference<T> {
 		return addBeanDefinition(name, type.kotlin, definition)
+	}
+
+	/**
+	 * Defines a bean (optionally with the specified name) of a Java type.
+	 *
+	 *
+	 * This version of `bean()` is intended for Java interoperability.
+	 *
+	 * @param name the bean's name (optional)
+	 * @param type the bean's type
+	 * @param definition the definition to construct the bean
+	 * @return a [BeanReference] for the defined bean that will be available later
+	 */
+	@JvmOverloads
+	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: () -> T): BeanReference<T> {
+		return addBeanDefinition(name, type.kotlin) { definition() }
 	}
 
 	/**
@@ -84,12 +100,12 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
 	@JvmOverloads
-	fun <T : Any> bean(name: String? = null, typeAndDefinition: Pair<Class<T>, () -> T>): BeanReference<T> {
+	fun <T : Any> bean(name: String? = null, typeAndDefinition: Pair<Class<T>, BeansProvider.() -> T>): BeanReference<T> {
 		return bean(name, typeAndDefinition.first, typeAndDefinition.second)
 	}
 
 	@VisibleForTesting
-	fun <T : Any> addBeanDefinition(name: String?, type: KClass<T>, definition: () -> T): BeanDefinition<T> {
+	fun <T : Any> addBeanDefinition(name: String?, type: KClass<T>, definition: (BeansProvider) -> T): BeanDefinition<T> {
 		val beanDefinition = BeanDefinition(name, type, definition)
 		beanDefinitions.add(beanDefinition)
 		return beanDefinition

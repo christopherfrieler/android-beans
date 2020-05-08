@@ -5,7 +5,6 @@ import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
@@ -13,7 +12,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
-import org.mockito.Mockito
 import rocks.frieler.android.beans.BeanConfiguration.Readiness
 
 class BeanConfigurationsBeansCollectorTest {
@@ -28,20 +26,20 @@ class BeanConfigurationsBeansCollectorTest {
 	private val beanDefinitionWithName: BeanDefinition<*> = mock()
 
 	@Test
-	fun `collectBeans() let's the BeanConfigurations define their beans`() {
+	fun `collectBeans() let's the BeanConfigurations define their beans providing itself as dependency-provider`() {
 		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
 		whenever(beanConfiguration.getBeanDefinitions())
 				.thenReturn(listOf(beanDefinitionWithoutName, beanDefinitionWithName))
 		whenever(beanDefinitionWithoutName.getName()).thenReturn(null)
-		whenever(beanDefinitionWithoutName.produceBean()).thenReturn(Any())
+		whenever(beanDefinitionWithoutName.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
 		whenever(beanDefinitionWithName.getName()).thenReturn("bean")
-		whenever(beanDefinitionWithName.produceBean()).thenReturn(Any())
+		whenever(beanDefinitionWithName.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
 		verify(beanConfiguration).getBeanDefinitions()
-		verify(beanRegistry).registerBean(beanDefinitionWithoutName.produceBean())
-		verify(beanRegistry).registerBean(beanDefinitionWithName.getName()!!, beanDefinitionWithName.produceBean())
+		verify(beanRegistry).registerBean(beanDefinitionWithoutName.produceBean(beanConfigurationsBeansCollector))
+		verify(beanRegistry).registerBean(beanDefinitionWithName.getName()!!, beanDefinitionWithName.produceBean(beanConfigurationsBeansCollector))
 	}
 
 	@Test
