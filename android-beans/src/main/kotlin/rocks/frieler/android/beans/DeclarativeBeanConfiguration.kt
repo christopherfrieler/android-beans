@@ -1,8 +1,5 @@
 package rocks.frieler.android.beans
 
-import androidx.annotation.VisibleForTesting
-import kotlin.reflect.KClass
-
 /**
  * Abstract super-class for [BeanConfiguration]s to define their beans in a declarative fashion.
  *
@@ -24,7 +21,6 @@ import kotlin.reflect.KClass
  * ```
  */
 abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
-	private val beanDefinitions: MutableList<BeanDefinition<*>> = ArrayList()
 
 	private var hasDeclaredBeans = false
 
@@ -34,7 +30,7 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 			beans()
 		}
 
-		return beanDefinitions
+		return super.getBeanDefinitions()
 	}
 
 	abstract fun beans()
@@ -101,12 +97,5 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	@JvmOverloads
 	fun <T : Any> bean(name: String? = null, typeAndDefinition: Pair<Class<T>, BeansProvider.() -> T>): BeanReference<T> {
 		return bean(name, typeAndDefinition.first, typeAndDefinition.second)
-	}
-
-	@VisibleForTesting
-	fun <T : Any> addBeanDefinition(name: String?, type: KClass<T>, definition: (BeansProvider) -> T): BeanDefinition<T> {
-		val beanDefinition = BeanDefinition(name, type, definition)
-		beanDefinitions.add(beanDefinition)
-		return beanDefinition
 	}
 }
