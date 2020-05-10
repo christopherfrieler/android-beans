@@ -1,10 +1,10 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
@@ -12,95 +12,79 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
-import rocks.frieler.android.beans.BeanConfiguration.Readiness
 
 class BeanConfigurationsBeansCollectorTest {
-	private val beanRegistry : BeanRegistry = mock()
+	private val beanRegistry: BeanRegistry = mock()
 	private val beanConfigurationsBeansCollector = BeanConfigurationsBeansCollector(beanRegistry)
 
 	private val beanConfiguration: BeanConfiguration = mock()
 	private val anotherBeanConfiguration: BeanConfiguration = mock()
 	private val yetAnotherBeanConfiguration: BeanConfiguration = mock()
 
-	private val beanDefinitionWithoutName: BeanDefinition<*> = mock()
-	private val beanDefinitionWithName: BeanDefinition<*> = mock()
+	private val beanDefinition = mock<BeanDefinition<*>>()
+	private val anotherBeanDefinition = mock<BeanDefinition<*>>()
+	private val yetAnotherBeanDefinition = mock<BeanDefinition<*>>()
 
 	@Test
-	fun `collectBeans() let's the BeanConfigurations define their beans providing itself as dependency-provider`() {
-		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		whenever(beanConfiguration.getBeanDefinitions())
-				.thenReturn(listOf(beanDefinitionWithoutName, beanDefinitionWithName))
+	fun `collectBeans() collects and processes the BeanConfigurations' BeanDefinitions providing itself as dependency-provider`() {
+		val bean = Any()
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(bean)
+		val anotherBean = Any()
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(anotherBean)
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
+		val yetAnotherBean = Any()
+		whenever(yetAnotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(yetAnotherBean)
+		whenever(anotherBeanConfiguration.getBeanDefinitions()).thenReturn(listOf(yetAnotherBeanDefinition))
+
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration, anotherBeanConfiguration))
+
+		verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		verify(beanRegistry).registerBean(bean)
+		verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+		verify(beanRegistry).registerBean(anotherBean)
+		verify(yetAnotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+		verify(beanRegistry).registerBean(yetAnotherBean)
+	}
+
+	@Test
+	fun `collectBeans() can process BeanDefinitions with and without name`() {
+		val beanDefinitionWithoutName: BeanDefinition<*> = mock()
+		val unnamedBean = Any()
 		whenever(beanDefinitionWithoutName.getName()).thenReturn(null)
-		whenever(beanDefinitionWithoutName.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
+		whenever(beanDefinitionWithoutName.produceBean(beanConfigurationsBeansCollector)).thenReturn(unnamedBean)
+		val beanDefinitionWithName: BeanDefinition<*> = mock()
+		val namedBean = Any()
 		whenever(beanDefinitionWithName.getName()).thenReturn("bean")
-		whenever(beanDefinitionWithName.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
+		whenever(beanDefinitionWithName.produceBean(beanConfigurationsBeansCollector)).thenReturn(namedBean)
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinitionWithoutName, beanDefinitionWithName))
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		verify(beanConfiguration).getBeanDefinitions()
-		verify(beanRegistry).registerBean(beanDefinitionWithoutName.produceBean(beanConfigurationsBeansCollector))
-		verify(beanRegistry).registerBean(beanDefinitionWithName.getName()!!, beanDefinitionWithName.produceBean(beanConfigurationsBeansCollector))
+		verify(beanDefinitionWithoutName).produceBean(beanConfigurationsBeansCollector)
+		verify(beanRegistry).registerBean(unnamedBean)
+		verify(beanDefinitionWithName).produceBean(beanConfigurationsBeansCollector)
+		verify(beanRegistry).registerBean("bean", namedBean)
 	}
 
 	@Test
-	fun `collectBeans() resolves dependencies between BeanConfigurations and handles them in a possible order`() {
-		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
-		whenever(beanConfiguration.getBeanDefinitions()).thenAnswer {
-			whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-			emptyList<BeanDefinition<*>>()
-		}
-		whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
-		whenever(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-		whenever(yetAnotherBeanConfiguration.getBeanDefinitions()).thenAnswer {
-			whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-			emptyList<BeanDefinition<*>>()
-		}
-
-		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration))
-
-		val inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration)
-		inOrder.verify(yetAnotherBeanConfiguration).getBeanDefinitions()
-		inOrder.verify(beanConfiguration).getBeanDefinitions()
-		inOrder.verify(anotherBeanConfiguration).getBeanDefinitions()
-	}
-
-	@Test
-	fun `collectBeans() delays BeanConfiguration waiting for an optional dependency`() {
-		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.DELAY)
-		whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.UNREADY)
-		whenever(yetAnotherBeanConfiguration.getBeanDefinitions()).thenAnswer {
-			whenever(anotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-			emptyList<BeanDefinition<*>>()
-		}
-		whenever(yetAnotherBeanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-
-		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration))
-
-		val inOrder = inOrder(beanConfiguration, anotherBeanConfiguration, yetAnotherBeanConfiguration)
-		inOrder.verify(yetAnotherBeanConfiguration).getBeanDefinitions()
-		inOrder.verify(anotherBeanConfiguration).getBeanDefinitions()
-		inOrder.verify(beanConfiguration).getBeanDefinitions()
-	}
-
-	@Test
-	fun `multiple calls to collectBeans() don't handle old BeanConfigurations`() {
-		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
-
+	fun `multiple calls to collectBeans() don't handle old BeanConfigurations nor their BeanDefinitions`() {
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition))
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
 		verify(beanConfiguration).getBeanDefinitions()
-		reset(beanConfiguration)
+		verify(beanDefinition).produceBean(any())
+		reset(beanConfiguration, beanDefinition)
 
 		beanConfigurationsBeansCollector.collectBeans(emptyList())
 
 		verifyNoMoreInteractions(beanConfiguration)
+		verifyNoMoreInteractions(beanDefinition)
 	}
 
 	@Test
 	fun `collectBeans() applies the BeanRegistryPostProcessor beans after collecting all beans`() {
-		val beanRegistryPostProcessor : BeanRegistryPostProcessor = mock()
+		val beanRegistryPostProcessor: BeanRegistryPostProcessor = mock()
 		whenever(beanRegistry.lookUpBeans(BeanRegistryPostProcessor::class)).thenReturn(listOf(beanRegistryPostProcessor))
-		whenever(beanConfiguration.isReadyToDefineBeans(beanConfigurationsBeansCollector)).thenReturn(Readiness.READY)
 
 		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
@@ -110,7 +94,7 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by name and type delegates to the BeanRegistry`() {
+	fun `lookUpBean() by name and type return bean already present in the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
 		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
@@ -119,12 +103,43 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by name and type delegates to the BeanRegistry and returns null without such bean`() {
+	fun `lookUpBean() by name and type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
+			val dependency = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
+			assertThat(dependency).isSameAs(this)
+			Any()
+		}
+		whenever(anotherBeanDefinition.getName()).thenReturn("bean")
+		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		assertThat(bean).isNull()
+		val inOrder = inOrder(beanDefinition, anotherBeanDefinition, beanRegistry)
+		inOrder.verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(beanRegistry).registerBean("bean", this)
+	}
+
+	@Test
+	fun `lookUpBean() by name and type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
+		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
+			val dependency = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
+			assertThat(dependency).isNull()
+			Any()
+		}
+		whenever(anotherBeanDefinition.getName()).thenReturn("anotherBean")
+		whenever(anotherBeanDefinition.getType()).thenReturn(Any::class)
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
+
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
+
+		verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
 	}
 
 	@Test
@@ -137,21 +152,64 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by type delegates to the BeanRegistry and returns null without such bean`() {
+	fun `lookUpBean() by type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
+			val dependency = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+			assertThat(dependency).isSameAs(this)
+			Any()
+		}
+		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		assertThat(bean).isNull()
+		val inOrder = inOrder(beanDefinition, anotherBeanDefinition, beanRegistry)
+		inOrder.verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(beanRegistry).registerBean(this)
 	}
 
 	@Test
-	fun `lookUpBeans() by type delegates to the BeanRegistry`() {
-		whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(this))
+	fun `lookUpBean() by type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
+		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
+			val dependency = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+			assertThat(dependency).isNull()
+			Any()
+		}
+		whenever(anotherBeanDefinition.getType()).thenReturn(Any::class)
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(Any())
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
-		val beans = beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
 
-		assertThat(beans).hasSize(1)
-		assertThat(beans).contains(this)
+		verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+	}
+
+	@Test
+	fun `lookUpBeans() by type returns existing beans from the BeanRegistry and remaining BeanDefinitions producing such beans`() {
+		val preExistingBean = BeanConfigurationsBeansCollectorTest()
+		whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(preExistingBean))
+		whenever(beanRegistry.registerBean(this)).thenAnswer {
+			whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(preExistingBean, this))
+		}
+		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
+			val dependencies = beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)
+			assertThat(dependencies).hasSize(2)
+			Unit
+		}
+		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
+		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
+
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
+
+		val inOrder = inOrder(beanDefinition, anotherBeanDefinition, beanRegistry)
+		inOrder.verify(beanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(anotherBeanDefinition).produceBean(beanConfigurationsBeansCollector)
+		inOrder.verify(beanRegistry).registerBean(this)
 	}
 }

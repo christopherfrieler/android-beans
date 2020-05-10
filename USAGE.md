@@ -112,17 +112,10 @@ of `MyBean` into the consuming code.
 
 ### Dependencies between beans 
 
-You can also use beans from other `BeanConfiguration`s to define a bean, that depends on them. In order to handle
-ordering between the `BeanConfiguration`s correctly, the dependency must be declared explicitly **before** the
-invocation of `beans()`. `BeanConfiguration` provides some methods for that. Android Beans will ensure, that `beans()`
-is called only after all dependencies are fulfilled. When you define the bean, you have access to a [BeansProvider] to
-obtain the dependencies.
+You can also use beans from other `BeanConfiguration`s to define a bean, that depends on them. When you define a bean in
+a [DeclarativeBeanConfiguration], you have access to a [BeansProvider] to obtain the dependencies.
 ```kotlin
 class MyBeanConfiguration : DeclarativeBeanConfiguration() {
-    init {
-        requireBean(type = MyDependency::class)
-    }
-
     override fun beans() {
         bean("myBean") { MyBean(lookUpBean(MyDependency::class)) }
     }
@@ -131,24 +124,12 @@ class MyBeanConfiguration : DeclarativeBeanConfiguration() {
 Or in Java:
 ```java
 public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
-    {
-    	requireBean(MyDependency.class);
-    }
-    
     @Override
     public void beans() {
         bean("myBean", MyBean.class, (dependencies) -> new MyBean(dependencies.lookUpBean(MyDependency.class)));
     }
 }
 ```
-`BeanConfiguration` provides the following methods to require other beans:
-- `requireBean(String?, KClass<T>)`: Requires a bean by name (optionally, if not `null`) and type.
-- `requireOptionalBean(String?, KClass<T>)`: Declares an optional dependency on a bean by name (optionally, if not
-`null`) and type. Android Beans will attempt to handle other `BeanConfiguration`s first to allow them to define such a
-bean.
-- `requireBeans(KClass<T>)`: Requires the beans of that type. Android Beans will attempt to handle other
-`BeanConfiguration`s first to allow them to define such beans.
-For convenient usage from Java there are also overloads with Java-`Class`es as arguments.
 
 ## Bean scopes
 

@@ -12,13 +12,12 @@ import kotlin.reflect.KClass
  * // 1. extend BeanConfiguration:
  * class MyBeanConfiguration : DeclarativeBeanConfiguration() {
  *
- *   // 2. declare dependencies to other beans using the require-methods:
- *   private val anotherBean = requireBean(type = AnotherBean::class)
- *
- *   // 3. define beans:
  *   override fun beans() {
+ *     // 2. define your beans:
  *     bean("my_bean") {
- *       MyBean(anotherBean.get())
+ *       // 3. obtain dependency to another bean:
+ *     	 val anotherBean = lookUpBean(AnotherBean::class)
+ *       MyBean(anotherBean!!)
  *     }
  *   }
  * }
