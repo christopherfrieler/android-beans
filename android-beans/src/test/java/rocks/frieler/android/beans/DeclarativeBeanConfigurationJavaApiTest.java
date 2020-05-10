@@ -10,11 +10,8 @@ import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -42,7 +39,46 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     }
 
     @Test
-    public void testBeanConfigurationCanDefineScopedBeans() {
+    public void testDeclarativeBeanConfigurationCanUseBeansDefinedEarlierInThisBeanConfiguration() {
+        BeansProvider dependencies = mock(BeansProvider.class);
+
+        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
+            @Override
+            public void beans() {
+                BeanReference<DeclarativeBeanConfigurationJavaApiTest> aBean = bean(DeclarativeBeanConfigurationJavaApiTest.class, DeclarativeBeanConfigurationJavaApiTest::new);
+                bean(String.class, () -> aBean.use().toString());
+            }
+        };
+
+        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
+
+        assertThat(beanDefinitions.size(), is(2));
+        final Object aBean = beanDefinitions.get(0).produceBean(dependencies);
+        assertThat(beanDefinitions.get(1).produceBean(dependencies), is(equalTo(aBean.toString())));
+    }
+
+    @Test
+    public void testDeclarativeBeanConfigurationCanDefineBeansWithDependencies() {
+        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
+            @Override
+            public void beans() {
+                bean(DeclarativeBeanConfigurationJavaApiTest.class, (BeansProvider dependencies) -> {
+                    dependencies.lookUpBean(DeclarativeBeanConfigurationJavaApiTest.class);
+                    dependencies.lookUpBean("aCertainBean", DeclarativeBeanConfigurationJavaApiTest.class);
+                    dependencies.lookUpBeans(DeclarativeBeanConfigurationJavaApiTest.class);
+                    return new DeclarativeBeanConfigurationJavaApiTest();
+                });
+            }
+        };
+
+        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
+
+        assertThat(beanDefinitions.size(), is(equalTo(1)));
+        assertThat(beanDefinitions.get(0).getName(), is(nullValue()));
+    }
+
+    @Test
+    public void testDeclarativeBeanConfigurationCanDefineScopedBeans() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {
@@ -68,7 +104,7 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     }
 
     @Test
-    public void testBeanConfigurationCanDefineScopedBeansWithDependencies() {
+    public void testDeclarativeBeanConfigurationCanDefineScopedBeansWithDependencies() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {
@@ -100,70 +136,5 @@ public class DeclarativeBeanConfigurationJavaApiTest {
         assertThat(beanDefinitions.get(0).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(SingletonScopedFactoryBean.class))));
         assertThat(beanDefinitions.get(1).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(PrototypeScopedFactoryBean.class))));
         assertThat(beanDefinitions.get(2).getType(), is(equalTo(JvmClassMappingKt.getKotlinClass(ActivityScopedFactoryBean.class))));
-    }
-
-    @Test
-    public void testBeanConfigurationCanUseBeansDefinedEarlierInThisBeanConfiguration() {
-        BeansProvider dependencies = mock(BeansProvider.class);
-
-        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
-            @Override
-            public void beans() {
-                BeanReference<DeclarativeBeanConfigurationJavaApiTest> aBean = bean(DeclarativeBeanConfigurationJavaApiTest.class, DeclarativeBeanConfigurationJavaApiTest::new);
-                bean(String.class, () -> aBean.use().toString());
-            }
-        };
-
-        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
-
-        assertThat(beanDefinitions.size(), is(2));
-        final Object aBean = beanDefinitions.get(0).produceBean(dependencies);
-        assertThat(beanDefinitions.get(1).produceBean(dependencies), is(equalTo(aBean.toString())));
-    }
-
-    @Test
-    public void testBeanConfigurationCanRequireDependencies() {
-        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
-            {
-                requireBean(DeclarativeBeanConfigurationJavaApiTest.class);
-                requireBean("bean", DeclarativeBeanConfigurationJavaApiTest.class);
-                requireOptionalBean(DeclarativeBeanConfigurationJavaApiTest.class);
-                requireBeans(DeclarativeBeanConfigurationJavaApiTest.class);
-            }
-
-            @Override
-            public void beans() {
-                bean("beanWithDependencies", Object.class, (dependencies) -> {
-                    assertThat(dependencies.lookUpBean(DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
-                    assertThat(dependencies.lookUpBean("bean", DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
-                    assertThat(dependencies.lookUpBeans(DeclarativeBeanConfigurationJavaApiTest.class), is(notNullValue()));
-                    return new Object();
-                });
-            }
-        };
-        List<BeanDependency<?>> beanDependencies = beanConfiguration.getDependencies();
-
-        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>(JvmClassMappingKt.getKotlinClass(DeclarativeBeanConfigurationJavaApiTest.class)))));
-        assertThat(beanDependencies, hasItem(equalTo(new SingleBeanDependency<>("bean", JvmClassMappingKt.getKotlinClass(DeclarativeBeanConfigurationJavaApiTest.class)))));
-        assertThat(beanDependencies, hasItem(equalTo(new OptionalSingleBeanDependency<>(JvmClassMappingKt.getKotlinClass(DeclarativeBeanConfigurationJavaApiTest.class)))));
-        assertThat(beanDependencies, hasItem(equalTo(new BeansOfTypeDependency<>(JvmClassMappingKt.getKotlinClass(DeclarativeBeanConfigurationJavaApiTest.class)))));
-    }
-
-    @Test
-    public void testDeclarativeBeanConfigurationCanDefineBeansWithDependencies() {
-        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
-            @Override
-            public void beans() {
-                bean(DeclarativeBeanConfigurationJavaApiTest.class, (BeansProvider dependencies) -> {
-                    assertThat(dependencies, isA(BeansProvider.class));
-                    return new DeclarativeBeanConfigurationJavaApiTest();
-                });
-            }
-        };
-
-        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
-
-        assertThat(beanDefinitions.size(), is(equalTo(1)));
-        assertThat(beanDefinitions.get(0).getName(), is(nullValue()));
     }
 }
