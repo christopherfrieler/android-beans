@@ -2,6 +2,7 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.containsAll
+import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import assertk.assertions.isSameAs
@@ -18,7 +19,7 @@ class BeanDependenciesResolutionTest {
 	fun `resolves dependency to a bean from another BeanConfiguration`() {
 		val beanConfiguration = object : DeclarativeBeanConfiguration() {
 			override fun beans() {
-				bean { BeanWithDependency(lookUpBean(Bean::class)!!) }
+				bean { BeanWithDependency(lookUpBean(Bean::class)) }
 			}
 		}
 
@@ -34,7 +35,7 @@ class BeanDependenciesResolutionTest {
 		assertThat(bean).isNotNull()
 		val beanWithDependency = beanRegistry.lookUpBean(BeanWithDependency::class)
 		assertThat(beanWithDependency).isNotNull()
-		assertThat(beanWithDependency!!.dependency).isSameAs(bean)
+		assertThat(beanWithDependency.dependency).isSameAs(bean)
 	}
 
 	@Test
@@ -48,7 +49,7 @@ class BeanDependenciesResolutionTest {
 		val anotherBeanConfiguration = object : DeclarativeBeanConfiguration() {
 			override fun beans() {
 				bean("anotherBean") {
-					BeanWithDependency(lookUpBean("bean", Bean::class)!!)
+					BeanWithDependency(lookUpBean("bean", Bean::class))
 				}
 			}
 		}
@@ -56,7 +57,7 @@ class BeanDependenciesResolutionTest {
 		val yetAnotherBeanConfiguration = object : DeclarativeBeanConfiguration() {
 			override fun beans() {
 				bean("yetAnotherBean") {
-					BeanWithDependency(lookUpBean("anotherBean", BeanWithDependency::class)!!)
+					BeanWithDependency(lookUpBean("anotherBean", BeanWithDependency::class))
 				}
 			}
 		}
@@ -67,10 +68,35 @@ class BeanDependenciesResolutionTest {
 		assertThat(bean).isNotNull()
 		val anotherBean = beanRegistry.lookUpBean("anotherBean", BeanWithDependency::class)
 		assertThat(anotherBean).isNotNull()
-		assertThat(anotherBean!!.dependency).isSameAs(bean)
+		assertThat(anotherBean.dependency).isSameAs(bean)
 		val yetAnotherBean = beanRegistry.lookUpBean("yetAnotherBean", BeanWithDependency::class)
 		assertThat(yetAnotherBean).isNotNull()
-		assertThat(yetAnotherBean!!.dependency).isSameAs(anotherBean)
+		assertThat(yetAnotherBean.dependency).isSameAs(anotherBean)
+	}
+
+	@Test
+	fun `resolves optional dependencies if available`() {
+		val beanConfiguration = object : DeclarativeBeanConfiguration() {
+			override fun beans() {
+				bean("presentBean") { Bean() }
+
+				bean {
+					val beans = mutableListOf<Bean>()
+					lookUpOptionalBean("presentBean", Bean::class)?.apply { beans.add(this) }
+					lookUpOptionalBean("missingBean", Bean::class)?.apply { beans.add(this) }
+					BeanWithDependencies(beans)
+				}
+			}
+		}
+
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
+
+		val presentBean = beanRegistry.lookUpBean("presentBean", Bean::class)
+		assertThat(presentBean).isNotNull()
+
+		val beanWithDependencies = beanRegistry.lookUpBean(BeanWithDependencies::class)
+		assertThat(beanWithDependencies).isNotNull()
+		assertThat(beanWithDependencies.dependencies).containsExactly(presentBean)
 	}
 
 	@Test
@@ -106,7 +132,7 @@ class BeanDependenciesResolutionTest {
 
 		val beanWithDependencies = beanRegistry.lookUpBean(BeanWithDependencies::class)
 		assertThat(beanWithDependencies).isNotNull()
-		assertThat(beanWithDependencies!!.dependencies).containsAll(bean, anotherBean)
+		assertThat(beanWithDependencies.dependencies).containsAll(bean, anotherBean)
 	}
 }
 

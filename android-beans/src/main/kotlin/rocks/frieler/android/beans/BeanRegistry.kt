@@ -104,7 +104,7 @@ class BeanRegistry internal constructor() : BeansProvider {
         return postProcessedBean
     }
 
-    override fun <T :Any> lookUpBean(name: String, type: KClass<T>): T? {
+    override fun <T :Any> lookUpOptionalBean(name: String, type: KClass<T>): T? {
         val beanCandidate = beans[name]
 		if (beanCandidate == null) {
 			return null
@@ -113,7 +113,7 @@ class BeanRegistry internal constructor() : BeansProvider {
 		}
 	}
 
-    override fun <T :Any> lookUpBean(type: KClass<T>): T? {
+    override fun <T :Any> lookUpOptionalBean(type: KClass<T>): T? {
         val preferredBeanName = getPreferredBeanName(type)
         val beanCandidateByPreferredName = beans[preferredBeanName]
         if (beanCandidateByPreferredName != null) {

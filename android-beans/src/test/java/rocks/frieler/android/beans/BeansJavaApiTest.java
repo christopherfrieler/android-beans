@@ -48,6 +48,20 @@ public class BeansJavaApiTest {
     }
 
     @Test
+    public void testLookupOptionalBeanByNameAndType() {
+        BeansJavaApiTest bean = Beans.lookUpOptionalBean("beansJavaApiTest", BeansJavaApiTest.class);
+
+        assertThat(bean, is(sameInstance(this)));
+    }
+
+    @Test
+    public void testLookupOptionalBeanByType() {
+        BeansJavaApiTest bean = Beans.lookUpOptionalBean(BeansJavaApiTest.class);
+
+        assertThat(bean, is(sameInstance(this)));
+    }
+
+    @Test
     public void testLookupAllBeansByType() {
         List<BeansJavaApiTest> beans = Beans.lookUpBeans(BeansJavaApiTest.class);
 

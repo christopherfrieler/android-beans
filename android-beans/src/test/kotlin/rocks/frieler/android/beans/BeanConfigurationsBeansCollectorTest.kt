@@ -94,8 +94,8 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by name and type return bean already present in the BeanRegistry`() {
-		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
+	fun `lookUpOptionalBean() by name and type return bean already present in the BeanRegistry`() {
+		whenever(beanRegistry.lookUpOptionalBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
 		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
 
@@ -103,10 +103,10 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by name and type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
+	fun `lookUpOptionalBean() by name and type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
-			val dependency = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
+			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean("bean", BeanConfigurationsBeansCollectorTest::class)
 			assertThat(dependency).isSameAs(this)
 			Any()
 		}
@@ -124,10 +124,10 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by name and type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
-		whenever(beanRegistry.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+	fun `lookUpOptionalBean() by name and type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
+		whenever(beanRegistry.lookUpOptionalBean("bean", BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
-			val dependency = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
+			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean("bean", BeanConfigurationsBeansCollectorTest::class)
 			assertThat(dependency).isNull()
 			Any()
 		}
@@ -143,19 +143,19 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by type delegates to the BeanRegistry to return the bean`() {
-		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
+	fun `lookUpOptionalBean() by type delegates to the BeanRegistry to return the bean`() {
+		whenever(beanRegistry.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(this)
 
-		val bean = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+		val bean = beanConfigurationsBeansCollector.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)
 
 		assertThat(bean).isSameAs(this)
 	}
 
 	@Test
-	fun `lookUpBean() by type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
+	fun `lookUpOptionalBean() by type processes remaining BeanDefinition to produce that bean when not present in the BeanRegistry`() {
 		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
-			val dependency = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)
 			assertThat(dependency).isSameAs(this)
 			Any()
 		}
@@ -172,10 +172,10 @@ class BeanConfigurationsBeansCollectorTest {
 	}
 
 	@Test
-	fun `lookUpBean() by type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
-		whenever(beanRegistry.lookUpBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
+	fun `lookUpOptionalBean() by type returns null without such bean in the BeanRegistry nor a BeanDefinition to produce it`() {
+		whenever(beanRegistry.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)).thenReturn(null)
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
-			val dependency = beanConfigurationsBeansCollector.lookUpBean(BeanConfigurationsBeansCollectorTest::class)
+			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)
 			assertThat(dependency).isNull()
 			Any()
 		}

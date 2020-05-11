@@ -25,60 +25,60 @@ class BeanRegistryTest {
     private val beanRegistry = BeanRegistry()
 
     @Test
-    fun `lookUpBean() by name and type returns null without a bean with the desired name`() {
-        val bean = beanRegistry.lookUpBean("bean", Any::class)
+    fun `lookUpOptionalBean() by name and type returns null without a bean with the desired name`() {
+        val bean = beanRegistry.lookUpOptionalBean("bean", Any::class)
 
         assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by name and type returns null when the bean with the desired name is of an incompatible type`() {
+    fun `lookUpOptionalBean() by name and type returns null when the bean with the desired name is of an incompatible type`() {
         val name = "bean"
         val registeredBean = Any()
 
         beanRegistry.registerBean(name, registeredBean)
-        val bean = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
+        val bean = beanRegistry.lookUpOptionalBean(name, BeanRegistryTest::class)
 
 		assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by name and type returns registered bean with the desired name and type`() {
+    fun `lookUpOptionalBean() by name and type returns registered bean with the desired name and type`() {
         val name = "bean"
         val registeredBean = Any()
 
         beanRegistry.registerBean(name, registeredBean)
-        val bean = beanRegistry.lookUpBean(name, Any::class)
+        val bean = beanRegistry.lookUpOptionalBean(name, Any::class)
 
         assertThat(bean).isSameAs(registeredBean)
     }
 
     @Test
-    fun `lookUpBean() by type returns null without a matching bean`() {
+    fun `lookUpOptionalBean() by type returns null without a matching bean`() {
         beanRegistry.registerBean("bean", Any())
-        val bean = beanRegistry.lookUpBean(BeanRegistryTest::class)
+        val bean = beanRegistry.lookUpOptionalBean(BeanRegistryTest::class)
 
 		assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by type returns single matching bean`() {
+    fun `lookUpOptionalBean() by type returns single matching bean`() {
         val registeredBean = Any()
 
         beanRegistry.registerBean("bean", registeredBean)
-        val bean = beanRegistry.lookUpBean(Any::class)
+        val bean = beanRegistry.lookUpOptionalBean(Any::class)
 
 		assertThat(bean).isSameAs(registeredBean)
     }
 
     @Test
-    fun `lookUpBean() by type returns one of multiple matching beans`() {
+    fun `lookUpOptionalBean() by type returns one of multiple matching beans`() {
 		val registeredBean1 = Any()
 		val registeredBean2 = Any()
 
 		beanRegistry.registerBean("bean1", registeredBean1)
 		beanRegistry.registerBean("bean2", registeredBean2)
-        val bean = beanRegistry.lookUpBean(Any::class)
+        val bean = beanRegistry.lookUpOptionalBean(Any::class)
 
 		assertThat(bean).isIn(registeredBean1, registeredBean2)
     }
@@ -124,32 +124,32 @@ class BeanRegistryTest {
     }
 
     @Test
-    fun `lookUpBean() by name and type returns null when the ScopedFactoryBean with desired name produces the wrong type`() {
+    fun `lookUpOptionalBean() by name and type returns null when the ScopedFactoryBean with desired name produces the wrong type`() {
         val name = "bean"
         val factoryBean: ScopedFactoryBean<Any> = mock()
         whenever(factoryBean.beanType).thenReturn(Any::class)
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean: Any? = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
+        val bean: Any? = beanRegistry.lookUpOptionalBean(name, BeanRegistryTest::class)
 
         assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by name and type returns null without a suitable scope for a matching ScopedFactoryBean`() {
+    fun `lookUpOptionalBean() by name and type returns null without a suitable scope for a matching ScopedFactoryBean`() {
         val name = "bean"
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
         whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
         whenever(factoryBean.scope).thenReturn("otherScope")
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean = beanRegistry.lookUpBean(name, factoryBean.beanType)
+        val bean = beanRegistry.lookUpOptionalBean(name, factoryBean.beanType)
 
         assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by name and type returns null when the suitable ScopedFactoryBean is not active`() {
+    fun `lookUpOptionalBean() by name and type returns null when the suitable ScopedFactoryBean is not active`() {
         whenever(beanScope.isActive).thenReturn(false)
         val name = "bean"
         val scope = beanScope.name
@@ -158,13 +158,13 @@ class BeanRegistryTest {
         whenever(factoryBean.scope).thenReturn(scope)
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean = beanRegistry.lookUpBean(name, factoryBean.beanType)
+        val bean = beanRegistry.lookUpOptionalBean(name, factoryBean.beanType)
 
         assertThat(bean).isNull()
     }
 
     @Test
-    fun `lookUpBean() by name and type returns scoped bean from active scope with the desired name and type`() {
+    fun `lookUpOptionalBean() by name and type returns scoped bean from active scope with the desired name and type`() {
         whenever(beanScope.isActive).thenReturn(true)
         val name = "bean"
         val scope = beanScope.name
@@ -177,13 +177,13 @@ class BeanRegistryTest {
 				.thenAnswer { invocation -> (invocation.getArgument(1) as ScopedFactoryBean<*>).produceBean(beanRegistry) }
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean = beanRegistry.lookUpBean(name, factoryBean.beanType)
+        val bean = beanRegistry.lookUpOptionalBean(name, factoryBean.beanType)
 
         assertThat(bean).isSameAs(scopedBean)
     }
 
     @Test
-    fun `lookUpBean() by type returns matching bean from ScopedFactoryBean`() {
+    fun `lookUpOptionalBean() by type returns matching bean from ScopedFactoryBean`() {
         whenever(beanScope.isActive).thenReturn(true)
         val name = "bean"
         val scope = beanScope.name
@@ -195,7 +195,7 @@ class BeanRegistryTest {
 				.thenAnswer { invocation -> (invocation.getArgument(1) as ScopedFactoryBean<*>).produceBean(beanRegistry) }
 
         beanRegistry.registerBean(name, factoryBean)
-        val bean = beanRegistry.lookUpBean(factoryBean.beanType)
+        val bean = beanRegistry.lookUpOptionalBean(factoryBean.beanType)
 
         assertThat(bean).isSameAs(this)
     }
