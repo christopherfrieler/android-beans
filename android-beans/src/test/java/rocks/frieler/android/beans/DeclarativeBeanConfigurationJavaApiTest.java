@@ -65,6 +65,8 @@ public class DeclarativeBeanConfigurationJavaApiTest {
                 bean(DeclarativeBeanConfigurationJavaApiTest.class, (BeansProvider dependencies) -> {
                     dependencies.lookUpBean(DeclarativeBeanConfigurationJavaApiTest.class);
                     dependencies.lookUpBean("aCertainBean", DeclarativeBeanConfigurationJavaApiTest.class);
+                    dependencies.lookUpOptionalBean(DeclarativeBeanConfigurationJavaApiTest.class);
+                    dependencies.lookUpOptionalBean("aCertainBean", DeclarativeBeanConfigurationJavaApiTest.class);
                     dependencies.lookUpBeans(DeclarativeBeanConfigurationJavaApiTest.class);
                     return new DeclarativeBeanConfigurationJavaApiTest();
                 });

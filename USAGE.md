@@ -74,7 +74,7 @@ different modules and also Android libraries as long as the files have different
 
 ## Using beans
 
-To use the previously defined beans you can look them up through the `Beans` facade-object, which offers three
+To use the previously defined beans you can look them up through the `Beans` facade-object, which offers several
 possibilities.
 
 **Lookup only by type:**
@@ -87,7 +87,7 @@ MyBean myBean = Beans.lookUpBean(MyBean.class);
 ```
 This allows the consuming code to obtain an instance of the desired type without having to know how it is constructed
 or even which implementation of an interface or abstract class it uses, since the returned bean can also be of a subtype
-of the desired type. 
+of the desired type.
 
 **Lookup by name and type:**
 ```kotlin
@@ -98,6 +98,17 @@ Or in Java:
 MyBean myBean = Beans.lookUpBean("myBean", MyBean.class);
 ```
 This can be useful if there could be more than one bean of that type and you want a specific one.
+
+**Lookup of an optional bean:**
+```kotlin
+val myBean: MyBean? = Beans.lookOptionalUpBean()
+```
+Or in Java:
+```java
+MyBean myBean = Beans.lookOptionalUpBean(MyBean.class);
+```
+In this case the bean might be `null`, which allows other parts of the application to specify the bean and influence the
+behaviour of the consuming code or not. Optional beans can be looked up by name and type as well.  
 
 **Lookup of all beans of a type**
 ```kotlin
@@ -130,6 +141,7 @@ public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
     }
 }
 ```
+The [BeansProvider] offers the same possibilities to look up beans as the [Beans] facade seen earlier.
 
 ## Bean scopes
 

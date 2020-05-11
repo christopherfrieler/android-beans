@@ -64,18 +64,18 @@ internal constructor(
 	 *
 	 * @see BeanRegistry.lookUpBean
 	 */
-	override fun <T :Any> lookUpBean(name: String, type: KClass<T>): T? {
-		return beanRegistry.lookUpBean(name, type) ?: findBeanDefinitionFor(name, type)?.let { this.process(it) }
+	override fun <T :Any> lookUpOptionalBean(name: String, type: KClass<T>): T? {
+		return beanRegistry.lookUpOptionalBean(name, type) ?: findBeanDefinitionFor(name, type)?.let { this.process(it) }
 	}
 
 	/**
 	 * Provides a bean by type from the underlying [BeanRegistry] or, if there is no such bean yet,
 	 * processes further [BeanDefinition]s that can produce that bean.
 	 *
-	 * @see BeanRegistry.lookUpBean
+	 * @see BeanRegistry.lookUpOptionalBean
 	 */
-	override fun <T :Any> lookUpBean(type: KClass<T>): T? {
-		return beanRegistry.lookUpBean(type) ?: findBeanDefinitionFor(type = type)?.let { this.process(it) }
+	override fun <T :Any> lookUpOptionalBean(type: KClass<T>): T? {
+		return beanRegistry.lookUpOptionalBean(type) ?: findBeanDefinitionFor(type = type)?.let { this.process(it) }
 	}
 
 	/**

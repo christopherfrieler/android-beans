@@ -21,7 +21,7 @@ object Beans {
      *
      * @param name the name of the desired bean (optional)
      * @param <T> the desired bean-type
-     * @return the bean or `null`
+     * @return the bean
      *
      * @see lookUpBean
      */
@@ -34,11 +34,11 @@ object Beans {
      * @param name the name of the desired bean (optional)
      * @param type the type of the desired bean
      * @param <T> the bean-type
-     * @return the bean or `null`
+     * @return the bean
      *
      * @see BeansProvider.lookUpBean
      */
-    fun <T : Any> lookUpBean(name: String? = null, type: KClass<T>): T? {
+    fun <T : Any> lookUpBean(name: String? = null, type: KClass<T>): T {
         return if (name == null)
             beansProvider.lookUpBean(type)
         else
@@ -52,13 +52,58 @@ object Beans {
      * @param name the name of the desired bean (optional)
      * @param type the type of the desired bean
      * @param <T> the bean-type
-     * @return the named bean or `null`
+     * @return the named bean
      *
      * @see lookUpBean
      */
     @JvmStatic
     @JvmOverloads
     fun <T :Any> lookUpBean(name: String? = null, type: Class<T>) = lookUpBean(name, type.kotlin)
+
+    /**
+     * Looks up the bean with the inferred type and given name (if not `null`) in the
+     * [BeansProvider] of this application.
+     *
+     * @param name the name of the desired bean (optional)
+     * @param <T> the desired bean-type
+     * @return the bean or `null`
+     *
+     * @see lookUpOptionalBean
+     */
+    inline fun <reified T : Any> lookUpOptionalBean(name: String? = null) = lookUpOptionalBean(name, T::class)
+
+    /**
+     * Looks up the bean with the given name (if not `null`) and type in the [BeansProvider] of this
+     * application.
+     *
+     * @param name the name of the desired bean (optional)
+     * @param type the type of the desired bean
+     * @param <T> the bean-type
+     * @return the bean or `null`
+     *
+     * @see BeansProvider.lookUpOptionalBean
+     */
+    fun <T : Any> lookUpOptionalBean(name: String? = null, type: KClass<T>): T? {
+        return if (name == null)
+            beansProvider.lookUpOptionalBean(type)
+        else
+            beansProvider.lookUpOptionalBean(name, type)
+    }
+
+    /**
+     * Looks up the bean with the given name (if not `null`) and type in the [BeansProvider] of this
+     * application.
+     *
+     * @param name the name of the desired bean (optional)
+     * @param type the type of the desired bean
+     * @param <T> the bean-type
+     * @return the named bean or `null`
+     *
+     * @see lookUpOptionalBean
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun <T :Any> lookUpOptionalBean(name: String? = null, type: Class<T>) = lookUpBean(name, type.kotlin)
 
     /**
      * Looks up all beans of the inferred type in the [BeansProvider] of this application.
