@@ -6,7 +6,9 @@ import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import assertk.assertions.isSameAs
+import org.junit.Ignore
 import org.junit.Test
+import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
 /**
  * Tests more complex situations where [BeanConfiguration]s depend on each other.
@@ -133,6 +135,29 @@ class BeanDependenciesResolutionTest {
 		val beanWithDependencies = beanRegistry.lookUpBean(BeanWithDependencies::class)
 		assertThat(beanWithDependencies).isNotNull()
 		assertThat(beanWithDependencies.dependencies).containsAll(bean, anotherBean)
+	}
+
+	@Test
+	@Ignore("known limitation")
+	fun `resolves dependency to a scoped bean defined later`() {
+		val beanConfiguration = object : DeclarativeBeanConfiguration() {
+			override fun beans() {
+				bean {
+					BeanWithDependency(lookUpBean(Bean::class))
+				}
+
+				lazyInstantiatedBean { Bean() }
+			}
+		}
+
+		beanConfigurationsBeansCollector.collectBeans(listOf(beanConfiguration))
+
+		val bean = beanRegistry.lookUpBean(Bean::class)
+		assertThat(bean).isNotNull()
+
+		val beanWithDependency = beanRegistry.lookUpBean(BeanWithDependency::class)
+		assertThat(beanWithDependency).isNotNull()
+		assertThat(beanWithDependency.dependency).isSameAs(bean)
 	}
 }
 
