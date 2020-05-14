@@ -6,10 +6,10 @@ import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.decorate
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBeanHandler
+import rocks.frieler.kotlin.reflect.isAssignableFrom
 import java.util.LinkedList
 import java.util.TreeMap
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmName
 
 /**
@@ -145,7 +145,7 @@ class BeanRegistry internal constructor() : BeansProvider {
     }
 
 	private fun <T :Any> resolveBeanFromCandidate(name: String, type: KClass<T>, beanCandidate: Any): T? {
-		if (beanCandidate is ScopedFactoryBean<*> && beanCandidate.beanType.isSubclassOf(type)) {
+		if (beanCandidate is ScopedFactoryBean<*> && type.isAssignableFrom(beanCandidate.beanType)) {
 			@Suppress("UNCHECKED_CAST") val factoryBean = beanCandidate as ScopedFactoryBean<T>
             val scopedFactoryBeanHandler = beanScopes[factoryBean.scope]
             if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive) {

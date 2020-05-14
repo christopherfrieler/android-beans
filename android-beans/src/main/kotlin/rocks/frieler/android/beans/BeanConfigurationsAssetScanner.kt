@@ -3,13 +3,13 @@ package rocks.frieler.android.beans
 import android.content.Context
 import android.content.res.AssetManager
 import rocks.frieler.android.beans.BeanConfigurationsAssetScanner.Companion.BEAN_CONFIGURATIONS_ASSET_PATH
+import rocks.frieler.kotlin.reflect.isAssignableFrom
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.ArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.isSupertypeOf
 import kotlin.reflect.jvm.jvmName
 
@@ -75,7 +75,7 @@ internal class BeanConfigurationsAssetScanner(private val context: Context) {
 			throw BeanInstantiationException("failed to instantiate BeanConfiguration $className.", e)
 		}
 
-		if (beanConfigurationClass.isSubclassOf(BeanConfiguration::class)) {
+		if (BeanConfiguration::class.isAssignableFrom(beanConfigurationClass)) {
 			@Suppress("UNCHECKED_CAST")
 			return instantiateBeanConfiguration(beanConfigurationClass as KClass<out BeanConfiguration>)
 		} else {

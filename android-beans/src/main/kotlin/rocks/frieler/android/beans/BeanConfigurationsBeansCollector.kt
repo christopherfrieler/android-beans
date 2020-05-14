@@ -1,8 +1,8 @@
 package rocks.frieler.android.beans
 
+import rocks.frieler.kotlin.reflect.isAssignableFrom
 import java.util.LinkedList
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 
 /**
  * The [BeanConfigurationsBeansCollector] collects the beans defined by [BeanConfiguration]s in a
@@ -94,6 +94,6 @@ internal constructor(
 
 	private fun <T : Any> findBeanDefinitionFor(name: String? = null, type: KClass<T>) : BeanDefinition<T>? {
 		@Suppress("UNCHECKED_CAST")
-		return remainingBeanDefinitions.find { (name == null || it.getName() == name) && it.getType().isSubclassOf(type) } as BeanDefinition<T>?
+		return remainingBeanDefinitions.find { (name == null || it.getName() == name) && type.isAssignableFrom(it.getType()) } as BeanDefinition<T>?
 	}
 }
