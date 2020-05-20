@@ -2,7 +2,7 @@ package rocks.frieler.android.beans
 
 import kotlin.reflect.KClass
 
-class BeanDefinition<T : Any>(
+open class BeanDefinition<T : Any>(
 		private val name: String?,
 		private val type: KClass<T>,
 		private val creator: (BeansProvider) -> T
