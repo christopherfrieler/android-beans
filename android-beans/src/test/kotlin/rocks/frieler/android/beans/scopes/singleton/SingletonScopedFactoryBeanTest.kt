@@ -5,11 +5,11 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
+import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.Companion.lazyInstantiated
@@ -48,10 +48,7 @@ class SingletonScopedFactoryBeanTest {
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
         assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
-        val definedFactoryBean = lazyInstantiatedBeanDefinition.second(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.second(dependencies), dependencies)
     }
 
     @Test
@@ -62,10 +59,7 @@ class SingletonScopedFactoryBeanTest {
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producer)
 
         assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
-        val definedFactoryBean = lazyInstantiatedBeanDefinition.second(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.second(dependencies), dependencies)
     }
 
     @Test
@@ -77,11 +71,17 @@ class SingletonScopedFactoryBeanTest {
 
         beanConfiguration.lazyInstantiatedBean(beanName) { producer() }
 
-        val factoryBeanDefinitionCaptor = argumentCaptor<BeansProvider.() -> SingletonScopedFactoryBean<*>>()
-        verify(beanConfiguration).addBeanDefinition(eq(beanName), eq(SingletonScopedFactoryBean::class), factoryBeanDefinitionCaptor.capture())
-        val definedFactoryBean = factoryBeanDefinitionCaptor.firstValue(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        val beanDefinitionCaptor = argumentCaptor<BeanDefinition<SingletonScopedFactoryBean<SingletonScopedFactoryBeanTest>>>()
+        verify(beanConfiguration).addBeanDefinition(beanDefinitionCaptor.capture())
+        val beanDefinition = beanDefinitionCaptor.firstValue
+        assertThat(beanDefinition.getName()).isEqualTo(beanName)
+        assertThat(beanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
+        assertSingletonScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)
+    }
+
+    private fun assertSingletonScopedFactoryBeanProducingThis(factoryBean: SingletonScopedFactoryBean<*>, dependencies: BeansProvider) {
+        assertThat(factoryBean).isInstanceOf(SingletonScopedFactoryBean::class)
+        assertThat(factoryBean.beanType).isEqualTo(SingletonScopedFactoryBeanTest::class)
+        assertThat(factoryBean.produceBean(dependencies)).isSameAs(this)
     }
 }

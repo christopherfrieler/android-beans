@@ -1,7 +1,5 @@
 package rocks.frieler.android.beans
 
-import kotlin.reflect.KClass
-
 /**
  * Abstract super-class to define beans for the context of an application.
  *
@@ -23,17 +21,11 @@ abstract class BeanConfiguration {
 	open fun getBeanDefinitions() : List<BeanDefinition<*>> = beanDefinitions
 
 	/**
-	 * Creates and adds a [BeanDefinition] from the given parts.
+	 * Adds a [BeanDefinition] to this [BeanConfiguration].
 	 *
-	 * @param name the (optional) name of the bean to define
-	 * @param type the type of bean to define
-	 * @param definition the function to create the actual bean instance
-	 * @param T the type of bean to define
-	 * @return a [BeanDefinition] from the given parts
+	 * @param beanDefinition the [BeanDefinition] to add
 	 */
-	fun <T : Any> addBeanDefinition(name: String?, type: KClass<T>, definition: (BeansProvider) -> T): BeanDefinition<T> {
-		val beanDefinition = BeanDefinition(name, type, definition)
+	fun <T : Any> addBeanDefinition(beanDefinition: BeanDefinition<T>) {
 		beanDefinitions.add(beanDefinition)
-		return beanDefinition
 	}
 }

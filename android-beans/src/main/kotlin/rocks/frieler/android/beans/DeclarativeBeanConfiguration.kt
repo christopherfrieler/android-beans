@@ -43,7 +43,9 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
 	inline fun <reified T : Any> bean(name: String? = null, noinline definition: BeansProvider.() -> T): BeanReference<T> {
-		return addBeanDefinition(name, T::class, definition)
+		val beanDefinition = BeanDefinition(name, T::class, definition)
+		addBeanDefinition(beanDefinition)
+		return beanDefinition
 	}
 
 	/**
@@ -59,7 +61,9 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 */
 	@JvmOverloads
 	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: BeansProvider.() -> T): BeanReference<T> {
-		return addBeanDefinition(name, type.kotlin, definition)
+		val beanDefinition = BeanDefinition(name, type.kotlin, definition)
+		addBeanDefinition(beanDefinition)
+		return beanDefinition
 	}
 
 	/**
@@ -75,7 +79,9 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 */
 	@JvmOverloads
 	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: () -> T): BeanReference<T> {
-		return addBeanDefinition(name, type.kotlin) { definition() }
+		val beanDefinition = BeanDefinition(name, type.kotlin) { definition() }
+		addBeanDefinition(beanDefinition)
+		return beanDefinition
 	}
 
 	/**

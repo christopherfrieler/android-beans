@@ -1,9 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.isEqualTo
-import assertk.assertions.isSameAs
+import assertk.assertions.contains
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
 
@@ -11,14 +9,11 @@ class BeanConfigurationTest {
 	private val beanConfiguration = object : BeanConfiguration() {}
 
 	@Test
-	fun `addBeanDefinition() creates, adds and returns a BeanDefinition`() {
-		val beanDefinition = beanConfiguration.addBeanDefinition("name", BeanConfigurationTest::class) { this }
+	fun `addBeanDefinition() adds a BeanDefinition`() {
+		val beanDefinition = mock<BeanDefinition<BeanConfigurationTest>>()
 
-		assertThat(beanConfiguration.getBeanDefinitions()).containsExactly(beanDefinition)
-		with(beanDefinition) {
-			assertThat(getName()).isEqualTo("name")
-			assertThat(getType()).isEqualTo(BeanConfigurationTest::class)
-			assertThat(produceBean(mock())).isSameAs(this@BeanConfigurationTest)
-		}
+		beanConfiguration.addBeanDefinition(beanDefinition)
+
+		assertThat(beanConfiguration.getBeanDefinitions()).contains(beanDefinition)
 	}
 }

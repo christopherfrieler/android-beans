@@ -5,11 +5,11 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
+import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 
@@ -48,9 +48,7 @@ class PrototypeScopedFactoryBeanTest {
 
         assertThat(prototypeBeanDefinition.first).isEqualTo(PrototypeScopedFactoryBean::class.java)
         val definedFactoryBean = prototypeBeanDefinition.second(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        assertPrototypeScopedFactoryBeanProducingThis(definedFactoryBean, dependencies)
     }
 
     @Test
@@ -62,9 +60,7 @@ class PrototypeScopedFactoryBeanTest {
 
         assertThat(prototypeBeanDefinition.first).isEqualTo(PrototypeScopedFactoryBean::class.java)
         val definedFactoryBean = prototypeBeanDefinition.second(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        assertPrototypeScopedFactoryBeanProducingThis(definedFactoryBean, dependencies)
     }
 
     @Test
@@ -76,11 +72,17 @@ class PrototypeScopedFactoryBeanTest {
 
         beanConfiguration.prototypeBean(beanName) { producer() }
 
-        val factoryBeanDefinitionCaptor = argumentCaptor<BeansProvider.() -> PrototypeScopedFactoryBean<*>>()
-        verify(beanConfiguration).addBeanDefinition(eq(beanName), eq(PrototypeScopedFactoryBean::class), factoryBeanDefinitionCaptor.capture())
-        val definedFactoryBean = factoryBeanDefinitionCaptor.firstValue(dependencies)
-        assertThat(definedFactoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
-        assertThat(definedFactoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
-        assertThat(definedFactoryBean.produceBean(dependencies)).isSameAs(this)
+        val beanDefinitionCaptor = argumentCaptor<BeanDefinition<PrototypeScopedFactoryBean<PrototypeScopedFactoryBeanTest>>>()
+        verify(beanConfiguration).addBeanDefinition(beanDefinitionCaptor.capture())
+        val beanDefinition = beanDefinitionCaptor.firstValue
+        assertThat(beanDefinition.getName()).isEqualTo(beanName)
+        assertThat(beanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
+        assertPrototypeScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)
+    }
+
+    private fun assertPrototypeScopedFactoryBeanProducingThis(factoryBean: PrototypeScopedFactoryBean<PrototypeScopedFactoryBeanTest>, dependencies: BeansProvider) {
+        assertThat(factoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
+        assertThat(factoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
+        assertThat(factoryBean.produceBean(dependencies)).isSameAs(this)
     }
 }
