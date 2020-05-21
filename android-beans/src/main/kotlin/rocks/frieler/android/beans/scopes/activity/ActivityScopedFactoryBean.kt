@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans.scopes.activity
 
+import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
@@ -15,31 +16,31 @@ class ActivityScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvide
 
 	companion object {
 		/**
-		 * Provides type and definition for a [ActivityScopedFactoryBean] that produces a bean of
+		 * Provides a [BeanDefinition] for a [ActivityScopedFactoryBean] that produces a bean of
 		 * the given type using the given producer without dependencies.
 		 *
 		 * @param type the type of bean produced
 		 * @param producer the producer to create new beans
 		 * @param <T> the type of bean produced
-		 * @return a new [ActivityScopedFactoryBean]
+		 * @return a [BeanDefinition] for a [ActivityScopedFactoryBean]
 		 */
         @JvmStatic
-        fun <T : Any> activityScoped(type: Class<T>, producer: () -> T): Pair<Class<ActivityScopedFactoryBean<*>>, BeansProvider.() -> ActivityScopedFactoryBean<T>> {
+        fun <T : Any> activityScoped(type: Class<T>, producer: () -> T): BeanDefinition<ActivityScopedFactoryBean<*>> {
 			return activityScoped(type, { _:BeansProvider -> producer() } as BeansProvider.() -> T)
 		}
 
 		/**
-		 * Provides type and definition for a [ActivityScopedFactoryBean] that produces a bean of
+		 * Provides a [BeanDefinition] for an [ActivityScopedFactoryBean] that produces a bean of
 		 * the given type using the given producer with dependencies.
 		 *
 		 * @param type the type of bean produced
 		 * @param producer the producer to create new beans
 		 * @param <T> the type of bean produced
-		 * @return a new [ActivityScopedFactoryBean]
+		 * @return a [BeanDefinition] for an [ActivityScopedFactoryBean]
 		 */
         @JvmStatic
-        fun <T : Any> activityScoped(type: Class<T>, producer: BeansProvider.() -> T): Pair<Class<ActivityScopedFactoryBean<*>>, BeansProvider.() -> ActivityScopedFactoryBean<T>> {
-			return Pair(ActivityScopedFactoryBean::class.java, { _:BeansProvider -> ActivityScopedFactoryBean(type.kotlin, producer) } )
+        fun <T : Any> activityScoped(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<ActivityScopedFactoryBean<*>> {
+			return BeanDefinition(type = ActivityScopedFactoryBean::class) { ActivityScopedFactoryBean(type.kotlin, producer) }
 		}
 	}
 }
