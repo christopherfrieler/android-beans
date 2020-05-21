@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans
 
+import rocks.frieler.kotlin.reflect.isAssignableFrom
 import kotlin.reflect.KClass
 
 open class BeanDefinition<T : Any>(
@@ -16,6 +17,10 @@ open class BeanDefinition<T : Any>(
 
 	fun getType() : KClass<T> {
 		return type
+	}
+
+	open fun canProduce(type: KClass<*>) : Boolean {
+		return type.isAssignableFrom(this.type)
 	}
 
 	fun produceBean(dependencyProvider: BeansProvider) : T {

@@ -94,6 +94,6 @@ internal constructor(
 
 	private fun <T : Any> findBeanDefinitionFor(name: String? = null, type: KClass<T>) : BeanDefinition<T>? {
 		@Suppress("UNCHECKED_CAST")
-		return remainingBeanDefinitions.find { (name == null || it.getName() == name) && type.isAssignableFrom(it.getType()) } as BeanDefinition<T>?
+		return remainingBeanDefinitions.find { (name == null || it.getName() == name) && it.canProduce(type) } as BeanDefinition<T>?
 	}
 }
