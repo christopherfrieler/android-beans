@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans.scopes.prototype
 
+import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
@@ -14,31 +15,31 @@ class PrototypeScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
 
     companion object {
         /**
-         * Provides type and definition for a [PrototypeScopedFactoryBean] that produces a bean of
+         * Provides a [BeanDefinition] for a [PrototypeScopedFactoryBean] that produces a bean of
          * the given type using the given producer without dependencies.
          *
          * @param type the type of bean produced
          * @param producer the producer to create new beans
          * @param <T> the type of bean produced
-         * @return a new [PrototypeScopedFactoryBean]
+         * @return a [BeanDefinition] for a [PrototypeScopedFactoryBean]
          */
         @JvmStatic
-        fun <T : Any> prototype(type: Class<T>, producer: () -> T): Pair<Class<PrototypeScopedFactoryBean<*>>, BeansProvider.() -> PrototypeScopedFactoryBean<T>> {
+        fun <T : Any> prototype(type: Class<T>, producer: () -> T): BeanDefinition<PrototypeScopedFactoryBean<*>> {
             return prototype(type, { _:BeansProvider -> producer() } as BeansProvider.() -> T)
         }
 
         /**
-         * Provides type and definition for a [PrototypeScopedFactoryBean] that produces a bean of
+         * Provides a [BeanDefinition] for a [PrototypeScopedFactoryBean] that produces a bean of
          * the given type using the given producer with dependencies.
          *
          * @param type the type of bean produced
          * @param producer the producer to create new beans
          * @param <T> the type of bean produced
-         * @return a new [PrototypeScopedFactoryBean]
+         * @return a [BeanDefinition] for a [PrototypeScopedFactoryBean]
          */
         @JvmStatic
-        fun <T : Any> prototype(type: Class<T>, producer: BeansProvider.() -> T): Pair<Class<PrototypeScopedFactoryBean<*>>, BeansProvider.() -> PrototypeScopedFactoryBean<T>> {
-            return Pair(PrototypeScopedFactoryBean::class.java, { _:BeansProvider -> PrototypeScopedFactoryBean(type.kotlin, producer) })
+        fun <T : Any> prototype(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<PrototypeScopedFactoryBean<*>> {
+            return BeanDefinition(type = PrototypeScopedFactoryBean::class) { PrototypeScopedFactoryBean(type.kotlin, producer) }
         }
     }
 }

@@ -1,6 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
@@ -11,6 +12,23 @@ import org.junit.Test
 
 class DeclarativeBeanConfigurationTest {
 	private val dependencyProvider: BeansProvider = mock()
+
+	@Test
+	fun `DeclarativeBeanConfiguration can define a bean directly through a BeanDefinition`() {
+		val aBeanConfiguration = object : DeclarativeBeanConfiguration() {
+			val beanDefinition = mock<BeanDefinition<Any>>()
+
+			override fun beans() {
+				bean(
+						beanDefinition
+				)
+			}
+		}
+
+		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
+
+		assertThat(beanDefinitions).contains(aBeanConfiguration.beanDefinition)
+	}
 
 	@Test
 	fun `DeclarativeBeanConfiguration can define beans with and without name`() {
@@ -78,22 +96,6 @@ class DeclarativeBeanConfigurationTest {
 					this@DeclarativeBeanConfigurationTest
 				}
 				bean("bean", Any::class.java, beanDefinition)
-			}
-		}
-
-		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
-
-		assertThat(beanDefinitions).hasSize(1)
-		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
-		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
-	}
-
-	@Test
-	fun `DeclarativeBeanConfiguration can define a bean from a Pair of Java type and definition for Java interoperability`() {
-		val aBeanConfiguration = object : DeclarativeBeanConfiguration() {
-			override fun beans() {
-				bean("bean", Pair(Any::class.java, { _:BeansProvider -> this@DeclarativeBeanConfigurationTest }))
 			}
 		}
 

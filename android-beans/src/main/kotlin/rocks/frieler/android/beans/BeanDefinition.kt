@@ -4,7 +4,7 @@ import rocks.frieler.kotlin.reflect.isAssignableFrom
 import kotlin.reflect.KClass
 
 open class BeanDefinition<T : Any>(
-		private val name: String?,
+		private val name: String? = null,
 		private val type: KClass<T>,
 		private val creator: (BeansProvider) -> T
 ) : BeanReference<T> {

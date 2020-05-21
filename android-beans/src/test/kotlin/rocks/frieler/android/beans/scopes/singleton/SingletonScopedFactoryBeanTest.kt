@@ -40,26 +40,26 @@ class SingletonScopedFactoryBeanTest {
     }
 
     @Test
-    fun `lazyInstantiated() provides a Pair of java-type and definition without dependencies for a SingletonScopedFactoryBean`() {
+    fun `lazyInstantiated() without dependencies provides a BeanDefinition for a SingletonScopedFactoryBean`() {
         val dependencies = mock<BeansProvider>()
         val producerWithoutDependencies: () -> SingletonScopedFactoryBeanTest = mock()
         whenever(producerWithoutDependencies()).thenReturn(this)
 
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
-        assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
-        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.second(dependencies), dependencies)
+        assertThat(lazyInstantiatedBeanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
+        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.produceBean(dependencies), dependencies)
     }
 
     @Test
-    fun `lazyInstantiated() provides a Pair of java-type and definition for a SingletonScopedFactoryBean`() {
+    fun `lazyInstantiated() provides a BeanDefinition for a SingletonScopedFactoryBean`() {
         val dependencies = mock<BeansProvider>()
         whenever(producer(dependencies)).thenReturn(this)
 
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producer)
 
-        assertThat(lazyInstantiatedBeanDefinition.first).isEqualTo(SingletonScopedFactoryBean::class.java)
-        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.second(dependencies), dependencies)
+        assertThat(lazyInstantiatedBeanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
+        assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.produceBean(dependencies), dependencies)
     }
 
     @Test

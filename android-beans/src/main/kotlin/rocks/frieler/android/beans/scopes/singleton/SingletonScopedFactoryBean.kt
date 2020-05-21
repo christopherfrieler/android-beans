@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans.scopes.singleton
 
+import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
@@ -18,7 +19,7 @@ class SingletonScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
 
     companion object {
         /**
-         * Provides type and definition for a [SingletonScopedFactoryBean] that produces a bean of
+         * Provides a [BeanDefinition] for a [SingletonScopedFactoryBean] that produces a bean of
 		 * the given type using the given producer without dependencies.
          *
          *
@@ -27,15 +28,15 @@ class SingletonScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
          * @param type the type of bean produced
          * @param producer the producer to lazily create the actual bean
          * @param <T> the type of bean produced
-         * @return type and definition for a [SingletonScopedFactoryBean]
+         * @return a [BeanDefinition] for a [SingletonScopedFactoryBean]
          */
 		@JvmStatic
-		fun <T : Any> lazyInstantiated(type: Class<T>, producer: () -> T): Pair<Class<SingletonScopedFactoryBean<*>>, BeansProvider.() -> SingletonScopedFactoryBean<T>> {
+		fun <T : Any> lazyInstantiated(type: Class<T>, producer: () -> T): BeanDefinition<SingletonScopedFactoryBean<*>> {
 			return lazyInstantiated(type, { _:BeansProvider -> producer() } as BeansProvider.() -> T)
 		}
 
 		/**
-		 * Provides type and definition for a [SingletonScopedFactoryBean] that produces a bean of
+		 * Provides a [BeanDefinition] for a [SingletonScopedFactoryBean] that produces a bean of
 		 * the given type using the given producer with dependencies.
 		 *
 		 *
@@ -44,11 +45,11 @@ class SingletonScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
 		 * @param type the type of bean produced
 		 * @param producer the producer to lazily create the actual bean
 		 * @param <T> the type of bean produced
-		 * @return type and definition for a [SingletonScopedFactoryBean]
+		 * @return a [BeanDefinition] for a [SingletonScopedFactoryBean]
 		 */
 		@JvmStatic
-		fun <T : Any> lazyInstantiated(type: Class<T>, producer: BeansProvider.() -> T): Pair<Class<SingletonScopedFactoryBean<*>>, BeansProvider.() -> SingletonScopedFactoryBean<T>> {
-			return Pair(SingletonScopedFactoryBean::class.java, { _:BeansProvider -> SingletonScopedFactoryBean(type.kotlin, producer) })
+		fun <T : Any> lazyInstantiated(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<SingletonScopedFactoryBean<*>> {
+			return BeanDefinition(type = SingletonScopedFactoryBean::class) { SingletonScopedFactoryBean(type.kotlin, producer) }
 		}
 	}
 }

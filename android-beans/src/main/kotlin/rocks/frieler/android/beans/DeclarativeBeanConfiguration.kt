@@ -36,6 +36,22 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	abstract fun beans()
 
 	/**
+	 * Defines a bean through a [BeanDefinition].
+	 *
+	 *
+	 * This is mainly a wrapper around [addBeanDefinition] to provide a declarative API to be used
+	 * with a factory-function for the [BeanDefinition]
+	 *
+	 * @param beanDefinition the [BeanDefinition]
+	 * @return a [BeanReference] for the defined bean that will be available later
+	 * @see addBeanDefinition
+	 */
+	fun <T : Any> bean(beanDefinition: BeanDefinition<T>): BeanReference<T> {
+		addBeanDefinition(beanDefinition)
+		return beanDefinition
+	}
+
+	/**
 	 * Defines a bean, optionally with the specified name.
 	 *
 	 * @param name the bean's name (optional)
@@ -82,26 +98,5 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 		val beanDefinition = BeanDefinition(name, type.kotlin) { definition() }
 		addBeanDefinition(beanDefinition)
 		return beanDefinition
-	}
-
-	/**
-	 * Defines a bean (optionally with the specified name) of a Java type.
-	 *
-	 *
-	 * This version of `bean()` is intended for Java interoperability. It allows to invoke `bean()`
-	 * with the result of a static convenience function, e.g. for scopes:
-	 * ```
-	 * bean("myScopedBean",
-	 *     ABeanScope.scoped(MyScopedBean.class, MyScopedBean::new)
-	 * );
-	 * ```
-	 *
-	 * @param name the bean's name (optional)
-	 * @param typeAndDefinition the bean's type and definition to construct the bean
-	 * @return a [BeanReference] for the defined bean that will be available later
-	 */
-	@JvmOverloads
-	fun <T : Any> bean(name: String? = null, typeAndDefinition: Pair<Class<T>, BeansProvider.() -> T>): BeanReference<T> {
-		return bean(name, typeAndDefinition.first, typeAndDefinition.second)
 	}
 }

@@ -39,28 +39,26 @@ class PrototypeScopedFactoryBeanTest {
     }
 
     @Test
-    fun `prototype() provides a Pair of java-type and definition without dependencies for a PrototypeScopedFactoryBean`() {
+    fun `prototype() without dependencies provides a BeanDefinition for a PrototypeScopedFactoryBean`() {
         val dependencies = mock<BeansProvider>()
         val producerWithoutDependencies: () -> PrototypeScopedFactoryBeanTest = mock()
         whenever(producerWithoutDependencies.invoke()).thenReturn(this)
 
         val prototypeBeanDefinition = PrototypeScopedFactoryBean.prototype(PrototypeScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
-        assertThat(prototypeBeanDefinition.first).isEqualTo(PrototypeScopedFactoryBean::class.java)
-        val definedFactoryBean = prototypeBeanDefinition.second(dependencies)
-        assertPrototypeScopedFactoryBeanProducingThis(definedFactoryBean, dependencies)
+        assertThat(prototypeBeanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
+        assertPrototypeScopedFactoryBeanProducingThis(prototypeBeanDefinition.produceBean(dependencies), dependencies)
     }
 
     @Test
-    fun `prototype() provides a Pair of java-type and definition for a PrototypeScopedFactoryBean`() {
+    fun `prototype() provides a BeanDefinition for a PrototypeScopedFactoryBean`() {
         val dependencies: BeansProvider = mock()
         whenever(producer(dependencies)).thenReturn(this)
 
         val prototypeBeanDefinition = PrototypeScopedFactoryBean.prototype(PrototypeScopedFactoryBeanTest::class.java, producer)
 
-        assertThat(prototypeBeanDefinition.first).isEqualTo(PrototypeScopedFactoryBean::class.java)
-        val definedFactoryBean = prototypeBeanDefinition.second(dependencies)
-        assertPrototypeScopedFactoryBeanProducingThis(definedFactoryBean, dependencies)
+        assertThat(prototypeBeanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
+        assertPrototypeScopedFactoryBeanProducingThis(prototypeBeanDefinition.produceBean(dependencies), dependencies)
     }
 
     @Test
@@ -80,7 +78,7 @@ class PrototypeScopedFactoryBeanTest {
         assertPrototypeScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)
     }
 
-    private fun assertPrototypeScopedFactoryBeanProducingThis(factoryBean: PrototypeScopedFactoryBean<PrototypeScopedFactoryBeanTest>, dependencies: BeansProvider) {
+    private fun assertPrototypeScopedFactoryBeanProducingThis(factoryBean: PrototypeScopedFactoryBean<*>, dependencies: BeansProvider) {
         assertThat(factoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
         assertThat(factoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
         assertThat(factoryBean.produceBean(dependencies)).isSameAs(this)

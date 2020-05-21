@@ -37,26 +37,26 @@ class ActivityScopedFactoryBeanTest {
 	}
 
 	@Test
-	fun `activityScoped() provides a Pair of java-type and definition without dependencies for an ActivityScopedFactoryBean`() {
+	fun `activityScoped() without dependencies provides a BeanDefinition for an ActivityScopedFactoryBean`() {
 		val dependencies: BeansProvider = mock()
 		val producerWithoutDependencies: () -> ActivityScopedFactoryBeanTest = mock()
 		whenever(producerWithoutDependencies.invoke()).thenReturn(this)
 
 		val activityScopedBeanDefinition = activityScoped(ActivityScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
-		assertThat(activityScopedBeanDefinition.first).isEqualTo(ActivityScopedFactoryBean::class.java)
-		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.second(dependencies), dependencies)
+		assertThat(activityScopedBeanDefinition.getType()).isEqualTo(ActivityScopedFactoryBean::class)
+		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.produceBean(dependencies), dependencies)
 	}
 
 	@Test
-	fun `activityScoped() provides a Pair of java-type and definition for an ActivityScopedFactoryBean`() {
+	fun `activityScoped() provides a BeanDefinition for an ActivityScopedFactoryBean`() {
 		val dependencies: BeansProvider = mock()
 		whenever(producer(dependencies)).thenReturn(this)
 
 		val activityScopedBeanDefinition = activityScoped(ActivityScopedFactoryBeanTest::class.java, producer)
 
-		assertThat(activityScopedBeanDefinition.first).isEqualTo(ActivityScopedFactoryBean::class.java)
-		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.second(dependencies), dependencies)
+		assertThat(activityScopedBeanDefinition.getType()).isEqualTo(ActivityScopedFactoryBean::class)
+		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.produceBean(dependencies), dependencies)
 	}
 
 	@Test
@@ -76,10 +76,9 @@ class ActivityScopedFactoryBeanTest {
 		assertActivityScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)
 	}
 
-	private fun assertActivityScopedFactoryBeanProducingThis(factoryBean: ActivityScopedFactoryBean<ActivityScopedFactoryBeanTest>, dependencies: BeansProvider) {
+	private fun assertActivityScopedFactoryBeanProducingThis(factoryBean: ActivityScopedFactoryBean<*>, dependencies: BeansProvider) {
 		assertThat(factoryBean).isInstanceOf(ActivityScopedFactoryBean::class)
 		assertThat(factoryBean.beanType).isEqualTo(ActivityScopedFactoryBeanTest::class)
 		assertThat(factoryBean.produceBean(dependencies)).isSameAs(this)
 	}
-
 }
