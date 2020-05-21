@@ -4,6 +4,7 @@ import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler.Companion.ACTIVITY_SCOPE
 import kotlin.reflect.KClass
@@ -40,13 +41,11 @@ class ActivityScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvide
 		 */
         @JvmStatic
         fun <T : Any> activityScoped(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<ActivityScopedFactoryBean<*>> {
-			return BeanDefinition(type = ActivityScopedFactoryBean::class) { ActivityScopedFactoryBean(type.kotlin, producer) }
+			return ScopedBeanDefinition(factoryBeanType = ActivityScopedFactoryBean::class, targetType = type.kotlin) { ActivityScopedFactoryBean(type.kotlin, producer) }
 		}
 	}
 }
 
 inline fun <reified T : Any> DeclarativeBeanConfiguration.activityScopedBean(name: String? = null, noinline definition: BeansProvider.() -> T) {
-	bean(name) {
-		ActivityScopedFactoryBean(T::class, definition)
-	}
+	addBeanDefinition(ScopedBeanDefinition(name, ActivityScopedFactoryBean::class, T::class) { ActivityScopedFactoryBean(T::class, definition) })
 }

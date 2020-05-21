@@ -12,6 +12,7 @@ import org.junit.Test
 import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean.Companion.activityScoped
 
 class ActivityScopedFactoryBeanTest {
@@ -44,6 +45,7 @@ class ActivityScopedFactoryBeanTest {
 
 		val activityScopedBeanDefinition = activityScoped(ActivityScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
+		assertThat(activityScopedBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
 		assertThat(activityScopedBeanDefinition.getType()).isEqualTo(ActivityScopedFactoryBean::class)
 		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.produceBean(dependencies), dependencies)
 	}
@@ -55,6 +57,7 @@ class ActivityScopedFactoryBeanTest {
 
 		val activityScopedBeanDefinition = activityScoped(ActivityScopedFactoryBeanTest::class.java, producer)
 
+		assertThat(activityScopedBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
 		assertThat(activityScopedBeanDefinition.getType()).isEqualTo(ActivityScopedFactoryBean::class)
 		assertActivityScopedFactoryBeanProducingThis(activityScopedBeanDefinition.produceBean(dependencies), dependencies)
 	}
@@ -71,6 +74,7 @@ class ActivityScopedFactoryBeanTest {
 		val beanDefinitionCaptor = argumentCaptor<BeanDefinition<ActivityScopedFactoryBean<ActivityScopedFactoryBeanTest>>>()
 		verify(beanConfiguration).addBeanDefinition(beanDefinitionCaptor.capture())
 		val beanDefinition = beanDefinitionCaptor.firstValue
+		assertThat(beanDefinition).isInstanceOf(ScopedBeanDefinition::class)
 		assertThat(beanDefinition.getName()).isEqualTo(beanName)
 		assertThat(beanDefinition.getType()).isEqualTo(ActivityScopedFactoryBean::class)
 		assertActivityScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)
