@@ -12,6 +12,7 @@ import org.junit.Test
 import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 
 class PrototypeScopedFactoryBeanTest {
     private val producer: BeansProvider.() -> PrototypeScopedFactoryBeanTest = mock()
@@ -46,6 +47,7 @@ class PrototypeScopedFactoryBeanTest {
 
         val prototypeBeanDefinition = PrototypeScopedFactoryBean.prototype(PrototypeScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
+        assertThat(prototypeBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(prototypeBeanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
         assertPrototypeScopedFactoryBeanProducingThis(prototypeBeanDefinition.produceBean(dependencies), dependencies)
     }
@@ -57,6 +59,7 @@ class PrototypeScopedFactoryBeanTest {
 
         val prototypeBeanDefinition = PrototypeScopedFactoryBean.prototype(PrototypeScopedFactoryBeanTest::class.java, producer)
 
+        assertThat(prototypeBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(prototypeBeanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
         assertPrototypeScopedFactoryBeanProducingThis(prototypeBeanDefinition.produceBean(dependencies), dependencies)
     }
@@ -73,6 +76,7 @@ class PrototypeScopedFactoryBeanTest {
         val beanDefinitionCaptor = argumentCaptor<BeanDefinition<PrototypeScopedFactoryBean<PrototypeScopedFactoryBeanTest>>>()
         verify(beanConfiguration).addBeanDefinition(beanDefinitionCaptor.capture())
         val beanDefinition = beanDefinitionCaptor.firstValue
+        assertThat(beanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(beanDefinition.getName()).isEqualTo(beanName)
         assertThat(beanDefinition.getType()).isEqualTo(PrototypeScopedFactoryBean::class)
         assertPrototypeScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)

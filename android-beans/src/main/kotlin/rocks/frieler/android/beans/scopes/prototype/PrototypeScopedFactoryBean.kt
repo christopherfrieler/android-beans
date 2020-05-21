@@ -4,6 +4,7 @@ import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import kotlin.reflect.KClass
 
@@ -39,13 +40,11 @@ class PrototypeScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
          */
         @JvmStatic
         fun <T : Any> prototype(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<PrototypeScopedFactoryBean<*>> {
-            return BeanDefinition(type = PrototypeScopedFactoryBean::class) { PrototypeScopedFactoryBean(type.kotlin, producer) }
+            return ScopedBeanDefinition(factoryBeanType = PrototypeScopedFactoryBean::class, targetType = type.kotlin) { PrototypeScopedFactoryBean(type.kotlin, producer) }
         }
     }
 }
 
 inline fun <reified T : Any> DeclarativeBeanConfiguration.prototypeBean(name: String? = null, noinline definition: BeansProvider.() -> T) {
-    bean(name) {
-        PrototypeScopedFactoryBean(T::class, definition)
-    }
+    addBeanDefinition(ScopedBeanDefinition(name, PrototypeScopedFactoryBean::class, T::class) { PrototypeScopedFactoryBean(T::class, definition) })
 }

@@ -12,6 +12,7 @@ import org.junit.Test
 import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.Companion.lazyInstantiated
 
 class SingletonScopedFactoryBeanTest {
@@ -47,6 +48,7 @@ class SingletonScopedFactoryBeanTest {
 
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producerWithoutDependencies)
 
+        assertThat(lazyInstantiatedBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(lazyInstantiatedBeanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
         assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.produceBean(dependencies), dependencies)
     }
@@ -58,6 +60,7 @@ class SingletonScopedFactoryBeanTest {
 
         val lazyInstantiatedBeanDefinition = lazyInstantiated(SingletonScopedFactoryBeanTest::class.java, producer)
 
+        assertThat(lazyInstantiatedBeanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(lazyInstantiatedBeanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
         assertSingletonScopedFactoryBeanProducingThis(lazyInstantiatedBeanDefinition.produceBean(dependencies), dependencies)
     }
@@ -74,6 +77,7 @@ class SingletonScopedFactoryBeanTest {
         val beanDefinitionCaptor = argumentCaptor<BeanDefinition<SingletonScopedFactoryBean<SingletonScopedFactoryBeanTest>>>()
         verify(beanConfiguration).addBeanDefinition(beanDefinitionCaptor.capture())
         val beanDefinition = beanDefinitionCaptor.firstValue
+        assertThat(beanDefinition).isInstanceOf(ScopedBeanDefinition::class)
         assertThat(beanDefinition.getName()).isEqualTo(beanName)
         assertThat(beanDefinition.getType()).isEqualTo(SingletonScopedFactoryBean::class)
         assertSingletonScopedFactoryBeanProducingThis(beanDefinition.produceBean(dependencies), dependencies)

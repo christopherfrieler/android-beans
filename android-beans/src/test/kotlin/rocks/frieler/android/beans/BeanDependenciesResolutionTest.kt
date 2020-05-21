@@ -6,7 +6,6 @@ import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import assertk.assertions.isSameAs
-import org.junit.Ignore
 import org.junit.Test
 import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
@@ -138,7 +137,7 @@ class BeanDependenciesResolutionTest {
 	}
 
 	@Test
-	@Ignore("known limitation")
+	//@Ignore("known limitation")
 	fun `resolves dependency to a scoped bean defined later`() {
 		val beanConfiguration = object : DeclarativeBeanConfiguration() {
 			override fun beans() {

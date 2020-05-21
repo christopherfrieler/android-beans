@@ -4,6 +4,7 @@ import rocks.frieler.android.beans.BeanDefinition
 import rocks.frieler.android.beans.BeansProvider
 import rocks.frieler.android.beans.DeclarativeBeanConfiguration
 import rocks.frieler.android.beans.scopes.GenericScopedFactoryBean
+import rocks.frieler.android.beans.scopes.ScopedBeanDefinition
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import kotlin.reflect.KClass
 
@@ -49,13 +50,11 @@ class SingletonScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
 		 */
 		@JvmStatic
 		fun <T : Any> lazyInstantiated(type: Class<T>, producer: BeansProvider.() -> T): BeanDefinition<SingletonScopedFactoryBean<*>> {
-			return BeanDefinition(type = SingletonScopedFactoryBean::class) { SingletonScopedFactoryBean(type.kotlin, producer) }
+			return ScopedBeanDefinition(factoryBeanType = SingletonScopedFactoryBean::class, targetType = type.kotlin) { SingletonScopedFactoryBean(type.kotlin, producer) }
 		}
 	}
 }
 
 inline fun <reified T : Any> DeclarativeBeanConfiguration.lazyInstantiatedBean(name: String? = null, noinline definition: BeansProvider.() -> T) {
-	bean(name) {
-		SingletonScopedFactoryBean(T::class, definition)
-	}
+	addBeanDefinition(ScopedBeanDefinition(name, SingletonScopedFactoryBean::class, T::class) { SingletonScopedFactoryBean(T::class, definition) })
 }
