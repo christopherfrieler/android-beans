@@ -2,7 +2,9 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.containsOnly
+import assertk.assertions.isEqualTo
 import assertk.assertions.isIn
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.any
@@ -97,21 +99,22 @@ class BeanRegistryTest {
     fun `registerBean() without explicit name generates a name from the bean-type`() {
         val bean = Any()
 
-        beanRegistry.registerBean(bean)
+        val generatedName = beanRegistry.registerBean(bean)
 
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class)).isSameAs(bean)
+        assertThat(beanRegistry.lookUpBean(generatedName, Any::class)).isSameAs(bean)
     }
 
     @Test
-    fun `generated bean names use ascending numbers in case of collisions`() {
+    fun `generated bean names avoid collisions`() {
         val bean1 = Any()
         val bean2 = Any()
 
-        beanRegistry.registerBean(bean1)
-        beanRegistry.registerBean(bean2)
+        val generatedNameForBean1 = beanRegistry.registerBean(bean1)
+        val generatedNameForBean2 = beanRegistry.registerBean(bean2)
 
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name, Any::class)).isSameAs(bean1)
-		assertThat(beanRegistry.lookUpBean(Any::class.java.name + "2", Any::class)).isSameAs(bean2)
+        assertThat(generatedNameForBean2).isNotEqualTo(generatedNameForBean1)
+        assertThat(beanRegistry.lookUpBean(generatedNameForBean1, Any::class)).isSameAs(bean1)
+		assertThat(beanRegistry.lookUpBean(generatedNameForBean2, Any::class)).isSameAs(bean2)
     }
 
     /* tests for bean-scopes: */
@@ -222,16 +225,12 @@ class BeanRegistryTest {
 
     @Test
     fun `generated bean name for ScopedFactoryBeans is derived from produced bean-type`() {
-		whenever(beanScope.isActive).thenReturn(true)
-		val scope = beanScope.name
         val factoryBean: ScopedFactoryBean<BeanRegistryTest> = mock()
-		whenever(factoryBean.scope).thenReturn(scope)
         whenever(factoryBean.beanType).thenReturn(BeanRegistryTest::class)
-        whenever(beanScope.getBean<BeanRegistryTest>(eq(BeanRegistryTest::class.java.name), any(), eq(beanRegistry))).thenReturn(this)
 
-        beanRegistry.registerBean(factoryBean)
+        val generatedName = beanRegistry.registerBean(factoryBean)
 
-        assertThat(beanRegistry.lookUpBean(this::class.jvmName, this::class)).isSameAs(this)
+        assertThat(generatedName).isEqualTo(this::class.jvmName)
     }
 
     @Test

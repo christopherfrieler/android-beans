@@ -41,12 +41,15 @@ class BeanRegistry internal constructor() : BeansProvider {
     }
 
     /**
-     * Registers the bean with a generated name at this [BeanRegistry].
+     * Registers the bean with a generated name at this [BeanRegistry] and returns this name.
      *
      * @param bean the bean
+	 * @return the generated name for the bean
      */
-    fun registerBean(bean: Any) {
-        registerBean(generateBeanName(bean), bean)
+    fun registerBean(bean: Any): String {
+		val name = generateBeanName(bean)
+		registerBean(name, bean)
+		return name
     }
 
     private fun generateBeanName(bean: Any): String {
