@@ -6,7 +6,9 @@ import assertk.assertions.hasClass
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
+import assertk.assertions.isFalse
 import assertk.assertions.isSameAs
+import assertk.assertions.isTrue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -29,6 +31,21 @@ class BeanDefinitionTest {
 	@Test
 	fun `getType() returns the bean-type`() {
 		assertThat(beanDefinition.getType()).isEqualTo(beanType)
+	}
+
+	@Test
+	fun `canProduce() a bean of the beanType`() {
+		assertThat(beanDefinition.canProduce(beanType)).isTrue()
+	}
+
+	@Test
+	fun `canProduce() a bean of a super-type of the beanType`() {
+		assertThat(beanDefinition.canProduce(Any::class)).isTrue()
+	}
+
+	@Test
+	fun `canProduce() declines to be able to produce a bean of any other type`() {
+		assertThat(beanDefinition.canProduce(Unit::class)).isFalse()
 	}
 
 	@Test

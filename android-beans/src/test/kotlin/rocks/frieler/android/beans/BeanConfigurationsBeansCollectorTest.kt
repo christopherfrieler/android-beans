@@ -111,7 +111,7 @@ class BeanConfigurationsBeansCollectorTest {
 			Any()
 		}
 		whenever(anotherBeanDefinition.getName()).thenReturn("bean")
-		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.canProduce(BeanConfigurationsBeansCollectorTest::class)).thenReturn(true)
 		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
 		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
@@ -159,7 +159,7 @@ class BeanConfigurationsBeansCollectorTest {
 			assertThat(dependency).isSameAs(this)
 			Any()
 		}
-		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.canProduce(BeanConfigurationsBeansCollectorTest::class)).thenReturn(true)
 		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
 		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
@@ -201,7 +201,7 @@ class BeanConfigurationsBeansCollectorTest {
 			assertThat(dependencies).hasSize(2)
 			Unit
 		}
-		whenever(anotherBeanDefinition.getType()).thenReturn(BeanConfigurationsBeansCollectorTest::class)
+		whenever(anotherBeanDefinition.canProduce(BeanConfigurationsBeansCollectorTest::class)).thenReturn(true)
 		whenever(anotherBeanDefinition.produceBean(beanConfigurationsBeansCollector)).thenReturn(this)
 		whenever(beanConfiguration.getBeanDefinitions()).thenReturn(listOf(beanDefinition, anotherBeanDefinition))
 
