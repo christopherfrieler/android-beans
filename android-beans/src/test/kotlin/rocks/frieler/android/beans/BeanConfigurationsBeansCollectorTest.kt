@@ -12,6 +12,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
+import kotlin.reflect.jvm.jvmName
 
 class BeanConfigurationsBeansCollectorTest {
 	private val beanRegistry: BeanRegistry = mock()
@@ -195,6 +196,7 @@ class BeanConfigurationsBeansCollectorTest {
 		whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(preExistingBean))
 		whenever(beanRegistry.registerBean(this)).thenAnswer {
 			whenever(beanRegistry.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)).thenReturn(listOf(preExistingBean, this))
+			this::class.jvmName
 		}
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
 			val dependencies = beanConfigurationsBeansCollector.lookUpBeans(BeanConfigurationsBeansCollectorTest::class)
