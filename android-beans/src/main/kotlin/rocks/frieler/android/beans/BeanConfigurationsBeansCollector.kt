@@ -1,6 +1,5 @@
 package rocks.frieler.android.beans
 
-import rocks.frieler.kotlin.reflect.isAssignableFrom
 import java.util.LinkedList
 import kotlin.reflect.KClass
 
@@ -41,15 +40,17 @@ internal constructor(
 		applyBeanRegistryPostProcessors()
 	}
 
-	private fun <T : Any> process(beanDefinition: BeanDefinition<T>) : T {
+	private fun <T : Any> process(beanDefinition: BeanDefinition<T>) : String {
 		remainingBeanDefinitions.remove(beanDefinition)
+		val name : String
 		val bean = beanDefinition.produceBean(this)
 		if (beanDefinition.getName() != null) {
-			this.beanRegistry.registerBean(beanDefinition.getName()!!, bean)
+			name = beanDefinition.getName()!!
+			this.beanRegistry.registerBean(name, bean)
 		} else {
-			this.beanRegistry.registerBean(bean)
+			name = this.beanRegistry.registerBean(bean)
 		}
-		return bean
+		return name
 	}
 
 	private fun applyBeanRegistryPostProcessors() {
@@ -65,7 +66,12 @@ internal constructor(
 	 * @see BeanRegistry.lookUpBean
 	 */
 	override fun <T :Any> lookUpOptionalBean(name: String, type: KClass<T>): T? {
-		return beanRegistry.lookUpOptionalBean(name, type) ?: findBeanDefinitionFor(name, type)?.let { this.process(it) }
+		beanRegistry.lookUpOptionalBean(name, type)?.also { return it }
+
+		return findBeanDefinitionFor(name, type)?.let {
+			this.process(it)
+			beanRegistry.lookUpOptionalBean(name, type)
+		}
 	}
 
 	/**
@@ -75,7 +81,12 @@ internal constructor(
 	 * @see BeanRegistry.lookUpOptionalBean
 	 */
 	override fun <T :Any> lookUpOptionalBean(type: KClass<T>): T? {
-		return beanRegistry.lookUpOptionalBean(type) ?: findBeanDefinitionFor(type = type)?.let { this.process(it) }
+		beanRegistry.lookUpOptionalBean(type)?.also { return it }
+
+		return findBeanDefinitionFor(type = type)?.let {
+			val name = this.process(it)
+			beanRegistry.lookUpOptionalBean(name, type)
+		}
 	}
 
 	/**
