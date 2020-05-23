@@ -106,27 +106,4 @@ class DeclarativeBeanConfigurationTest {
 		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
 		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
 	}
-
-	@Test
-	fun `Defining a bean returns a BeanReference to use the bean as a dependency for further beans`() {
-		val aBeanConfiguration = object : DeclarativeBeanConfiguration() {
-			override fun beans() {
-				val beanRef = bean("bean") {
-					this@DeclarativeBeanConfigurationTest
-				}
-
-				bean("anotherBean") {
-					beanRef.use()
-				}
-			}
-		}
-
-		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
-
-		assertThat(beanDefinitions).hasSize(2)
-		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
-		assertThat(beanDefinitions[1].getName()).isEqualTo("anotherBean")
-		assertThat(beanDefinitions[1].produceBean(dependencyProvider)).isSameAs(this)
-	}
 }

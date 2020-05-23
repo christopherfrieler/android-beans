@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 import static rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean.activityScoped;
 import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
 import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazyInstantiated;
@@ -36,25 +35,6 @@ public class DeclarativeBeanConfigurationJavaApiTest {
         assertThat(beanDefinitions.size(), is(equalTo(2)));
         assertThat(beanDefinitions.get(0).getName(), is(nullValue()));
         assertThat(beanDefinitions.get(1).getName(), is("named_bean"));
-    }
-
-    @Test
-    public void testDeclarativeBeanConfigurationCanUseBeansDefinedEarlierInThisBeanConfiguration() {
-        BeansProvider dependencies = mock(BeansProvider.class);
-
-        DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
-            @Override
-            public void beans() {
-                BeanReference<DeclarativeBeanConfigurationJavaApiTest> aBean = bean(DeclarativeBeanConfigurationJavaApiTest.class, DeclarativeBeanConfigurationJavaApiTest::new);
-                bean(String.class, () -> aBean.use().toString());
-            }
-        };
-
-        List<BeanDefinition<?>> beanDefinitions = beanConfiguration.getBeanDefinitions();
-
-        assertThat(beanDefinitions.size(), is(2));
-        final Object aBean = beanDefinitions.get(0).produceBean(dependencies);
-        assertThat(beanDefinitions.get(1).produceBean(dependencies), is(equalTo(aBean.toString())));
     }
 
     @Test

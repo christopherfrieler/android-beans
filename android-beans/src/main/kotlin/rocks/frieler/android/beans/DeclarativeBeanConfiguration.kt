@@ -43,12 +43,10 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * with a factory-function for the [BeanDefinition]
 	 *
 	 * @param beanDefinition the [BeanDefinition]
-	 * @return a [BeanReference] for the defined bean that will be available later
 	 * @see addBeanDefinition
 	 */
-	fun <T : Any> bean(beanDefinition: BeanDefinition<T>): BeanReference<T> {
+	fun <T : Any> bean(beanDefinition: BeanDefinition<T>) {
 		addBeanDefinition(beanDefinition)
-		return beanDefinition
 	}
 
 	/**
@@ -56,12 +54,10 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 *
 	 * @param name the bean's name (optional)
 	 * @param definition the definition to construct the bean
-	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
-	inline fun <reified T : Any> bean(name: String? = null, noinline definition: BeansProvider.() -> T): BeanReference<T> {
+	inline fun <reified T : Any> bean(name: String? = null, noinline definition: BeansProvider.() -> T) {
 		val beanDefinition = BeanDefinition(name, T::class, definition)
 		addBeanDefinition(beanDefinition)
-		return beanDefinition
 	}
 
 	/**
@@ -73,13 +69,11 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @param name the bean's name (optional)
 	 * @param type the bean's type
 	 * @param definition the definition to construct the bean
-	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
 	@JvmOverloads
-	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: BeansProvider.() -> T): BeanReference<T> {
+	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: BeansProvider.() -> T) {
 		val beanDefinition = BeanDefinition(name, type.kotlin, definition)
 		addBeanDefinition(beanDefinition)
-		return beanDefinition
 	}
 
 	/**
@@ -91,12 +85,10 @@ abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 	 * @param name the bean's name (optional)
 	 * @param type the bean's type
 	 * @param definition the definition to construct the bean
-	 * @return a [BeanReference] for the defined bean that will be available later
 	 */
 	@JvmOverloads
-	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: () -> T): BeanReference<T> {
+	fun <T : Any> bean(name: String? = null, type: Class<T>, definition: () -> T) {
 		val beanDefinition = BeanDefinition(name, type.kotlin) { definition() }
 		addBeanDefinition(beanDefinition)
-		return beanDefinition
 	}
 }

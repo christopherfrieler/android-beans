@@ -1,11 +1,7 @@
 package rocks.frieler.android.beans
 
-import assertk.all
 import assertk.assertThat
-import assertk.assertions.hasClass
-import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFailure
 import assertk.assertions.isFalse
 import assertk.assertions.isSameAs
 import assertk.assertions.isTrue
@@ -56,38 +52,5 @@ class BeanDefinitionTest {
 
 		verify(beanCreator).invoke(dependencyProvider)
 		assertThat(bean).isSameAs(this)
-	}
-
-	@Test
-	fun `produceBean() cannot be invoked twice`() {
-		whenever(beanCreator.invoke(dependencyProvider)).thenReturn(this)
-
-		beanDefinition.produceBean(dependencyProvider)
-		assertThat {
-			beanDefinition.produceBean(dependencyProvider)
-		}.isFailure().all {
-			hasClass(IllegalStateException::class)
-			hasMessage("the bean was already produced.")
-		}
-	}
-
-	@Test
-	fun `use() cannot be invoked before the bean was produced`() {
-		assertThat {
-			beanDefinition.use()
-		}.isFailure().all {
-			hasClass(IllegalStateException::class)
-			hasMessage("the bean was not produced yet.")
-		}
-	}
-
-	@Test
-	fun `use() returns the produced bean`() {
-		whenever(beanCreator.invoke(dependencyProvider)).thenReturn(this)
-
-		val producedBean = beanDefinition.produceBean(dependencyProvider)
-		val bean = beanDefinition.use()
-
-		assertThat(bean).isSameAs(producedBean)
 	}
 }
