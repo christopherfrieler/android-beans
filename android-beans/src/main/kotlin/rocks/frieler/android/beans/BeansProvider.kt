@@ -5,7 +5,6 @@ import kotlin.reflect.KClass
 /**
  * Interface for classes that provide the beans of an application.
  *
- *
  * Beans are simple Java objects, that get registered with a name and can be looked up either by their name or type to
  * inject them as dependencies (DI).
  *

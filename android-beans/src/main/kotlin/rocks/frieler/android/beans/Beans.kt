@@ -7,6 +7,8 @@ import kotlin.reflect.KClass
  * Facade-object to access the beans in the global [BeansProvider].
  *
  * [Beans] needs to be initialized with the [Beans.Initializer] first.
+ *
+ * @author Christopher Frieler
  */
 object Beans {
     private lateinit var beansProvider: BeansProvider

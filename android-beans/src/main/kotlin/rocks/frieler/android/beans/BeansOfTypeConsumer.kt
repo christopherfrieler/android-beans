@@ -6,10 +6,12 @@ import kotlin.reflect.KClass
 /**
  * [BeanPostProcessor] to consume all beans of a certain type (including all its subtypes).
  *
- *
- * A common use-case is to collect all beans implementing a certain interface and inject them lazily into another bean.
+ * A common use-case is to collect all beans implementing a certain interface and inject them lazily
+ * into another bean.
  *
  * @param <Type> the type of beans to post-process
+ *
+ * @author Christopher Frieler
  */
 class BeansOfTypeConsumer<Type : Any>(private val type: KClass<Type>, private val consumer: (Type) -> Unit) : BeanPostProcessor {
 

@@ -4,6 +4,8 @@ import android.app.Activity
 
 /**
  * Interface for activity-scoped beans that need to be aware of the [Activity] they're scoped to.
+ *
+ * @author Christopher Frieler
  */
 interface ActivityAware {
 	/**

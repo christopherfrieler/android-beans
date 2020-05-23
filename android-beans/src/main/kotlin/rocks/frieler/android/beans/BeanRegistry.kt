@@ -15,10 +15,11 @@ import kotlin.reflect.jvm.jvmName
 /**
  * [BeansProvider] that holds and provides beans which were explicitly registered before.
  *
- *
  * The [BeanRegistry] supports the
  * [singleton][SingletonScopedFactoryBeanHandler.SINGLETON_SCOPE] and
  * [prototype][PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE] scopes by default.
+ *
+ * @author Christopher Frieler
  */
 class BeanRegistry internal constructor() : BeansProvider {
     private val beans: MutableMap<String, Any> = HashMap()

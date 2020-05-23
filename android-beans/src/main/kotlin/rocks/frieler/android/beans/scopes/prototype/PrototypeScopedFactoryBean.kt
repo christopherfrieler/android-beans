@@ -10,6 +10,8 @@ import kotlin.reflect.KClass
 
 /**
  * [ScopedFactoryBean] for beans of the [PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE]-scope.
+ *
+ * @author Christopher Frieler
  */
 class PrototypeScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvider.() -> T)
     : GenericScopedFactoryBean<T>(PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE, type, producer) {
@@ -45,6 +47,14 @@ class PrototypeScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvid
     }
 }
 
+/**
+ * Adds a [BeanDefinition] for a [PrototypeScopedFactoryBean] that produces a bean with the given
+ * definition, optionally with the specified name.
+ *
+ * @param name the bean's name (optional)
+ * @param definition the definition to construct the bean
+ * @param <T> the type of bean produced
+ */
 inline fun <reified T : Any> DeclarativeBeanConfiguration.prototypeBean(name: String? = null, noinline definition: BeansProvider.() -> T) {
     addBeanDefinition(ScopedBeanDefinition(name, PrototypeScopedFactoryBean::class, T::class) { PrototypeScopedFactoryBean(T::class, definition) })
 }

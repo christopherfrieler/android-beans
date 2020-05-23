@@ -3,6 +3,11 @@ package rocks.frieler.android.beans.scopes
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
+/**
+ * Generic implementation for [ScopedFactoryBean].
+ *
+ * @author Christopher Frieler
+ */
 open class GenericScopedFactoryBean<T : Any>(
         override val scope: String,
         override val beanType: KClass<T>,

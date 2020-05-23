@@ -7,6 +7,8 @@ import android.os.Bundle
 /**
  * Implementation of the [android.app.Application.ActivityLifecycleCallbacks] that holds the [Activity]
  * which is currently in the foreground (if any).
+ *
+ * @author Christopher Frieler
  */
 class ForegroundActivityHolder : ActivityLifecycleCallbacks {
 	var currentActivity: Activity? = null
