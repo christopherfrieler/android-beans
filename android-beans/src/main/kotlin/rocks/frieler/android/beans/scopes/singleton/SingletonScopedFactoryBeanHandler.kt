@@ -8,8 +8,9 @@ import java.util.HashMap
 /**
  * [ScopedFactoryBeanHandler] for the [singleton][name]-scope.
  *
- *
  * It produces a new bean-instance only for the first time and re-uses it forever.
+ *
+ * @author Christopher Frieler
  */
 class SingletonScopedFactoryBeanHandler : ScopedFactoryBeanHandler {
     private val beans: MutableMap<String, Any> = HashMap()

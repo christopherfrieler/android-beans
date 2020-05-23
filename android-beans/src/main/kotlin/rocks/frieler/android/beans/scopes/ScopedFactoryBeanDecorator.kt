@@ -10,6 +10,8 @@ fun <T : Any> ScopedFactoryBean<T>.decorate(): ScopedFactoryBeanDecorator<T> = S
  * Decorator for [ScopedFactoryBean]s to enhance their behaviour.
  *
  * @param <T> the type of bean produced
+ *
+ * @author Christopher Frieler
  */
 class ScopedFactoryBeanDecorator<T : Any> constructor(private val delegate: ScopedFactoryBean<T>) : ScopedFactoryBean<T> {
     override val scope: String

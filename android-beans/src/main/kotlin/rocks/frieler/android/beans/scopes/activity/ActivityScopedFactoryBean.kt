@@ -11,6 +11,8 @@ import kotlin.reflect.KClass
 
 /**
  * [ScopedFactoryBean] for beans of the [ActivityScopedFactoryBeanHandler.ACTIVITY_SCOPE]-scope.
+ *
+ * @author Christopher Frieler
  */
 class ActivityScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvider.() -> T)
 	: GenericScopedFactoryBean<T>(ACTIVITY_SCOPE, type, producer) {
@@ -46,6 +48,14 @@ class ActivityScopedFactoryBean<T : Any>(type: KClass<T>, producer: BeansProvide
 	}
 }
 
+/**
+ * Adds a [BeanDefinition] for an [ActivityScopedFactoryBean] that produces a bean with the given
+ * definition, optionally with the specified name.
+ *
+ * @param name the bean's name (optional)
+ * @param definition the definition to construct the bean
+ * @param <T> the type of bean produced
+ */
 inline fun <reified T : Any> DeclarativeBeanConfiguration.activityScopedBean(name: String? = null, noinline definition: BeansProvider.() -> T) {
 	addBeanDefinition(ScopedBeanDefinition(name, ActivityScopedFactoryBean::class, T::class) { ActivityScopedFactoryBean(T::class, definition) })
 }

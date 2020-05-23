@@ -1,12 +1,11 @@
 package rocks.frieler.android.beans
 
 /**
- * Abstract super-class to define beans for the context of an application.
- *
+ * Abstract super-class to define beans for the context of an application by providing
+ * [BeanDefinition]s.
  *
  * [BeanConfiguration]s can be defined as an object or must provide a public constructor, which
  * takes the [android.content.Context] or no arguments, to be instantiated.
- *
  *
  * @author Christopher Frieler
  */

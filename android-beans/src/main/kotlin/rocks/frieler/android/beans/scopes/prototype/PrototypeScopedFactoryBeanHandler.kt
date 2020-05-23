@@ -9,6 +9,8 @@ import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
  *
  *
  * It produces a new bean-instance every time.
+ *
+ * @author Christopher Frieler
  */
 class PrototypeScopedFactoryBeanHandler : ScopedFactoryBeanHandler {
     override val name: String

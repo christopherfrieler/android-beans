@@ -12,13 +12,13 @@ import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHand
 /**
  * [ScopedFactoryBeanHandler] for the [ACTIVITY_SCOPE]-scope.
  *
- *
  * It provides a bean-instance per [android.app.Activity], always scoped to the
  * [foreground-activity][ForegroundActivityHolder.currentActivity]. Due to the limitation of the [ViewModelProvider]s
  * this only works for subtypes of [ComponentActivity] such as the `android.support.v7.app.AppCompatActivity`.
  *
- *
  * The [ActivityScopedFactoryBeanHandler] supports the [ActivityAware]-interface.
+ *
+ * @author Christopher Frieler
  */
 class ActivityScopedFactoryBeanHandler(private val foregroundActivityHolder: ForegroundActivityHolder) : ScopedFactoryBeanHandler {
 

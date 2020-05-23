@@ -4,6 +4,8 @@ import rocks.frieler.android.beans.BeansProvider
 
 /**
  * Interface for classes handling [ScopedFactoryBean]s of the corresponding scope.
+ *
+ * @author Christopher Frieler
  */
 interface ScopedFactoryBeanHandler {
 
@@ -36,6 +38,6 @@ interface ScopedFactoryBeanHandler {
      * @param dependencies a [BeansProvider] to obtain dependencies
      * @param <T> the type of the bean
      * @return the existing bean in this scope or a new one
-    </T> */
+     */
     fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T
 }

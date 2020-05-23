@@ -3,7 +3,6 @@ package rocks.frieler.android.beans
 /**
  * Abstract super-class for [BeanConfiguration]s to define their beans in a declarative fashion.
  *
- *
  * Usage example:
  * ```kotlin
  * // 1. extend BeanConfiguration:
@@ -19,6 +18,8 @@ package rocks.frieler.android.beans
  *   }
  * }
  * ```
+ *
+ * @author Christopher Frieler
  */
 abstract class DeclarativeBeanConfiguration : BeanConfiguration() {
 

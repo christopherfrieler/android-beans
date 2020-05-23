@@ -5,13 +5,11 @@ import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHand
 import rocks.frieler.android.beans.scopes.activity.ForegroundActivityHolder
 
 /**
- * [Application] that sets up a [BeanRegistry], initialized by a [BeanConfigurationsBeansCollector].
+ * [Application] that initializes a [BeanRegistry] from [BeanConfiguration]s.
  *
+ * In your application you can use [Beans] to access the beans.
  *
- * In your application, use [Beans] to access the beans.
- *
- *
- * The [BeanRegistry] supports the [ActivityScopedFactoryBeanHandler.ACTIVITY_SCOPE].
+ * The [BeanRegistry] additionally supports the [ActivityScopedFactoryBeanHandler.ACTIVITY_SCOPE].
  */
 class BeanRegistryApplication : Application() {
 	override fun onCreate() {
