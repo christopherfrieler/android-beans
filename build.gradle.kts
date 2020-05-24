@@ -13,7 +13,7 @@ buildscript {
 
 allprojects {
     group = "rocks.frieler.android"
-    version = "0.4.1-SNAPSHOT"
+    version = "0.4.1"
 
     repositories {
         google()
