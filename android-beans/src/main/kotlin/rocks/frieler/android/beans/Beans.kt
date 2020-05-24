@@ -105,7 +105,7 @@ object Beans {
      */
     @JvmStatic
     @JvmOverloads
-    fun <T :Any> lookUpOptionalBean(name: String? = null, type: Class<T>) = lookUpBean(name, type.kotlin)
+    fun <T :Any> lookUpOptionalBean(name: String? = null, type: Class<T>) = lookUpOptionalBean(name, type.kotlin)
 
     /**
      * Looks up all beans of the inferred type in the [BeansProvider] of this application.
