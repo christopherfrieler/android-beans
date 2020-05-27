@@ -1,10 +1,10 @@
 # Android Beans
 
-A dependency injection library for Android apps, that aims for two goals:
-- **Power** - Provide the full power of dynamic dependency injection at runtime to allow e.g. injection of all implementations of a certain interface or injecting our custom implementation into another library.
-- **Simplicity** - Allow users to define and inject their beans straight forward without the need for too complex structures as e.g. the components, modules and scopes seen with [Dagger](https://google.github.io/dagger/).
-
-In addition Android Beans provides convenient **Java Support** - even though it is written in Kotlin. 
+A dependency injection library for Android apps, that aims for:
+- **Power** - Provide the full power of dynamic dependency injection at runtime to allow e.g. injection of all implementations of a certain interface or injecting your custom implementation into another library.
+- **Cleanness** - Your beans are just plain Kotlin or Java objects. No need to implement interfaces or pollute them with annotations from the framework.
+- **Simplicity** - Allow users to define and inject their beans straight forward without the need for too complex structures as e.g. the components, modules and scopes seen with other DI frameworks.
+- **Kotlin- and Java-Support** - Although Android Beans itself is written in Kotlin, it also offers a convenient API for Java apps going beyond the Kotlin's Java interoperability. You can even use it apps with mixed sources or during migrations from Java to Kotlin.
 
 
 ## Usage
