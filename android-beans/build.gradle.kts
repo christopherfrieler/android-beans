@@ -21,8 +21,7 @@ android {
     compileSdkVersion(29)
     buildToolsVersion("29.0.3")
     kotlinOptions {
-        val options = this as org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-        options.jvmTarget = "1.8"
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
