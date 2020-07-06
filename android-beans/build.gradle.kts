@@ -51,8 +51,8 @@ android {
 }
 
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-stdlib:${Dependencies.kotlin_version}")
-    api("org.jetbrains.kotlin:kotlin-reflect:${Dependencies.kotlin_version}")
+    api(kotlin("stdlib"))
+    api(kotlin("reflect"))
     implementation("net.sourceforge.streamsupport:streamsupport:1.7.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
