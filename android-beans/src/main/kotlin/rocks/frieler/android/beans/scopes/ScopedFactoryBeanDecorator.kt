@@ -1,6 +1,6 @@
 package rocks.frieler.android.beans.scopes
 
-import java8.util.function.Function
+import java.util.function.Function
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 

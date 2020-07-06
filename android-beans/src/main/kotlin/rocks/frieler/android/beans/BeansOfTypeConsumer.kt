@@ -1,6 +1,6 @@
 package rocks.frieler.android.beans
 
-import java8.util.function.Consumer
+import java.util.function.Consumer
 import kotlin.reflect.KClass
 
 /**
