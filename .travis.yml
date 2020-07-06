@@ -1,6 +1,6 @@
+os: linux
+dist: xenial
 language: android
-
-sudo: false
 
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -20,8 +20,8 @@ android:
   components:
     - android-29
     - build-tools-29.0.3
-licenses:
-  - 'android-sdk-license-.+'
+  licenses:
+    - 'android-sdk-license-.+'
 
 before_install:
   - chmod +x gradlew
@@ -31,7 +31,7 @@ script: ./gradlew clean testReleaseUnitTest assembleRelease kdocJar sourcesJar
 deploy:
   provider: script
   script: ./gradlew :android-beans:bintrayUpload
-  skip_cleanup: true
+  cleanup: true
   on:
     tags: true
 
