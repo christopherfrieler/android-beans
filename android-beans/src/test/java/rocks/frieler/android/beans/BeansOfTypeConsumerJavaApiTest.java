@@ -2,7 +2,7 @@ package rocks.frieler.android.beans;
 
 import org.junit.Test;
 
-import java8.util.function.Consumer;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;

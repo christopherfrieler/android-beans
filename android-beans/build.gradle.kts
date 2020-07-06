@@ -15,6 +15,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -52,8 +53,9 @@ android {
 dependencies {
     api(kotlin("stdlib"))
     api(kotlin("reflect"))
-    implementation("net.sourceforge.streamsupport:streamsupport:1.7.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.9")
 
 	testImplementation("junit:junit:4.13")
     testImplementation("org.hamcrest:hamcrest:2.2")

@@ -1,6 +1,6 @@
 package rocks.frieler.android.beans
 
-import java8.util.function.Function
+import java.util.function.Function
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.decorate
