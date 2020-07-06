@@ -59,7 +59,7 @@ dependencies {
 	testImplementation("junit:junit:4.13")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
-    testImplementation("org.mockito:mockito-core:2.26.0")
+    testImplementation("org.mockito:mockito-core:3.3.3")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("org.robolectric:robolectric:4.3.1")
 }
