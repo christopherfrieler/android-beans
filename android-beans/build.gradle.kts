@@ -4,6 +4,7 @@ plugins {
 	id("com.android.library")
     id("kotlin-android")
     id("org.jetbrains.dokka-android")
+    id("org.gradle.jacoco")
 	id("maven-publish")
 	id("com.jfrog.bintray")
 }
@@ -74,6 +75,17 @@ val kdocJar by tasks.registering(Jar::class) {
 val sourcesJar by tasks.registering(Jar::class) {
     from(android.sourceSets["main"].java.srcDirs)
     archiveClassifier.set("sources")
+}
+
+val jacocoReport by tasks.registering(JacocoReport::class) {
+    group = "verification"
+    dependsOn(tasks.getByName("testReleaseUnitTest"))
+    classDirectories.from("$buildDir/tmp/kotlin-classes/release")
+    executionData(files("$buildDir/jacoco/testReleaseUnitTest.exec"))
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = false
+    }
 }
 
 publishing {
