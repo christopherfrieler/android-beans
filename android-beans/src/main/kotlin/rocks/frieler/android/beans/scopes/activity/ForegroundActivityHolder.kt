@@ -38,6 +38,11 @@ class ForegroundActivityHolder : ActivityLifecycleCallbacks {
 		}
 	}
 
-	override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
-	override fun onActivityDestroyed(activity: Activity) {}
+	override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {
+		// nothing to do
+	}
+
+	override fun onActivityDestroyed(activity: Activity) {
+		// nothing to do
+	}
 }
