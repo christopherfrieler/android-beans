@@ -1,5 +1,7 @@
 # Android Beans
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christopherfrieler_android-beans&metric=alert_status)](https://sonarcloud.io/dashboard?id=christopherfrieler_android-beans)
+
 A dependency injection library for Android apps, that aims for:
 - **Power** - Provide the full power of dynamic dependency injection at runtime to allow e.g. injection of all implementations of a certain interface or injecting your custom implementation into another library.
 - **Cleanness** - Your beans are just plain Kotlin or Java objects. No need to implement interfaces or pollute them with annotations from the framework.
