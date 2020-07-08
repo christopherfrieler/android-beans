@@ -93,6 +93,7 @@ val jacocoReport by tasks.registering(JacocoReport::class) {
         html.isEnabled = false
     }
 }
+rootProject.tasks["sonarqube"].dependsOn(jacocoReport)
 
 publishing {
     publications {
