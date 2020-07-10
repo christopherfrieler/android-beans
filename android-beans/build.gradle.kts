@@ -77,6 +77,12 @@ val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
 }
 
+tasks.withType(Test::class) {
+    with(extensions.getByType(JacocoTaskExtension::class)) {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*") // workaround for https://github.com/gradle/gradle/issues/5184
+    }
+}
 val jacocoReport by tasks.registering(JacocoReport::class) {
     group = "verification"
     dependsOn(tasks.getByName("testReleaseUnitTest"))
