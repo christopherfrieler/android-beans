@@ -47,6 +47,7 @@ android {
 			android.libraryVariants.matching { name == "release" }.all { outputs.all { this as BaseVariantOutputImpl
 				outputFileName = outputFileName.replace("-release", "") }
 			}
+            testBuildType = this.name
 		}
     }
 }
