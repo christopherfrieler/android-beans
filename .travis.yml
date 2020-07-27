@@ -24,10 +24,10 @@ android:
     - 'android-sdk-license-.+'
 
 before_install:
+  - printenv
   - chmod +x gradlew
 
 script:
-  - printenv
   - . ./.travis/prepareSonarAnalysis.sh
   - ./gradlew clean testReleaseUnitTest sonarqube assembleRelease kdocJar sourcesJar
 
