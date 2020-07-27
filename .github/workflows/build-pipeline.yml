@@ -27,7 +27,7 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace \
           lintRelease testReleaseUnitTest \
-          assembleRelease kdocJar sourcesJar
+          generatePomFileForMavenPublication assembleRelease kdocJar sourcesJar
       - name: Archive lint results
         uses: actions/upload-artifact@v2
         with:
@@ -38,6 +38,11 @@ jobs:
         with:
           name: test-report
           path: android-beans/build/reports/tests/testReleaseUnitTest/**/*
+      - name: Archive pom
+        uses: actions/upload-artifact@v2
+        with:
+          name: pom
+          path: android-beans/build/publications/maven/pom-default.xml
       - name: Archive aar
         uses: actions/upload-artifact@v2
         with:
