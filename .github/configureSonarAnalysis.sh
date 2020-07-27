@@ -12,6 +12,7 @@ case "$GITHUB_EVENT_NAME" in
   "pull_request")
     export SONAR_ANALYSIS_TYPE="pull_request"
     export SONAR_PULLREQUEST_KEY=$(echo "$GITHUB_REF" | sed -e "s/^refs\/pull\///" -e "s/\/merge$//")
+    export GITHUB_SHA=$(git rev-parse "$GITHUB_HEAD_REF") # workaround for the throw-away merge commit
     ;;
   *)
     echo "warn: unknown GITHUB_EVENT_NAME=$GITHUB_EVENT_NAME"
