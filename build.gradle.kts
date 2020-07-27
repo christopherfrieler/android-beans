@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.0")
+        classpath("com.android.tools.build:gradle:4.0.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
         classpath("org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
