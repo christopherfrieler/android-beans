@@ -13,6 +13,7 @@ case "$TRAVIS_EVENT_TYPE" in
     fi
     ;;
   "pull_request")
+    exit 1
     export SONAR_ANALYSIS_TYPE="pull_request"
     export SONAR_PULLREQUEST_KEY="$TRAVIS_PULL_REQUEST"
     ;;
