@@ -23,10 +23,13 @@ jobs:
           restore-keys: |
             gradle-dists-
       - name: Build and check library
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          . ./.github/configureSonarAnalysis.sh
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace \
-          lintRelease testReleaseUnitTest \
+          lintRelease testReleaseUnitTest sonarqube \
           generatePomFileForMavenPublication assembleRelease kdocJar sourcesJar
       - name: Archive lint results
         uses: actions/upload-artifact@v2
