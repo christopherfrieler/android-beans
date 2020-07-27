@@ -19,3 +19,4 @@ To use Android Beans in your app, follow the [User-Manual](USAGE.md).
 If you have an idea, problem or question about Android Beans you can open an [issue](https://github.com/christopherfrieler/android-beans/issues).
 
 If you want to clone the repository and work on the code have a look at the [DEVELOPING.md](DEVELOPING.md).
+
