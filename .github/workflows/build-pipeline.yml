@@ -28,3 +28,28 @@ jobs:
           ./gradlew --no-daemon --stacktrace \
           lintRelease testReleaseUnitTest \
           assembleRelease kdocJar sourcesJar
+      - name: Archive lint results
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint-report
+          path: android-beans/build/reports/lint-results-release.*
+      - name: Archive teset results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report
+          path: android-beans/build/reports/tests/testReleaseUnitTest/**/*
+      - name: Archive aar
+        uses: actions/upload-artifact@v2
+        with:
+          name: aar
+          path: android-beans/build/outputs/aar/android-beans-*.aar
+      - name: Archive kdoc
+        uses: actions/upload-artifact@v2
+        with:
+          name: kdoc
+          path: android-beans/build/libs/android-beans-*-kdoc.jar
+      - name: Archive sources
+        uses: actions/upload-artifact@v2
+        with:
+          name: sources
+          path: android-beans/build/libs/android-beans-*-sources.jar
