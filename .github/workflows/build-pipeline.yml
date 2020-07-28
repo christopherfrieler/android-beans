@@ -61,3 +61,32 @@ jobs:
         with:
           name: sources
           path: android-beans/build/libs/android-beans-*-sources.jar
+
+  deploy:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: ['build']
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Cache gradle distribution
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper/dists
+          key: gradle-dists-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Cache gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches/modules-2
+          key: gradle-deps-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            gradle-dists-
+      - name: Deploy to bintray
+        env:
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace :android-beans:bintrayUpload
