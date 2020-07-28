@@ -1,5 +1,6 @@
 # Android Beans
 
+[![Build-Pipeline](https://github.com/christopherfrieler/android-beans/workflows/Build-Pipeline/badge.svg)](https://github.com/christopherfrieler/android-beans/actions?query=branch%3Amaster)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=christopherfrieler_android-beans&metric=alert_status)](https://sonarcloud.io/dashboard?id=christopherfrieler_android-beans)
 
 A dependency injection library for Android apps, that aims for:
