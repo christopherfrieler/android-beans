@@ -85,7 +85,9 @@ class BeanConfigurationsAssetScannerTest {
 		}
 	}
 
-	internal class ABeanConfigurationNeedingTheContext(context: Context) : BeanConfiguration() {
+	internal class ABeanConfigurationNeedingTheContext(
+		@Suppress("UNUSED_PARAMETER") context: Context
+	) : BeanConfiguration() {
 		override fun getBeanDefinitions(): List<BeanDefinition<*>> {
 			return emptyList()
 		}
