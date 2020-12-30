@@ -7,7 +7,6 @@ import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import java.util.function.Function
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -53,15 +52,15 @@ class ScopedFactoryBeanDecoratorTest {
         val dependencies: BeansProvider = mock()
         val bean = this
         whenever(scopedFactoryBean.produceBean(dependencies)).thenReturn(bean)
-        val postProcessing: Function<ScopedFactoryBeanDecoratorTest, ScopedFactoryBeanDecoratorTest> = mock()
+        val postProcessing: (ScopedFactoryBeanDecoratorTest) -> ScopedFactoryBeanDecoratorTest = mock()
         val beanAfterPostProcessing = ScopedFactoryBeanDecoratorTest()
-        whenever(postProcessing.apply(bean)).thenReturn(beanAfterPostProcessing)
+        whenever(postProcessing.invoke(bean)).thenReturn(beanAfterPostProcessing)
 
         val finalBean = decoratedFactoryBean.withPostProcessing(postProcessing).produceBean(dependencies)
 
         inOrder(scopedFactoryBean, postProcessing) {
             verify(scopedFactoryBean).produceBean(dependencies)
-            verify(postProcessing).apply(bean)
+            verify(postProcessing).invoke(bean)
         }
         assertThat(finalBean).isSameAs(beanAfterPostProcessing)
     }

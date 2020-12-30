@@ -1,6 +1,5 @@
 package rocks.frieler.android.beans
 
-import java.util.function.Function
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.decorate
@@ -153,7 +152,7 @@ class BeanRegistry internal constructor() : BeansProvider {
 			@Suppress("UNCHECKED_CAST") val factoryBean = beanCandidate as ScopedFactoryBean<T>
             val scopedFactoryBeanHandler = beanScopes[factoryBean.scope]
             if (scopedFactoryBeanHandler != null && scopedFactoryBeanHandler.isActive) {
-                return scopedFactoryBeanHandler.getBean(name, factoryBean.decorate().withPostProcessing(Function { bean: T -> postProcessBean(name, bean) }), this)
+                return scopedFactoryBeanHandler.getBean(name, factoryBean.decorate().withPostProcessing { bean: T -> postProcessBean(name, bean) }, this)
             }
         }
 

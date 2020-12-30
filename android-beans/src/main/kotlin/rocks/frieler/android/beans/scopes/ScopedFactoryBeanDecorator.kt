@@ -1,6 +1,5 @@
 package rocks.frieler.android.beans.scopes
 
-import java.util.function.Function
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
@@ -20,15 +19,15 @@ class ScopedFactoryBeanDecorator<T : Any> constructor(private val delegate: Scop
     override val beanType: KClass<T>
         get() = delegate.beanType
 
-    private var postProcessing: Function<T, T>? = null
+    private var postProcessing: ((T) -> T)? = null
 
     override fun produceBean(dependencies: BeansProvider): T {
         var bean = delegate.produceBean(dependencies)
-        postProcessing?.let { bean = it.apply(bean) }
+        postProcessing?.let { bean = it.invoke(bean) }
         return bean
     }
 
-    fun withPostProcessing(postProcessing: Function<T, T>): ScopedFactoryBeanDecorator<T> {
+    fun withPostProcessing(postProcessing: (T) -> T): ScopedFactoryBeanDecorator<T> {
         this.postProcessing = postProcessing
         return this
     }
