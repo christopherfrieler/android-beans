@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
         classpath("org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
         classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
