@@ -18,9 +18,12 @@ import kotlin.reflect.jvm.jvmName
  * [singleton][SingletonScopedFactoryBeanHandler.SINGLETON_SCOPE] and
  * [prototype][PrototypeScopedFactoryBeanHandler.PROTOTYPE_SCOPE] scopes by default.
  *
+ * [BeanRegistry] is also a [HierarchicalBeansProvider], so it supports a parent to inherit beans
+ * from.
+ *
  * @author Christopher Frieler
  */
-class BeanRegistry internal constructor() : BeansProvider {
+class BeanRegistry internal constructor(parent: BeansProvider? = null) : HierarchicalBeansProvider(parent) {
     private val beans: MutableMap<String, Any> = HashMap()
     private val beanPostProcessors: MutableList<BeanPostProcessor> = LinkedList()
 
@@ -107,7 +110,7 @@ class BeanRegistry internal constructor() : BeansProvider {
         return postProcessedBean
     }
 
-    override fun <T :Any> lookUpOptionalBean(name: String, type: KClass<T>): T? {
+	override fun <T : Any> lookUpOptionalLocalBean(name: String, type: KClass<T>): T? {
         val beanCandidate = beans[name]
 		if (beanCandidate == null) {
 			return null
@@ -116,7 +119,7 @@ class BeanRegistry internal constructor() : BeansProvider {
 		}
 	}
 
-    override fun <T :Any> lookUpOptionalBean(type: KClass<T>): T? {
+    override fun <T :Any> lookUpOptionalLocalBean(type: KClass<T>): T? {
         val preferredBeanName = getPreferredBeanName(type)
         val beanCandidateByPreferredName = beans[preferredBeanName]
         if (beanCandidateByPreferredName != null) {
@@ -136,7 +139,7 @@ class BeanRegistry internal constructor() : BeansProvider {
         return null
     }
 
-    override fun <T :Any> lookUpBeans(type: KClass<T>): List<T> {
+    override fun <T :Any> lookUpLocalBeans(type: KClass<T>): List<T> {
         val matchingBeans: MutableList<T> = ArrayList()
         for ((key, value) in beans) {
             val bean = resolveBeanFromCandidate(key, type, value)
