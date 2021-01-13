@@ -20,11 +20,19 @@ import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean
 import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean
+import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
 @RunWith(MockitoJUnitRunner::class)
 class BeanRegistryTest {
     private val beanRegistry = BeanRegistry()
+
+    private val parent = mock<BeansProvider>().apply {
+        whenever(lookUpOptionalBean(any(), any<KClass<*>>())).thenReturn(null)
+        whenever(lookUpOptionalBean(any<KClass<*>>())).thenReturn(null)
+        whenever(lookUpBeans(any<KClass<*>>())).thenReturn(emptyList())
+    }
+    private val beanRegistryWithParent = BeanRegistry(parent)
 
     @Test
     fun `lookUpOptionalBean() by name and type returns null without a bean with the desired name`() {
@@ -53,6 +61,17 @@ class BeanRegistryTest {
         val bean = beanRegistry.lookUpOptionalBean(name, Any::class)
 
         assertThat(bean).isSameAs(registeredBean)
+    }
+
+    @Test
+    fun `lookUpOptionalBean() by name and type returns bean with the desired name and type from parent if no local one matches`() {
+        val name = "bean"
+        val inheritedBean = Any()
+        whenever(parent.lookUpOptionalBean(name, Any::class)).thenReturn(inheritedBean)
+
+        val bean = beanRegistryWithParent.lookUpOptionalBean(name, Any::class)
+
+        assertThat(bean).isSameAs(inheritedBean)
     }
 
     @Test
@@ -86,6 +105,16 @@ class BeanRegistryTest {
     }
 
     @Test
+    fun `lookUpOptionalBean() by type returns bean with the desired type from parent if no local one matches`() {
+        val inheritedBean = Any()
+        whenever(parent.lookUpOptionalBean(Any::class)).thenReturn(inheritedBean)
+
+        val bean = beanRegistryWithParent.lookUpOptionalBean(Any::class)
+
+        assertThat(bean).isSameAs(inheritedBean)
+    }
+
+    @Test
     fun `lookUpBeans() by type returns all beans assignable to the desired type`() {
         beanRegistry.registerBean("object", Any())
         beanRegistry.registerBean("long", 42L)
@@ -93,6 +122,18 @@ class BeanRegistryTest {
         val numbers = beanRegistry.lookUpBeans(Number::class)
 
 		assertThat(numbers).containsOnly(42L, 3.14)
+    }
+
+    @Test
+    fun `lookUpBeans() by type returns all registered and inherited beans`() {
+        val inheritedBean = Any()
+        whenever(parent.lookUpBeans(Any::class)).thenReturn(listOf(inheritedBean))
+        val registeredBean = Any()
+        beanRegistryWithParent.registerBean(registeredBean)
+
+        val beans = beanRegistryWithParent.lookUpBeans(Any::class)
+
+        assertThat(beans).containsOnly(registeredBean, inheritedBean)
     }
 
     @Test
