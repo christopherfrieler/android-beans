@@ -15,6 +15,7 @@ class BeanRegistryApplication : Application() {
 	override fun onCreate() {
 		super.onCreate()
 		Beans.Initializer()
+				.addParent(AndroidInfrastructureBeansProvider(this))
 				.addScope(activityScope())
 				.collectBeans(scanAssetsForBeanConfigurations())
 				.initialize()

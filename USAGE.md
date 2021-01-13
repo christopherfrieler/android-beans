@@ -143,6 +143,21 @@ public class MyBeanConfiguration extends DeclarativeBeanConfiguration {
 ```
 The [BeansProvider] offers the same possibilities to look up beans as the [Beans] facade seen earlier.
 
+### Injecting Android services
+
+When initialized by the `BeanRegistryApplication`, `Beans` provides some Android infrastructure beans from the
+`Application`. These include the `PackageManger`, the `Resources`, the `AssetManager`, the `ContentResolver` and all
+system-services.
+```kotlin
+val packageManager = Beans.lookUpBean(PackageManager::class)
+val accountService = Beans.lookUpBean("account", AccountService::class)
+```
+Or in Java:
+```java
+PackageManager packageManager = Beans.lookUpBean(PackageManager.class);
+AccountService accountService = Beans.lookUpBean("account", AccountService.class);
+```
+
 ## Bean scopes
 
 ### Singleton scope
