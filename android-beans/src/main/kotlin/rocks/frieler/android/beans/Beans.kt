@@ -148,7 +148,22 @@ object Beans {
      * Initializes [Beans] with a [BeanRegistry] and allows to configure it.
      */
     class Initializer {
-        private val beanRegistry = BeanRegistry()
+        private var parent: BeansProvider? = null
+        private val scopes = ArrayList<ScopedFactoryBeanHandler>()
+        private val beanConfigurations = ArrayList<BeanConfiguration>()
+
+        /**
+         * Adds a parent [BeansProvider].
+         *
+         * @param parent
+         * @return the [Initializer] itself
+         *
+         * @see [HierarchicalBeansProvider]
+         */
+        fun addParent(parent: BeansProvider): Initializer {
+            this.parent = parent
+            return this
+        }
 
         /**
          * Adds a bean-scope expressed by the given [ScopedFactoryBeanHandler].
@@ -159,7 +174,7 @@ object Beans {
          * @see BeanRegistry.addBeanScope
          */
         fun addScope(scopedFactoryBeanHandler: ScopedFactoryBeanHandler): Initializer {
-            beanRegistry.addBeanScope(scopedFactoryBeanHandler)
+            scopes.add(scopedFactoryBeanHandler)
             return this
         }
 
@@ -172,7 +187,7 @@ object Beans {
          * @see BeanConfigurationsBeansCollector.collectBeans
          */
         fun collectBeans(beanConfigurations: List<BeanConfiguration>): Initializer {
-            BeanConfigurationsBeansCollector(beanRegistry).collectBeans(beanConfigurations)
+            this.beanConfigurations.addAll(beanConfigurations)
             return this
         }
 
@@ -180,6 +195,10 @@ object Beans {
          * Initializes [Beans] with the applied configuration.
          */
         fun initialize() {
+            val beanRegistry = BeanRegistry(parent).apply {
+                scopes.forEach { addBeanScope(it) }
+                BeanConfigurationsBeansCollector(this).collectBeans(beanConfigurations)
+            }
             setBeans(beanRegistry)
         }
     }
