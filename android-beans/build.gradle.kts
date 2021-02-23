@@ -102,6 +102,7 @@ publishing {
             pom.withXml {
 				asNode().appendNode("name", "android-beans")
 				asNode().appendNode("description", "A dependency injection library for Java Android apps.")
+				asNode().appendNode("url", "https://github.com/christopherfrieler/android-beans")
                 asNode().appendNode("licenses").appendNode("license")
                         .appendNode("name", "MIT").parent()
                         .appendNode("url", "https://opensource.org/licenses/MIT").parent()
