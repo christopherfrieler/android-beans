@@ -3,11 +3,11 @@
 
 ## Integrating Android Beans into an app
 
-Make sure you have 'jcenter' added to your repositories in your build.gradle.kts file:
+Make sure you have 'mavencentral' added to your repositories in your build.gradle.kts file:
 ```kotlin
 allprojects {
     repositories {
-        jcenter()
+        mavencentral()
     }
 }
 ```

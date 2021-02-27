@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.net.URI
 
 plugins {
 	id("com.android.library")
@@ -6,7 +7,8 @@ plugins {
     id("org.jetbrains.dokka-android")
     id("org.gradle.jacoco")
 	id("maven-publish")
-	id("com.jfrog.bintray")
+	id("signing")
+    id("io.codearte.nexus-staging")
 }
 
 android {
@@ -134,24 +136,33 @@ publishing {
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "sonatype-staging"
+            url = URI.create("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
+            }
+        }
+    }
 }
 
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_API_KEY")
+signing {
+    sign(publishing.publications)
 
-    with(pkg) {
-        repo = "android"
-        name = project.name
-        userOrg = "christopherfrieler"
-        setLicenses("MIT")
-        desc = "A dependency injection library for Java Android apps."
-        vcsUrl = "https://github.com/christopherfrieler/android-beans.git"
-        githubRepo = "christopherfrieler/android-beans"
-
-        version.name = "${project.version}"
+    System.getenv("SIGNING_KEY_ID")?.also { signingKeyId ->
+        project.setProperty("signing.keyId", signingKeyId)
+        project.setProperty("signing.secretKeyRingFile", rootProject.file("$signingKeyId.gpg"))
+        project.setProperty("signing.password", System.getenv("SIGNING_KEY_PASSWORD"))
     }
-    publish = true
+}
 
-    setPublications("maven")
+nexusStaging {
+    packageGroup = project.group as String
+    stagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID")
+    val stagingRepository = publishing.repositories["sonatype-staging"] as MavenArtifactRepository
+    username = stagingRepository.credentials.username
+    password = stagingRepository.credentials.password
 }

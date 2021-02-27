@@ -10,7 +10,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
         classpath("org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
+        classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
 

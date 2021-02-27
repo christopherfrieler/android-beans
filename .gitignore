@@ -2,6 +2,7 @@
 **/build/
 
 local.properties
+*.gpg
 
 *.iml
 .idea/
