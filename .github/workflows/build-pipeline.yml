@@ -83,13 +83,18 @@ jobs:
           key: gradle-deps-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             gradle-dists-
-      - name: Deploy to bintray
+      - name: Deploy to mavencentral
         env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
         run: |
+          echo $SIGNING_KEY_BASE64 | base64 -d > "$SIGNING_KEY_ID.gpg"
           chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace :android-beans:bintrayUpload
+          ./gradlew --no-daemon --stacktrace :android-beans:publishMavenPublicationToSonatype-stagingRepository :android-beans:closeAndReleaseRepository
       - name: Prepare release info
         uses: actions/create-release@v1
         env:
