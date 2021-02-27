@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
         classpath("org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
