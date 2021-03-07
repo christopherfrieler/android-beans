@@ -10,57 +10,24 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Cache gradle distribution
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper/dists
-          key: gradle-dists-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Cache gradle dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches/modules-2
-          key: gradle-deps-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            gradle-dists-
-      - name: Build and check library
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Configure Sonar-Analysis
         run: |
           . ./.github/configureSonarAnalysis.sh
-          chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace \
-          lintRelease testReleaseUnitTest sonarqube \
-          generatePomFileForMavenPublication assembleRelease kdocJar sourcesJar
-      - name: Archive lint results
-        uses: actions/upload-artifact@v2
+      - name: Build and check library
+        uses: christopherfrieler/gradle-wrapper-action@0.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          name: lint-report
-          path: android-beans/build/reports/lint-results-release.*
-      - name: Archive teset results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-report
-          path: android-beans/build/reports/tests/testReleaseUnitTest/**/*
-      - name: Archive pom
-        uses: actions/upload-artifact@v2
-        with:
-          name: pom
-          path: android-beans/build/publications/maven/pom-default.xml
-      - name: Archive aar
-        uses: actions/upload-artifact@v2
-        with:
-          name: aar
-          path: android-beans/build/outputs/aar/android-beans-*.aar
-      - name: Archive kdoc
-        uses: actions/upload-artifact@v2
-        with:
-          name: kdoc
-          path: android-beans/build/libs/android-beans-*-kdoc.jar
-      - name: Archive sources
-        uses: actions/upload-artifact@v2
-        with:
-          name: sources
-          path: android-beans/build/libs/android-beans-*-sources.jar
+          arguments: |
+            lintRelease testReleaseUnitTest sonarqube
+            generatePomFileForMavenPublication assembleRelease kdocJar sourcesJar
+          artifacts: |
+            lint-report android-beans/build/reports/lint-results-release.*
+            test-report android-beans/build/reports/tests/testReleaseUnitTest/**/*
+            pom android-beans/build/publications/maven/pom-default.xml
+            aar android-beans/build/outputs/aar/android-beans-*.aar
+            kdoc android-beans/build/libs/android-beans-*-kdoc.jar
+            sources android-beans/build/libs/android-beans-*-sources.jar
 
   deploy:
     if: startsWith(github.ref, 'refs/tags/')
@@ -71,30 +38,23 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Cache gradle distribution
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper/dists
-          key: gradle-dists-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Cache gradle dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches/modules-2
-          key: gradle-deps-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            gradle-dists-
-      - name: Deploy to mavencentral
+      - name: Prepare signing-key file
         env:
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
+        run: echo $SIGNING_KEY_BASE64 | base64 -d > "$SIGNING_KEY_ID.gpg"
+      - name: Deploy to mavencentral
+        uses: christopherfrieler/gradle-wrapper-action@0.1.0
+        env:
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
-        run: |
-          echo $SIGNING_KEY_BASE64 | base64 -d > "$SIGNING_KEY_ID.gpg"
-          chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace :android-beans:publishMavenPublicationToSonatype-stagingRepository :android-beans:closeAndReleaseRepository
+        with:
+          arguments: |
+            :android-beans:publishMavenPublicationToSonatype-stagingRepository
+            :android-beans:closeAndReleaseRepository
       - name: Prepare release info
         uses: actions/create-release@v1
         env:
