@@ -3,7 +3,6 @@ import com.android.build.gradle.internal.cxx.logging.warnln
 buildscript {
     repositories {
         google()
-        jcenter()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
@@ -24,7 +23,6 @@ allprojects {
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
 }
