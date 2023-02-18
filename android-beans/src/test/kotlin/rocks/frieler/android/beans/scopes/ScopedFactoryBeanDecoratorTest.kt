@@ -7,13 +7,10 @@ import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
-@RunWith(MockitoJUnitRunner::class)
 class ScopedFactoryBeanDecoratorTest {
     private val scopedFactoryBean: ScopedFactoryBean<ScopedFactoryBeanDecoratorTest> = mock()
     private val decoratedFactoryBean = scopedFactoryBean.decorate()

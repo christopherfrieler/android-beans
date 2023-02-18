@@ -5,12 +5,9 @@ import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import org.junit.jupiter.api.Test
 import java.util.function.Consumer
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class BeansOfTypeConsumerTest {
     private val consumer: (BeansOfTypeConsumerTest) -> Unit = mock()
     private val beansOfTypeConsumer = BeansOfTypeConsumer(BeansOfTypeConsumerTest::class, consumer)

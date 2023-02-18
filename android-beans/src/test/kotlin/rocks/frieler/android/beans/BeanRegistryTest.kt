@@ -12,10 +12,8 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean
@@ -23,7 +21,6 @@ import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
-@RunWith(MockitoJUnitRunner::class)
 class BeanRegistryTest {
     private val beanRegistry = BeanRegistry()
 
@@ -161,7 +158,7 @@ class BeanRegistryTest {
     /* tests for bean-scopes: */
     private val beanScope: ScopedFactoryBeanHandler = mock()
 
-    @Before
+    @BeforeEach
     fun setupBeanScope() {
         whenever(beanScope.name).thenReturn("aScope")
         beanRegistry.addBeanScope(beanScope)

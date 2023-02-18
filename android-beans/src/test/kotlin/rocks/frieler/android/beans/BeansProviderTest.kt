@@ -10,7 +10,7 @@ import assertk.assertions.isSameAs
 import assertk.assertions.prop
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.reflect.KClass
 
 class BeansProviderTest {

@@ -6,13 +6,10 @@ import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.BeansProvider
 
 
-@RunWith(MockitoJUnitRunner::class)
 class GenericScopedFactoryBeanTest {
     private val scope = "aScope"
     private val producer: BeansProvider.() -> GenericScopedFactoryBeanTest = mock()

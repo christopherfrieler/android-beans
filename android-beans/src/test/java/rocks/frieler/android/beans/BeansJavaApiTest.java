@@ -1,22 +1,22 @@
 package rocks.frieler.android.beans;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import kotlin.jvm.JvmClassMappingKt;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 
 public class BeansJavaApiTest {
-    @Before
+    @BeforeEach
     public void initializeBeans() {
         new Beans.Initializer()
                 .collectBeans(Collections.singletonList(new BeanConfiguration() {

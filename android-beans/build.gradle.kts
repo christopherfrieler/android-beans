@@ -63,11 +63,13 @@ dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-	testImplementation("junit:junit:4.13")
-    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
     testImplementation("org.mockito:mockito-core:3.3.3")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
+    testImplementation("org.junit.vintage:junit-vintage-engine")
     testImplementation("org.robolectric:robolectric:4.3.1")
 }
 
@@ -83,6 +85,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 tasks.withType(Test::class) {
+    useJUnitPlatform()
     with(extensions.getByType(JacocoTaskExtension::class)) {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*") // workaround for https://github.com/gradle/gradle/issues/5184

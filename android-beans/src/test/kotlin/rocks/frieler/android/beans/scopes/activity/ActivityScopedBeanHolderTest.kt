@@ -3,7 +3,7 @@ package rocks.frieler.android.beans.scopes.activity
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler.ActivityScopedBeanHolder
 
 class ActivityScopedBeanHolderTest {

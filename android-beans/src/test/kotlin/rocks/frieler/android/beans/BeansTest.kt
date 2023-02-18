@@ -8,13 +8,13 @@ import assertk.assertions.isNull
 import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class BeansTest {
     private val beansProvider: BeansProvider = mock()
 
-    @Before
+    @BeforeEach
     fun configureMockBeansProvider() {
         Beans.setBeans(beansProvider)
     }

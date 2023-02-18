@@ -8,7 +8,8 @@ import assertk.assertions.hasSize
 import assertk.assertions.isInstanceOf
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.ByteArrayInputStream
 import java.io.IOException
 
@@ -46,37 +47,37 @@ class BeanConfigurationsAssetScannerTest {
 		assertThat(beanConfigurations).contains(ABeanConfigurationObject)
 	}
 
-	@Test(expected = BeanInstantiationException::class)
+	@Test
 	fun `scan() throws BeanInstantiationException when listing the assets fails`() {
 		whenever(assets.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenThrow(IOException::class.java)
 
-		beanConfigurationsAssetScanner.scan(assets)
+		assertThrows<BeanInstantiationException> { beanConfigurationsAssetScanner.scan(assets) }
 	}
 
-	@Test(expected = BeanInstantiationException::class)
+	@Test
 	fun `scan() throws BeanInstantiationException when reading an asset fails`() {
 		whenever(assets.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(arrayOf("beans.txt"))
 		whenever(assets.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt")).thenThrow(IOException::class.java)
 
-		beanConfigurationsAssetScanner.scan(assets)
+		assertThrows<BeanInstantiationException> { beanConfigurationsAssetScanner.scan(assets) }
 	}
 
-	@Test(expected = BeanInstantiationException::class)
+	@Test
 	fun `scan() throws BeanInstantiationException when specified class is not found`() {
 		whenever(assets.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(arrayOf("beans.txt"))
 		whenever(assets.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt"))
 				.thenReturn(ByteArrayInputStream("something.ThatIsNotAClass\n".toByteArray()))
 
-		beanConfigurationsAssetScanner.scan(assets)
+		assertThrows<BeanInstantiationException> { beanConfigurationsAssetScanner.scan(assets) }
 	}
 
-	@Test(expected = BeanInstantiationException::class)
+	@Test
 	fun `scan() throws BeanInstantiationException when specified class is not a BeanConfiguration`() {
 		whenever(assets.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(arrayOf("beans.txt"))
 		whenever(assets.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt"))
 				.thenReturn(ByteArrayInputStream("rocks.frieler.android.beans.BeanConfigurationsAssetScannerTest\n".toByteArray()))
 
-		beanConfigurationsAssetScanner.scan(assets)
+		assertThrows<BeanInstantiationException> { beanConfigurationsAssetScanner.scan(assets) }
 	}
 
 	class ABeanConfiguration : BeanConfiguration() {

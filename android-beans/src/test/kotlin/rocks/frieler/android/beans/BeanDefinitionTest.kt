@@ -8,7 +8,7 @@ import assertk.assertions.isTrue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BeanDefinitionTest {
 	private val beanName = "name"

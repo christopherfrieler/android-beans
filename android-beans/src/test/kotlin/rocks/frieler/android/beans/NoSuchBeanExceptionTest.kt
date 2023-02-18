@@ -2,7 +2,7 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class NoSuchBeanExceptionTest {
 	@Test
