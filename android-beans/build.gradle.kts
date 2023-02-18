@@ -8,7 +8,7 @@ plugins {
     id("org.gradle.jacoco")
 	id("maven-publish")
 	id("signing")
-    id("io.codearte.nexus-staging")
+    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
 android {
