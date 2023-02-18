@@ -1,10 +1,10 @@
 package rocks.frieler.android.beans
 
 import assertk.all
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFailure
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
 import assertk.assertions.prop
@@ -33,9 +33,9 @@ class BeansProviderTest {
 	fun `lookUpBean() by name and type throws NoSuchBeanException when optionally present bean is not present`() {
 		whenever(beansProvider.lookUpOptionalBean("name", BeansProviderTest::class)).thenReturn(null)
 
-		val exception = assertThat {
+		val exception = assertFailure {
 			beansProvider.lookUpBean("name", BeansProviderTest::class)
-		}.isFailure()
+		}
 
 		exception.all {
 			hasClass(NoSuchBeanException::class)
@@ -57,9 +57,9 @@ class BeansProviderTest {
 	fun `lookUpBean() by type throws NoSuchBeanException when optionally present bean is not present`() {
 		whenever(beansProvider.lookUpOptionalBean(BeansProviderTest::class)).thenReturn(null)
 
-		val exception = assertThat {
+		val exception = assertFailure {
 			beansProvider.lookUpBean(BeansProviderTest::class)
-		}.isFailure()
+		}
 
 		exception.all {
 			hasClass(NoSuchBeanException::class)
