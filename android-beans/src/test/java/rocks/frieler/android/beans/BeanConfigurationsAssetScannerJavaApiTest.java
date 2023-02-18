@@ -17,14 +17,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class BeanConfigurationsAssetScannerJavaApiTest {
+class BeanConfigurationsAssetScannerJavaApiTest {
 	private final Context context = mock(Context.class);
 	private final BeanConfigurationsAssetScanner beanConfigurationsAssetScanner = new BeanConfigurationsAssetScanner(context);
 
 	private final AssetManager assetManager = mock(AssetManager.class);
 
 	@Test
-	public void canInstantiateAJavaBeanConfiguration() throws IOException {
+	void canInstantiateAJavaBeanConfiguration() throws IOException {
 		when(assetManager.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(new String[] { "beans.txt" });
 		when(assetManager.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt"))
 				.thenReturn(new ByteArrayInputStream(("rocks.frieler.android.beans.BeanConfigurationsAssetScannerJavaApiTest$AJavaBeanConfiguration\n").getBytes()));
@@ -43,7 +43,7 @@ public class BeanConfigurationsAssetScannerJavaApiTest {
 	}
 
 	@Test
-	public void canInstantiateAJavaBeanConfigurationNeedingTheContext() throws IOException {
+	void canInstantiateAJavaBeanConfigurationNeedingTheContext() throws IOException {
 		when(assetManager.list(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH)).thenReturn(new String[] { "beans.txt" });
 		when(assetManager.open(BeanConfigurationsAssetScanner.BEAN_CONFIGURATIONS_ASSET_PATH + "/beans.txt"))
 				.thenReturn(new ByteArrayInputStream(("rocks.frieler.android.beans.BeanConfigurationsAssetScannerJavaApiTest$AJavaBeanConfigurationNeedingTheContext\n").getBytes()));

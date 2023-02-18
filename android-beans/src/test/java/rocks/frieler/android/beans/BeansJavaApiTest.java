@@ -15,9 +15,9 @@ import java.util.List;
 import kotlin.jvm.JvmClassMappingKt;
 
 
-public class BeansJavaApiTest {
+class BeansJavaApiTest {
     @BeforeEach
-    public void initializeBeans() {
+    void initializeBeans() {
         new Beans.Initializer()
                 .collectBeans(Collections.singletonList(new BeanConfiguration() {
                     @NotNull
@@ -34,35 +34,35 @@ public class BeansJavaApiTest {
     }
 
     @Test
-    public void testLookupSingleBeanByNameAndType() {
+    void testLookupSingleBeanByNameAndType() {
         BeansJavaApiTest bean = Beans.lookUpBean("beansJavaApiTest", BeansJavaApiTest.class);
 
         assertThat(bean, is(sameInstance(this)));
     }
 
     @Test
-    public void testLookupSingleBeanByType() {
+    void testLookupSingleBeanByType() {
         BeansJavaApiTest bean = Beans.lookUpBean(BeansJavaApiTest.class);
 
         assertThat(bean, is(sameInstance(this)));
     }
 
     @Test
-    public void testLookupOptionalBeanByNameAndType() {
+    void testLookupOptionalBeanByNameAndType() {
         BeansJavaApiTest bean = Beans.lookUpOptionalBean("beansJavaApiTest", BeansJavaApiTest.class);
 
         assertThat(bean, is(sameInstance(this)));
     }
 
     @Test
-    public void testLookupOptionalBeanByType() {
+    void testLookupOptionalBeanByType() {
         BeansJavaApiTest bean = Beans.lookUpOptionalBean(BeansJavaApiTest.class);
 
         assertThat(bean, is(sameInstance(this)));
     }
 
     @Test
-    public void testLookupAllBeansByType() {
+    void testLookupAllBeansByType() {
         List<BeansJavaApiTest> beans = Beans.lookUpBeans(BeansJavaApiTest.class);
 
         assertThat(beans.size(), is(1));
