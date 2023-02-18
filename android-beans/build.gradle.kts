@@ -23,7 +23,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    compileSdk = 29
+    compileSdk = 33
     buildToolsVersion = "34.0.0"
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
