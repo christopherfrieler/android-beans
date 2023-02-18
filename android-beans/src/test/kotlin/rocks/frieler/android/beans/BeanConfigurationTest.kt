@@ -2,7 +2,7 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.contains
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.junit.jupiter.api.Test
 
 class BeanConfigurationTest {

@@ -1,5 +1,6 @@
 package rocks.frieler.android.beans
 
+import assertk.Assert
 import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
@@ -8,9 +9,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
 import assertk.assertions.prop
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.spy
+import org.mockito.kotlin.whenever
 import kotlin.reflect.KClass
 
 class BeansProviderTest {
@@ -37,8 +38,13 @@ class BeansProviderTest {
 			beansProvider.lookUpBean("name", BeansProviderTest::class)
 		}
 
-		exception.all {
-			hasClass(NoSuchBeanException::class)
+		val noSuchBeanExceptionAssert = exception.let {
+			it.hasClass(NoSuchBeanException::class)
+			@Suppress("UNCHECKED_CAST")
+			it as Assert<NoSuchBeanException>
+		}
+
+		noSuchBeanExceptionAssert.all {
 			prop(NoSuchBeanException::name).isEqualTo("name")
 			prop(NoSuchBeanException::type).isEqualTo(BeansProviderTest::class)
 		}
@@ -63,8 +69,8 @@ class BeansProviderTest {
 
 		exception.all {
 			hasClass(NoSuchBeanException::class)
-			prop(NoSuchBeanException::name).isNull()
-			prop(NoSuchBeanException::type).isEqualTo(BeansProviderTest::class)
+			prop("name") { (it as NoSuchBeanException).name }.isNull()
+			prop("type") { (it as NoSuchBeanException).type }.isEqualTo(BeansProviderTest::class)
 		}
 	}
 }

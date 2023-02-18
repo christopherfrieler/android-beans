@@ -6,10 +6,10 @@ import assertk.assertions.containsExactly
 import assertk.assertions.hasClass
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class BeansTest {
     private val beansProvider: BeansProvider = mock()

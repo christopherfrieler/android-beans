@@ -66,8 +66,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
-    testImplementation("org.mockito:mockito-core:3.3.3")
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 
     testImplementation("org.junit.vintage:junit-vintage-engine")
     testImplementation("org.robolectric:robolectric:4.3.1")

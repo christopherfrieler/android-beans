@@ -1,9 +1,9 @@
 package rocks.frieler.android.beans.scopes.activity
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBeanHandler.ActivityScopedBeanHolder
 
 class ActivityScopedBeanHolderTest {
@@ -16,7 +16,7 @@ class ActivityScopedBeanHolderTest {
 		beanHolder.bean = bean
 		beanHolder.onCleared()
 
-		verifyZeroInteractions(bean)
+		verifyNoInteractions(bean)
 	}
 
 	@Test
