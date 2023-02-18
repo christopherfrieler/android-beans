@@ -16,9 +16,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import rocks.frieler.android.beans.BeansProvider
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest=Config.NONE)
 class ActivityScopedFactoryBeanHandlerTest {
 	private val foregroundActivityHolder : ForegroundActivityHolder = mock()
 	private val activityScopedFactoryBeanHandler = ActivityScopedFactoryBeanHandler(foregroundActivityHolder)

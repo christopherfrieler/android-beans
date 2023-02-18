@@ -69,7 +69,7 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 
     testImplementation("org.junit.vintage:junit-vintage-engine")
-    testImplementation("org.robolectric:robolectric:4.3.1")
+    testImplementation("org.robolectric:robolectric:4.10.3")
 }
 
 val kdocJar by tasks.registering(Jar::class) {
