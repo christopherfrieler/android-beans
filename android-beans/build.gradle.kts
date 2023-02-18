@@ -98,7 +98,7 @@ val jacocoReport by tasks.registering(JacocoReport::class) {
         html.required.set(false)
     }
 }
-rootProject.tasks["sonarqube"].dependsOn(jacocoReport)
+rootProject.tasks["sonar"].dependsOn(jacocoReport)
 
 publishing {
     publications {

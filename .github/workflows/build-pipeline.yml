@@ -20,7 +20,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           arguments: |
-            lintRelease testReleaseUnitTest sonarqube
+            lintRelease testReleaseUnitTest sonar
             generatePomFileForMavenPublication assembleRelease kdocJar sourcesJar
           artifacts: |
             lint-report android-beans/build/reports/lint-results-release.*

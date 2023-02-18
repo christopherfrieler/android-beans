@@ -7,13 +7,12 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:8.1.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
 
 plugins {
-    id("org.sonarqube") version "2.7.1"
+    id("org.sonarqube") version "4.2.1.3168"
 }
 
 allprojects {
@@ -32,7 +31,7 @@ tasks {
     }
 }
 
-sonarqube {
+sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.organization", "christopherfrieler")
