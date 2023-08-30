@@ -2,7 +2,7 @@
 
 ## Requirements
 
-Android Beans requires jdk-11 to build.
+Android Beans requires jdk-17 to build.
 
 
 ## Development commands

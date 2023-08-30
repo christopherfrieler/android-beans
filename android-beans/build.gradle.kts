@@ -4,11 +4,11 @@ import java.net.URI
 plugins {
 	id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.dokka-android")
+    id("org.jetbrains.dokka") version "1.8.20"
     id("org.gradle.jacoco")
 	id("maven-publish")
 	id("signing")
-    id("io.codearte.nexus-staging")
+    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
 android {
@@ -16,27 +16,25 @@ android {
         maybeCreate("main").java.srcDirs("src/main/kotlin/")
         maybeCreate("test").java.srcDirs("src/test/kotlin/")
     }
+    namespace = "rocks.frieler.android.beans"
 
     compileOptions {
-        coreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    compileSdkVersion(29)
-    buildToolsVersion("29.0.3")
+    compileSdk = 33
+    buildToolsVersion = "34.0.0"
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(29)
+        minSdk = 21
 
-        versionCode = 1
-        versionName = "${project.version}"
         // append version to android build-artifacts:
 		libraryVariants.all { outputs.all { this as BaseVariantOutputImpl
-			outputFileName = outputFileName.replace(base.archivesBaseName, "${base.archivesBaseName}-${version}")
+			outputFileName = outputFileName.replace(base.archivesName.get(), "${base.archivesName.get()}-${version}")
 		}}
 		fileTree("proguard/").forEach(defaultConfig::consumerProguardFile)
     }
@@ -52,6 +50,10 @@ android {
             testBuildType = this.name
 		}
     }
+
+    publishing {
+        singleVariant("release")
+    }
 }
 
 dependencies {
@@ -59,19 +61,20 @@ dependencies {
     api(kotlin("reflect"))
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.1")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
-	testImplementation("junit:junit:4.13")
-    testImplementation("org.hamcrest:hamcrest:2.2")
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
-    testImplementation("org.mockito:mockito-core:3.3.3")
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-    testImplementation("org.robolectric:robolectric:4.3.1")
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+
+    testImplementation("org.junit.vintage:junit-vintage-engine")
+    testImplementation("org.robolectric:robolectric:4.10.3")
 }
 
 val kdocJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokka)
-    from("${buildDir}/dokka")
+    dependsOn(tasks.dokkaHtml)
+    from("${layout.buildDirectory}/dokka")
     archiveClassifier.set("kdoc")
 }
 
@@ -81,6 +84,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 }
 
 tasks.withType(Test::class) {
+    useJUnitPlatform()
     with(extensions.getByType(JacocoTaskExtension::class)) {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*") // workaround for https://github.com/gradle/gradle/issues/5184
@@ -89,14 +93,14 @@ tasks.withType(Test::class) {
 val jacocoReport by tasks.registering(JacocoReport::class) {
     group = "verification"
     dependsOn(tasks.getByName("testReleaseUnitTest"))
-    classDirectories.from("$buildDir/tmp/kotlin-classes/release")
-    executionData(files("$buildDir/jacoco/testReleaseUnitTest.exec"))
+    classDirectories.from("${layout.buildDirectory}/tmp/kotlin-classes/release")
+    executionData(files("${layout.buildDirectory}/jacoco/testReleaseUnitTest.exec"))
     reports {
-        xml.isEnabled = true
-        html.isEnabled = false
+        xml.required.set(true)
+        html.required.set(false)
     }
 }
-rootProject.tasks["sonarqube"].dependsOn(jacocoReport)
+rootProject.tasks["sonar"].dependsOn(jacocoReport)
 
 publishing {
     publications {

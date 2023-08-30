@@ -3,16 +3,13 @@ package rocks.frieler.android.beans.scopes
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import rocks.frieler.android.beans.BeansProvider
 
 
-@RunWith(MockitoJUnitRunner::class)
 class GenericScopedFactoryBeanTest {
     private val scope = "aScope"
     private val producer: BeansProvider.() -> GenericScopedFactoryBeanTest = mock()

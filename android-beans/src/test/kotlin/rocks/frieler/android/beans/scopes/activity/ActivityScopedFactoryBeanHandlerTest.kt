@@ -7,18 +7,20 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isSameAs
 import assertk.assertions.isTrue
-import com.nhaarman.mockitokotlin2.clearInvocations
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import rocks.frieler.android.beans.BeansProvider
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest=Config.NONE)
 class ActivityScopedFactoryBeanHandlerTest {
 	private val foregroundActivityHolder : ForegroundActivityHolder = mock()
 	private val activityScopedFactoryBeanHandler = ActivityScopedFactoryBeanHandler(foregroundActivityHolder)

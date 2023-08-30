@@ -6,7 +6,7 @@ import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isNotNull
 import assertk.assertions.isSameAs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
 /**

@@ -1,20 +1,20 @@
 package rocks.frieler.android.beans
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.hasClass
-import assertk.assertions.isFailure
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class BeansTest {
     private val beansProvider: BeansProvider = mock()
 
-    @Before
+    @BeforeEach
     fun configureMockBeansProvider() {
         Beans.setBeans(beansProvider)
     }
@@ -33,10 +33,9 @@ class BeansTest {
     fun `lookUpBean() by given type rethrows NoSuchBeanException without such bean`() {
         whenever(beansProvider.lookUpBean(Any::class)).thenThrow(NoSuchBeanException(Any::class))
 
-        assertThat {
+        assertFailure {
             Beans.lookUpBean(type = Any::class)
-        }.isFailure()
-                .hasClass(NoSuchBeanException::class)
+        }.hasClass(NoSuchBeanException::class)
     }
 
     @Test
@@ -65,10 +64,9 @@ class BeansTest {
         val name = "bean"
         whenever(beansProvider.lookUpBean(name, Any::class)).thenThrow(NoSuchBeanException(name, Any::class))
 
-        assertThat {
+        assertFailure {
             Beans.lookUpBean(name, Any::class)
-        }.isFailure()
-                .hasClass(NoSuchBeanException::class)
+        }.hasClass(NoSuchBeanException::class)
     }
 
     @Test

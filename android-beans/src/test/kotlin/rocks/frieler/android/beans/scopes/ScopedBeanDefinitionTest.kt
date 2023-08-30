@@ -3,8 +3,8 @@ package rocks.frieler.android.beans.scopes
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import com.nhaarman.mockitokotlin2.mock
-import org.junit.Test
+import org.mockito.kotlin.mock
+import org.junit.jupiter.api.Test
 
 class ScopedBeanDefinitionTest {
 	private val scopedBeanDefinition = ScopedBeanDefinition(factoryBeanType = ScopedFactoryBean::class, targetType = ScopedBeanDefinitionTest::class) { mock() }

@@ -1,14 +1,5 @@
 package rocks.frieler.android.beans;
 
-import org.junit.Test;
-
-import java.util.List;
-
-import kotlin.jvm.JvmClassMappingKt;
-import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean;
-import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
-import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,10 +9,19 @@ import static rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryB
 import static rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean.prototype;
 import static rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean.lazyInstantiated;
 
-public class DeclarativeBeanConfigurationJavaApiTest {
+import org.junit.Test;
+
+import java.util.List;
+
+import kotlin.jvm.JvmClassMappingKt;
+import rocks.frieler.android.beans.scopes.activity.ActivityScopedFactoryBean;
+import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean;
+import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean;
+
+class DeclarativeBeanConfigurationJavaApiTest {
 
     @Test
-    public void testDeclarativeBeanConfigurationCanDefineBeansWithAndWithoutName() {
+    void testDeclarativeBeanConfigurationCanDefineBeansWithAndWithoutName() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {
@@ -38,7 +38,7 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     }
 
     @Test
-    public void testDeclarativeBeanConfigurationCanDefineBeansWithDependencies() {
+    void testDeclarativeBeanConfigurationCanDefineBeansWithDependencies() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {
@@ -60,7 +60,7 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     }
 
     @Test
-    public void testDeclarativeBeanConfigurationCanDefineScopedBeans() {
+    void testDeclarativeBeanConfigurationCanDefineScopedBeans() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {
@@ -86,7 +86,7 @@ public class DeclarativeBeanConfigurationJavaApiTest {
     }
 
     @Test
-    public void testDeclarativeBeanConfigurationCanDefineScopedBeansWithDependencies() {
+    void testDeclarativeBeanConfigurationCanDefineScopedBeansWithDependencies() {
         DeclarativeBeanConfiguration beanConfiguration = new DeclarativeBeanConfiguration() {
             @Override
             public void beans() {

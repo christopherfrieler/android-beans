@@ -3,17 +3,14 @@ package rocks.frieler.android.beans.scopes
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.inOrder
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import rocks.frieler.android.beans.BeansProvider
 import kotlin.reflect.KClass
 
-@RunWith(MockitoJUnitRunner::class)
 class ScopedFactoryBeanDecoratorTest {
     private val scopedFactoryBean: ScopedFactoryBean<ScopedFactoryBeanDecoratorTest> = mock()
     private val decoratedFactoryBean = scopedFactoryBean.decorate()

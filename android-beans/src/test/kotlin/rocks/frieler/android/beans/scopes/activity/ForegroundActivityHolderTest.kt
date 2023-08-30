@@ -4,8 +4,8 @@ import android.app.Activity
 import assertk.assertThat
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import org.junit.Test
+import org.mockito.kotlin.mock
+import org.junit.jupiter.api.Test
 
 class ForegroundActivityHolderTest {
 	private val foregroundActivityHolder = ForegroundActivityHolder()

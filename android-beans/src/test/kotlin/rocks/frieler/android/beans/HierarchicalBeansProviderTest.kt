@@ -4,9 +4,9 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 

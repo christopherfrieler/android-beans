@@ -1,16 +1,17 @@
 package rocks.frieler.android.beans
 
+import assertk.Assert
 import assertk.all
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.hasClass
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFailure
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
 import assertk.assertions.prop
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito.spy
+import org.mockito.kotlin.whenever
 import kotlin.reflect.KClass
 
 class BeansProviderTest {
@@ -33,12 +34,17 @@ class BeansProviderTest {
 	fun `lookUpBean() by name and type throws NoSuchBeanException when optionally present bean is not present`() {
 		whenever(beansProvider.lookUpOptionalBean("name", BeansProviderTest::class)).thenReturn(null)
 
-		val exception = assertThat {
+		val exception = assertFailure {
 			beansProvider.lookUpBean("name", BeansProviderTest::class)
-		}.isFailure()
+		}
 
-		exception.all {
-			hasClass(NoSuchBeanException::class)
+		val noSuchBeanExceptionAssert = exception.let {
+			it.hasClass(NoSuchBeanException::class)
+			@Suppress("UNCHECKED_CAST")
+			it as Assert<NoSuchBeanException>
+		}
+
+		noSuchBeanExceptionAssert.all {
 			prop(NoSuchBeanException::name).isEqualTo("name")
 			prop(NoSuchBeanException::type).isEqualTo(BeansProviderTest::class)
 		}
@@ -57,14 +63,14 @@ class BeansProviderTest {
 	fun `lookUpBean() by type throws NoSuchBeanException when optionally present bean is not present`() {
 		whenever(beansProvider.lookUpOptionalBean(BeansProviderTest::class)).thenReturn(null)
 
-		val exception = assertThat {
+		val exception = assertFailure {
 			beansProvider.lookUpBean(BeansProviderTest::class)
-		}.isFailure()
+		}
 
 		exception.all {
 			hasClass(NoSuchBeanException::class)
-			prop(NoSuchBeanException::name).isNull()
-			prop(NoSuchBeanException::type).isEqualTo(BeansProviderTest::class)
+			prop("name") { (it as NoSuchBeanException).name }.isNull()
+			prop("type") { (it as NoSuchBeanException).type }.isEqualTo(BeansProviderTest::class)
 		}
 	}
 }

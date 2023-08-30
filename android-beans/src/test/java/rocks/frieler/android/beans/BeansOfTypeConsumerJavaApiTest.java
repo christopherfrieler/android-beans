@@ -1,18 +1,18 @@
 package rocks.frieler.android.beans;
 
-import org.junit.Test;
-
-import java.util.function.Consumer;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class BeansOfTypeConsumerJavaApiTest {
+import org.junit.Test;
+
+import java.util.function.Consumer;
+
+class BeansOfTypeConsumerJavaApiTest {
 	@Test
-	public void BeansOfTypeConsumerCanBeUsedWithJavaTypeAndConsumer() {
+	void BeansOfTypeConsumerCanBeUsedWithJavaTypeAndConsumer() {
 		@SuppressWarnings("unchecked") Consumer<BeansOfTypeConsumerJavaApiTest> consumer = mock(Consumer.class);
 
 		BeansOfTypeConsumer<BeansOfTypeConsumerJavaApiTest> beansOfTypeConsumer = new BeansOfTypeConsumer<>(BeansOfTypeConsumerJavaApiTest.class, consumer);

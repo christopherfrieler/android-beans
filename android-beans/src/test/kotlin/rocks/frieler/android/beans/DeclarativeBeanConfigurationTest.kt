@@ -7,8 +7,8 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.mock
-import org.junit.Test
+import org.mockito.kotlin.mock
+import org.junit.jupiter.api.Test
 
 class DeclarativeBeanConfigurationTest {
 	private val dependencyProvider: BeansProvider = mock()

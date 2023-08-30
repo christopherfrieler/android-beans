@@ -7,15 +7,13 @@ import assertk.assertions.isIn
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import rocks.frieler.android.beans.scopes.ScopedFactoryBean
 import rocks.frieler.android.beans.scopes.ScopedFactoryBeanHandler
 import rocks.frieler.android.beans.scopes.prototype.PrototypeScopedFactoryBean
@@ -23,7 +21,6 @@ import rocks.frieler.android.beans.scopes.singleton.SingletonScopedFactoryBean
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
-@RunWith(MockitoJUnitRunner::class)
 class BeanRegistryTest {
     private val beanRegistry = BeanRegistry()
 
@@ -161,7 +158,7 @@ class BeanRegistryTest {
     /* tests for bean-scopes: */
     private val beanScope: ScopedFactoryBeanHandler = mock()
 
-    @Before
+    @BeforeEach
     fun setupBeanScope() {
         whenever(beanScope.name).thenReturn("aScope")
         beanRegistry.addBeanScope(beanScope)
