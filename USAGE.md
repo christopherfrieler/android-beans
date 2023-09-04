@@ -15,7 +15,7 @@ allprojects {
 Add Android Beans to your dependencies:
 ```kotlin
 dependencies {
-    implementation("rocks.frieler.android:android-beans:0.8.0")
+    implementation("rocks.frieler.android:android-beans:0.8.1")
 }
 ```
 
