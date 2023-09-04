@@ -8,7 +8,7 @@ package rocks.frieler.android.beans
  *
  * @author Christopher Frieler
  */
-interface BeanRegistryPostProcessor {
+fun interface BeanRegistryPostProcessor {
     /**
      *
      */

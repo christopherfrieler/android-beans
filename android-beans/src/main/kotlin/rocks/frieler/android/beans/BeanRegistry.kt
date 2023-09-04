@@ -67,7 +67,7 @@ class BeanRegistry internal constructor(parent: BeansProvider? = null) : Hierarc
 			beanName += suffix
         }
 
-		return beanName
+        return beanName
     }
 
     /**
@@ -112,11 +112,11 @@ class BeanRegistry internal constructor(parent: BeansProvider? = null) : Hierarc
 
 	override fun <T : Any> lookUpOptionalLocalBean(name: String, type: KClass<T>): T? {
         val beanCandidate = beans[name]
-		if (beanCandidate == null) {
-			return null
-		} else {
-			return resolveBeanFromCandidate(name, type, beanCandidate)
-		}
+        return if (beanCandidate == null) {
+            null
+        } else {
+            resolveBeanFromCandidate(name, type, beanCandidate)
+        }
 	}
 
     override fun <T :Any> lookUpOptionalLocalBean(type: KClass<T>): T? {
