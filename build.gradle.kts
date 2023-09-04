@@ -12,6 +12,7 @@ buildscript {
 
 plugins {
     id("org.sonarqube") version "4.2.1.3168"
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
 allprojects {
@@ -40,6 +41,17 @@ sonar {
             "branch" -> property("sonar.branch.name", System.getenv("SONAR_BRANCH_NAME"))
             "pull_request" -> property("sonar.pullrequest.key", System.getenv("SONAR_PULLREQUEST_KEY"))
             else -> warnln("unknown SONAR_ANALYSIS_TYPE: '%s'", analysisType)
+        }
+    }
+}
+
+nexusPublishing {
+    packageGroup = project.group as String
+    this.repositories {
+        sonatype {
+            stagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID")
+            username = System.getenv("SONATYPE_USERNAME")
+            password = System.getenv("SONATYPE_PASSWORD")
         }
     }
 }

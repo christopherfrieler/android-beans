@@ -54,9 +54,7 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
         with:
-          arguments: |
-            :android-beans:publishMavenPublicationToSonatype-stagingRepository
-            :android-beans:closeAndReleaseRepository
+          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
       - name: Prepare release info
         uses: softprops/action-gh-release@v1
         with:

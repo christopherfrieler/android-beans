@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
-import java.net.URI
 
 plugins {
 	id("com.android.library")
@@ -8,7 +7,6 @@ plugins {
     id("org.gradle.jacoco")
 	id("maven-publish")
 	id("signing")
-    id("io.codearte.nexus-staging") version "0.30.0"
 }
 
 android {
@@ -140,17 +138,6 @@ publishing {
             }
         }
     }
-
-    repositories {
-        maven {
-            name = "sonatype-staging"
-            url = URI.create("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("SONATYPE_USERNAME")
-                password = System.getenv("SONATYPE_PASSWORD")
-            }
-        }
-    }
 }
 
 signing {
@@ -161,12 +148,4 @@ signing {
         project.setProperty("signing.secretKeyRingFile", rootProject.file("$signingKeyId.gpg"))
         project.setProperty("signing.password", System.getenv("SIGNING_KEY_PASSWORD"))
     }
-}
-
-nexusStaging {
-    packageGroup = project.group as String
-    stagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID")
-    val stagingRepository = publishing.repositories["sonatype-staging"] as MavenArtifactRepository
-    username = stagingRepository.credentials.username
-    password = stagingRepository.credentials.password
 }
