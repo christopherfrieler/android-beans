@@ -59,7 +59,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          name: ${{ github.ref }}
           body: 'TODO: write changelog for this version!'
           draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
