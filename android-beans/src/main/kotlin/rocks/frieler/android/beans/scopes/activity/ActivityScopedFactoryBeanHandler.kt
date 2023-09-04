@@ -31,7 +31,7 @@ class ActivityScopedFactoryBeanHandler(private val foregroundActivityHolder: For
 	override fun <T :Any> getBean(name: String, factoryBean: ScopedFactoryBean<T>, dependencies: BeansProvider): T {
 		val activity = foregroundActivityHolder.currentActivity as ComponentActivity
 		@Suppress("UNCHECKED_CAST")
-		val beanHolder: ActivityScopedBeanHolder<T> = ViewModelProvider(activity).get(name, ActivityScopedBeanHolder::class.java) as ActivityScopedBeanHolder<T>
+		val beanHolder: ActivityScopedBeanHolder<T> = ViewModelProvider(activity)[name, ActivityScopedBeanHolder::class.java] as ActivityScopedBeanHolder<T>
 		if (!beanHolder.containsBean()) {
 			beanHolder.bean = factoryBean.produceBean(dependencies)
 		}
