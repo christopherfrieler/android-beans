@@ -3,8 +3,8 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
 	id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.dokka") version "1.8.20"
-    id("org.gradle.jacoco")
+    id("org.jetbrains.dokka") version "2.0.0"
+    id("jacoco")
 	id("maven-publish")
 	id("signing")
 }
@@ -22,7 +22,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     compileSdk = 33
-    buildToolsVersion = "34.0.0"
+    buildToolsVersion = "36.0.0"
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
@@ -71,7 +71,7 @@ dependencies {
 }
 
 val kdocJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokkaHtml)
+    dependsOn(tasks.dokkaGenerate)
     from("${layout.buildDirectory}/dokka")
     archiveClassifier.set("kdoc")
 }
