@@ -17,7 +17,7 @@ plugins {
 
 allprojects {
     group = "rocks.frieler.android"
-    version = "0.9.0-SNAPSHOT"
+    version = "0.9.0"
 
     repositories {
         google()
