@@ -57,7 +57,8 @@ android {
 dependencies {
     api(kotlin("stdlib"))
     api(kotlin("reflect"))
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("androidx.activity:activity-ktx:1.10.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
