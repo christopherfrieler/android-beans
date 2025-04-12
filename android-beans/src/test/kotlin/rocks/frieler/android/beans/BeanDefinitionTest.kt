@@ -1,10 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
-import assertk.assertions.isSameAs
-import assertk.assertions.isTrue
+import assertk.assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -51,6 +48,6 @@ class BeanDefinitionTest {
 		val bean = beanDefinition.produceBean(dependencyProvider)
 
 		verify(beanCreator).invoke(dependencyProvider)
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 }

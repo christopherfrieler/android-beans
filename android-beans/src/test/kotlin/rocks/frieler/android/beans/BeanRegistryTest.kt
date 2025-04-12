@@ -1,12 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.containsOnly
-import assertk.assertions.isEqualTo
-import assertk.assertions.isIn
-import assertk.assertions.isNotEqualTo
-import assertk.assertions.isNull
-import assertk.assertions.isSameAs
+import assertk.assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -57,7 +52,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(name, registeredBean)
         val bean = beanRegistry.lookUpOptionalBean(name, Any::class)
 
-        assertThat(bean).isSameAs(registeredBean)
+        assertThat(bean).isSameInstanceAs(registeredBean)
     }
 
     @Test
@@ -68,7 +63,7 @@ class BeanRegistryTest {
 
         val bean = beanRegistryWithParent.lookUpOptionalBean(name, Any::class)
 
-        assertThat(bean).isSameAs(inheritedBean)
+        assertThat(bean).isSameInstanceAs(inheritedBean)
     }
 
     @Test
@@ -86,7 +81,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean("bean", registeredBean)
         val bean = beanRegistry.lookUpOptionalBean(Any::class)
 
-		assertThat(bean).isSameAs(registeredBean)
+        assertThat(bean).isSameInstanceAs(registeredBean)
     }
 
     @Test
@@ -108,7 +103,7 @@ class BeanRegistryTest {
 
         val bean = beanRegistryWithParent.lookUpOptionalBean(Any::class)
 
-        assertThat(bean).isSameAs(inheritedBean)
+        assertThat(bean).isSameInstanceAs(inheritedBean)
     }
 
     @Test
@@ -139,7 +134,7 @@ class BeanRegistryTest {
 
         val generatedName = beanRegistry.registerBean(bean)
 
-        assertThat(beanRegistry.lookUpBean(generatedName, Any::class)).isSameAs(bean)
+        assertThat(beanRegistry.lookUpBean(generatedName, Any::class)).isSameInstanceAs(bean)
     }
 
     @Test
@@ -151,8 +146,8 @@ class BeanRegistryTest {
         val generatedNameForBean2 = beanRegistry.registerBean(bean2)
 
         assertThat(generatedNameForBean2).isNotEqualTo(generatedNameForBean1)
-        assertThat(beanRegistry.lookUpBean(generatedNameForBean1, Any::class)).isSameAs(bean1)
-		assertThat(beanRegistry.lookUpBean(generatedNameForBean2, Any::class)).isSameAs(bean2)
+        assertThat(beanRegistry.lookUpBean(generatedNameForBean1, Any::class)).isSameInstanceAs(bean1)
+        assertThat(beanRegistry.lookUpBean(generatedNameForBean2, Any::class)).isSameInstanceAs(bean2)
     }
 
     /* tests for bean-scopes: */
@@ -220,7 +215,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(name, factoryBean)
         val bean = beanRegistry.lookUpOptionalBean(name, factoryBean.beanType)
 
-        assertThat(bean).isSameAs(scopedBean)
+        assertThat(bean).isSameInstanceAs(scopedBean)
     }
 
     @Test
@@ -238,7 +233,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(name, factoryBean)
         val bean = beanRegistry.lookUpOptionalBean(factoryBean.beanType)
 
-        assertThat(bean).isSameAs(this)
+        assertThat(bean).isSameInstanceAs(this)
     }
 
     @Test
@@ -279,7 +274,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(name, singletonFactory)
         val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
-        assertThat(beanInstance).isSameAs(this)
+        assertThat(beanInstance).isSameInstanceAs(this)
     }
 
     @Test
@@ -290,7 +285,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(name, prototype)
         val beanInstance = beanRegistry.lookUpBean(name, BeanRegistryTest::class)
 
-		assertThat(beanInstance).isSameAs(this)
+        assertThat(beanInstance).isSameInstanceAs(this)
     }
 
     /* tests for post-processing: */
@@ -306,7 +301,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean("bean", originalBean)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
-        assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameAs(replacementBean)
+        assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameInstanceAs(replacementBean)
     }
 
     @Test
@@ -319,7 +314,7 @@ class BeanRegistryTest {
         beanRegistry.registerBean(beanPostProcessor)
 
 		verify(beanPostProcessor).postProcessBean("bean", originalBean)
-		assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameAs(replacementBean)
+        assertThat(beanRegistry.lookUpBean("bean", Any::class)).isSameInstanceAs(replacementBean)
     }
 
     @Test
@@ -343,6 +338,6 @@ class BeanRegistryTest {
 		val finalBean = beanRegistry.lookUpBean(name, Any::class)
 
         verify(beanPostProcessor).postProcessBean(name, originalBean)
-		assertThat(finalBean).isSameAs(replacementBean)
+        assertThat(finalBean).isSameInstanceAs(replacementBean)
     }
 }

@@ -3,8 +3,8 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
 	id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.dokka") version "1.8.20"
-    id("org.gradle.jacoco")
+    id("org.jetbrains.dokka") version "2.0.0"
+    id("jacoco")
 	id("maven-publish")
 	id("signing")
 }
@@ -21,8 +21,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    compileSdk = 33
-    buildToolsVersion = "34.0.0"
+    compileSdk = 34
+    buildToolsVersion = "36.0.0"
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
@@ -57,21 +57,22 @@ android {
 dependencies {
     api(kotlin("stdlib"))
     api(kotlin("reflect"))
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring(libs.android.tools.desugar.jdk.libs)
 
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.assertk.jvm)
+    testImplementation(libs.mockito.kotlin)
 
-    testImplementation("org.junit.vintage:junit-vintage-engine")
-    testImplementation("org.robolectric:robolectric:4.10.3")
+    testImplementation(libs.junit.vintage.engine)
+    testImplementation(libs.robolectric)
 }
 
 val kdocJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.dokkaHtml)
+    dependsOn(tasks.dokkaGenerate)
     from("${layout.buildDirectory}/dokka")
     archiveClassifier.set("kdoc")
 }

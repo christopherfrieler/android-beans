@@ -5,14 +5,14 @@ buildscript {
         google()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
+        classpath(libs.kotlin)
+        classpath(libs.android.build.tools.gradle)
     }
 }
 
 plugins {
-    id("org.sonarqube") version "4.2.1.3168"
-    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+    id("org.sonarqube") version "6.1.0.5360"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 allprojects {

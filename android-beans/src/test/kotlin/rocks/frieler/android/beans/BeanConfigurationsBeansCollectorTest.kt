@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
@@ -100,7 +101,7 @@ class BeanConfigurationsBeansCollectorTest {
 
 		val bean = beanConfigurationsBeansCollector.lookUpBean("bean", BeanConfigurationsBeansCollectorTest::class)
 
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -111,7 +112,7 @@ class BeanConfigurationsBeansCollectorTest {
 		}
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
 			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean("bean", BeanConfigurationsBeansCollectorTest::class)
-			assertThat(dependency).isSameAs(this)
+			assertThat(dependency).isSameInstanceAs(this)
 			Any()
 		}
 		whenever(anotherBeanDefinition.getName()).thenReturn("bean")
@@ -152,7 +153,7 @@ class BeanConfigurationsBeansCollectorTest {
 
 		val bean = beanConfigurationsBeansCollector.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)
 
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -164,7 +165,7 @@ class BeanConfigurationsBeansCollectorTest {
 		}
 		whenever(beanDefinition.produceBean(beanConfigurationsBeansCollector)).thenAnswer {
 			val dependency = beanConfigurationsBeansCollector.lookUpOptionalBean(BeanConfigurationsBeansCollectorTest::class)
-			assertThat(dependency).isSameAs(this)
+			assertThat(dependency).isSameInstanceAs(this)
 			Any()
 		}
 		whenever(anotherBeanDefinition.canProduce(BeanConfigurationsBeansCollectorTest::class)).thenReturn(true)

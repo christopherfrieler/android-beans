@@ -3,10 +3,7 @@ package rocks.frieler.android.beans.scopes.activity
 import android.app.Activity
 import androidx.activity.ComponentActivity
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
-import assertk.assertions.isSameAs
-import assertk.assertions.isTrue
+import assertk.assertions.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.clearInvocations
@@ -69,7 +66,7 @@ class ActivityScopedFactoryBeanHandlerTest {
 
 		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -83,13 +80,13 @@ class ActivityScopedFactoryBeanHandlerTest {
 		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
 		verify(activityScopedFactoryBean).produceBean(dependencies)
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 		clearInvocations(activityScopedFactoryBean)
 
 		val beanAgain = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
 		verify(activityScopedFactoryBean, never()).produceBean(dependencies)
-		assertThat(beanAgain).isSameAs(bean)
+		assertThat(beanAgain).isSameInstanceAs(bean)
 	}
 
 	@Test
@@ -104,6 +101,6 @@ class ActivityScopedFactoryBeanHandlerTest {
 		val bean = activityScopedFactoryBeanHandler.getBean("bean", activityScopedFactoryBean, dependencies)
 
 		verify(activityAwareBean).setActivity(componentActivity)
-		assertThat(bean).isSameAs(activityAwareBean)
+		assertThat(bean).isSameInstanceAs(activityAwareBean)
 	}
 }

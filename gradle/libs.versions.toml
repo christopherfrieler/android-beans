@@ -1,0 +1,25 @@
+[versions]
+kotlin = "2.1.20"
+android-build-tools-gradle = "8.7.3"
+androidx-activity = "1.10.1"
+androidx-lifecycle = "2.8.7"
+android-tools-desugar_jdk_libs = "2.1.5"
+junit = "5.11.3"
+assertk = "0.28.1"
+mockito = "5.4.0"
+robolectric = "4.14.1"
+
+[plugins]
+
+[libraries]
+kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+android-build-tools-gradle = { module = "com.android.tools.build:gradle", version.ref = "android-build-tools-gradle" }
+android-tools-desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-tools-desugar_jdk_libs" }
+androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine" }
+assertk-jvm = { module = "com.willowtreeapps.assertk:assertk-jvm", version.ref = "assertk" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }

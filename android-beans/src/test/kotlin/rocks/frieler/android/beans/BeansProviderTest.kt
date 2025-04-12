@@ -4,11 +4,7 @@ import assertk.Assert
 import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.hasClass
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNull
-import assertk.assertions.isSameAs
-import assertk.assertions.prop
+import assertk.assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.whenever
@@ -27,7 +23,7 @@ class BeansProviderTest {
 
 		val bean = beansProvider.lookUpBean("name", BeansProviderTest::class)
 
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -56,7 +52,7 @@ class BeansProviderTest {
 
 		val bean = beansProvider.lookUpBean(BeansProviderTest::class)
 
-		assertThat(bean).isSameAs(this)
+		assertThat(bean).isSameInstanceAs(this)
 	}
 
 	@Test

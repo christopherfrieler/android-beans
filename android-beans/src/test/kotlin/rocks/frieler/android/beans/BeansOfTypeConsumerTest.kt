@@ -2,6 +2,7 @@ package rocks.frieler.android.beans
 
 import assertk.assertThat
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -19,7 +20,7 @@ class BeansOfTypeConsumerTest {
         val processedBean = beansOfTypeConsumer.postProcessBean("bean", originalBean)
 
         verifyNoInteractions(consumer)
-        assertThat(processedBean).isSameAs(originalBean)
+        assertThat(processedBean).isSameInstanceAs(originalBean)
     }
 
     @Test
@@ -27,7 +28,7 @@ class BeansOfTypeConsumerTest {
         val processedBean = beansOfTypeConsumer.postProcessBean("bean", this)
 
         verify(consumer)(this)
-        assertThat(processedBean).isSameAs(this)
+        assertThat(processedBean).isSameInstanceAs(this)
     }
 
     @Test
@@ -38,6 +39,6 @@ class BeansOfTypeConsumerTest {
         val processedBean = beansOfTypeConsumer.postProcessBean("bean", this)
 
         verify(consumer).accept(this)
-        assertThat(processedBean).isSameAs(this)
+        assertThat(processedBean).isSameInstanceAs(this)
     }
 }

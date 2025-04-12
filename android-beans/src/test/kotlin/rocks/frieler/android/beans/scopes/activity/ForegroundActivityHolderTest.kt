@@ -4,6 +4,7 @@ import android.app.Activity
 import assertk.assertThat
 import assertk.assertions.isNull
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import org.mockito.kotlin.mock
 import org.junit.jupiter.api.Test
 
@@ -18,21 +19,21 @@ class ForegroundActivityHolderTest {
 	fun `ForegroundActivityHolder holds created Activity`() {
 		foregroundActivityHolder.onActivityCreated(activity, null)
 
-		assertThat(foregroundActivityHolder.currentActivity).isSameAs(activity)
+		assertThat(foregroundActivityHolder.currentActivity).isSameInstanceAs(activity)
 	}
 
 	@Test
 	fun `ForegroundActivityHolder holds started Activity`() {
 		foregroundActivityHolder.onActivityStarted(activity)
 
-		assertThat(foregroundActivityHolder.currentActivity).isSameAs(activity)
+		assertThat(foregroundActivityHolder.currentActivity).isSameInstanceAs(activity)
 	}
 
 	@Test
 	fun `ForegroundActivityHolder holds resumed Activity`() {
 		foregroundActivityHolder.onActivityResumed(activity)
 
-		assertThat(foregroundActivityHolder.currentActivity).isSameAs(activity)
+		assertThat(foregroundActivityHolder.currentActivity).isSameInstanceAs(activity)
 	}
 
 	@Test
@@ -48,7 +49,7 @@ class ForegroundActivityHolderTest {
 		foregroundActivityHolder.onActivityResumed(activity)
 		foregroundActivityHolder.onActivityPaused(anotherActivity)
 
-		assertThat(foregroundActivityHolder.currentActivity).isSameAs(activity)
+		assertThat(foregroundActivityHolder.currentActivity).isSameInstanceAs(activity)
 	}
 
 	@Test
@@ -64,6 +65,6 @@ class ForegroundActivityHolderTest {
 		foregroundActivityHolder.onActivityResumed(activity)
 		foregroundActivityHolder.onActivityStopped(anotherActivity)
 
-		assertThat(foregroundActivityHolder.currentActivity).isSameAs(activity)
+		assertThat(foregroundActivityHolder.currentActivity).isSameInstanceAs(activity)
 	}
 }

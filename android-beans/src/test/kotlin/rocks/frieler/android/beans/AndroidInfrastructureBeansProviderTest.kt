@@ -11,6 +11,7 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -26,7 +27,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean("PackageManager", PackageManager::class)
 
-		assertThat(bean).isSameAs(packageManager)
+		assertThat(bean).isSameInstanceAs(packageManager)
 	}
 
 	@Test
@@ -36,7 +37,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean("Resources", Resources::class)
 
-		assertThat(bean).isSameAs(resources)
+		assertThat(bean).isSameInstanceAs(resources)
 	}
 
 	@Test
@@ -46,7 +47,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean("AssetManager", AssetManager::class)
 
-		assertThat(bean).isSameAs(assetManager)
+		assertThat(bean).isSameInstanceAs(assetManager)
 	}
 
 	@Test
@@ -56,7 +57,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean("ContentResolver", ContentResolver::class)
 
-		assertThat(bean).isSameAs(contentResolver)
+		assertThat(bean).isSameInstanceAs(contentResolver)
 	}
 
 	@Test
@@ -67,7 +68,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(Context.LAYOUT_INFLATER_SERVICE, LayoutInflater::class)
 
-		assertThat(bean).isSameAs(layoutInflater)
+		assertThat(bean).isSameInstanceAs(layoutInflater)
 	}
 
 	@Test
@@ -77,7 +78,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(PackageManager::class)
 
-		assertThat(bean).isSameAs(packageManager)
+		assertThat(bean).isSameInstanceAs(packageManager)
 	}
 
 	@Test
@@ -87,7 +88,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(Resources::class)
 
-		assertThat(bean).isSameAs(resources)
+		assertThat(bean).isSameInstanceAs(resources)
 	}
 
 	@Test
@@ -97,7 +98,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(AssetManager::class)
 
-		assertThat(bean).isSameAs(assetManager)
+		assertThat(bean).isSameInstanceAs(assetManager)
 	}
 
 	@Test
@@ -107,7 +108,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(ContentResolver::class)
 
-		assertThat(bean).isSameAs(contentResolver)
+		assertThat(bean).isSameInstanceAs(contentResolver)
 	}
 
 	@Test
@@ -118,7 +119,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(LayoutInflater::class)
 
-		assertThat(bean).isSameAs(layoutInflater)
+		assertThat(bean).isSameInstanceAs(layoutInflater)
 	}
 
 	@Test

@@ -1,11 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.containsAll
-import assertk.assertions.containsExactly
-import assertk.assertions.containsOnly
-import assertk.assertions.isNotNull
-import assertk.assertions.isSameAs
+import assertk.assertions.*
 import org.junit.jupiter.api.Test
 import rocks.frieler.android.beans.scopes.singleton.lazyInstantiatedBean
 
@@ -36,7 +32,7 @@ class BeanDependenciesResolutionTest {
 		assertThat(bean).isNotNull()
 		val beanWithDependency = beanRegistry.lookUpBean(BeanWithDependency::class)
 		assertThat(beanWithDependency).isNotNull()
-		assertThat(beanWithDependency.dependency).isSameAs(bean)
+		assertThat(beanWithDependency.dependency).isSameInstanceAs(bean)
 	}
 
 	@Test
@@ -69,10 +65,10 @@ class BeanDependenciesResolutionTest {
 		assertThat(bean).isNotNull()
 		val anotherBean = beanRegistry.lookUpBean("anotherBean", BeanWithDependency::class)
 		assertThat(anotherBean).isNotNull()
-		assertThat(anotherBean.dependency).isSameAs(bean)
+		assertThat(anotherBean.dependency).isSameInstanceAs(bean)
 		val yetAnotherBean = beanRegistry.lookUpBean("yetAnotherBean", BeanWithDependency::class)
 		assertThat(yetAnotherBean).isNotNull()
-		assertThat(yetAnotherBean.dependency).isSameAs(anotherBean)
+		assertThat(yetAnotherBean.dependency).isSameInstanceAs(anotherBean)
 	}
 
 	@Test
@@ -133,7 +129,7 @@ class BeanDependenciesResolutionTest {
 
 		val beanWithDependencies = beanRegistry.lookUpBean(BeanWithDependencies::class)
 		assertThat(beanWithDependencies).isNotNull()
-		assertThat(beanWithDependencies.dependencies).containsAll(bean, anotherBean)
+		assertThat(beanWithDependencies.dependencies).containsAtLeast(bean, anotherBean)
 	}
 
 	@Test
@@ -156,7 +152,7 @@ class BeanDependenciesResolutionTest {
 
 		val beanWithDependency = beanRegistry.lookUpBean(BeanWithDependency::class)
 		assertThat(beanWithDependency).isNotNull()
-		assertThat(beanWithDependency.dependency).isSameAs(bean)
+		assertThat(beanWithDependency.dependency).isSameInstanceAs(bean)
 	}
 }
 
