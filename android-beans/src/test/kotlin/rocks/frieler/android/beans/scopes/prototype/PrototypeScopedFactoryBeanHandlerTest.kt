@@ -3,6 +3,7 @@ package rocks.frieler.android.beans.scopes.prototype
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -35,7 +36,7 @@ class PrototypeScopedFactoryBeanHandlerTest {
 
         val beanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean, dependencies)
 
-        assertThat(beanInstance).isSameAs(bean)
+        assertThat(beanInstance).isSameInstanceAs(bean)
     }
 
     @Test
@@ -49,7 +50,7 @@ class PrototypeScopedFactoryBeanHandlerTest {
         val secondBeanInstance = prototypeScopedFactoryBeanHandler.getBean("bean", scopedFactoryBean, beansProvider)
 
         verify(scopedFactoryBean, Mockito.times(2)).produceBean(beansProvider)
-        assertThat(firstBeanInstance).isSameAs(firstBean)
-        assertThat(secondBeanInstance).isSameAs(secondBean)
+        assertThat(firstBeanInstance).isSameInstanceAs(firstBean)
+        assertThat(secondBeanInstance).isSameInstanceAs(secondBean)
     }
 }

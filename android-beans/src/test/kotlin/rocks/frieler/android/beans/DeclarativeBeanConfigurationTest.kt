@@ -1,12 +1,7 @@
 package rocks.frieler.android.beans
 
 import assertk.assertThat
-import assertk.assertions.contains
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
-import assertk.assertions.isNull
-import assertk.assertions.isSameAs
+import assertk.assertions.*
 import org.mockito.kotlin.mock
 import org.junit.jupiter.api.Test
 
@@ -48,9 +43,9 @@ class DeclarativeBeanConfigurationTest {
 
 		assertThat(beanDefinitions).hasSize(2)
 		assertThat(beanDefinitions[0].getName()).isNull()
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
+		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameInstanceAs(this)
 		assertThat(beanDefinitions[1].getName()).isEqualTo("named_bean")
-		assertThat(beanDefinitions[1].produceBean(dependencyProvider)).isSameAs(this)
+		assertThat(beanDefinitions[1].produceBean(dependencyProvider)).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -67,7 +62,7 @@ class DeclarativeBeanConfigurationTest {
 		val beanDefinitions = aBeanConfiguration.getBeanDefinitions()
 
 		assertThat(beanDefinitions).hasSize(1)
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
+		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -84,7 +79,7 @@ class DeclarativeBeanConfigurationTest {
 		assertThat(beanDefinitions).hasSize(1)
 		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
 		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
+		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameInstanceAs(this)
 	}
 
 	@Test
@@ -104,6 +99,6 @@ class DeclarativeBeanConfigurationTest {
 		assertThat(beanDefinitions).hasSize(1)
 		assertThat(beanDefinitions[0].getName()).isEqualTo("bean")
 		assertThat(beanDefinitions[0].getType()).isEqualTo(Any::class)
-		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameAs(this)
+		assertThat(beanDefinitions[0].produceBean(dependencyProvider)).isSameInstanceAs(this)
 	}
 }

@@ -2,10 +2,7 @@ package rocks.frieler.android.beans
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.hasClass
-import assertk.assertions.isNull
-import assertk.assertions.isSameAs
+import assertk.assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -26,7 +23,7 @@ class BeansTest {
 
         val retrievedBean = Beans.lookUpBean(type = Any::class)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -45,7 +42,7 @@ class BeansTest {
 
         val retrievedBean: Any? = Beans.lookUpBean()
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -56,7 +53,7 @@ class BeansTest {
 
         val retrievedBean = Beans.lookUpBean(name, Any::class)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -77,7 +74,7 @@ class BeansTest {
 
         val retrievedBean: Any? = Beans.lookUpBean(name)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -87,7 +84,7 @@ class BeansTest {
 
         val retrievedBean = Beans.lookUpOptionalBean(type = Any::class)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -106,7 +103,7 @@ class BeansTest {
 
         val retrievedBean: Any? = Beans.lookUpOptionalBean()
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -117,7 +114,7 @@ class BeansTest {
 
         val retrievedBean = Beans.lookUpOptionalBean(name, Any::class)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test
@@ -138,7 +135,7 @@ class BeansTest {
 
         val retrievedBean: Any? = Beans.lookUpOptionalBean(name)
 
-        assertThat(retrievedBean).isSameAs(bean)
+        assertThat(retrievedBean).isSameInstanceAs(bean)
     }
 
     @Test

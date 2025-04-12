@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isSameAs
+import assertk.assertions.isSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
@@ -36,7 +37,7 @@ class PrototypeScopedFactoryBeanTest {
         val producedBean = factoryBean.produceBean(dependencies)
 
         verify(producer).invoke(dependencies)
-        assertThat(producedBean).isSameAs(this)
+        assertThat(producedBean).isSameInstanceAs(this)
     }
 
     @Test
@@ -85,6 +86,6 @@ class PrototypeScopedFactoryBeanTest {
     private fun assertPrototypeScopedFactoryBeanProducingThis(factoryBean: PrototypeScopedFactoryBean<*>, dependencies: BeansProvider) {
         assertThat(factoryBean).isInstanceOf(PrototypeScopedFactoryBean::class)
         assertThat(factoryBean.beanType).isEqualTo(PrototypeScopedFactoryBeanTest::class)
-        assertThat(factoryBean.produceBean(dependencies)).isSameAs(this)
+        assertThat(factoryBean.produceBean(dependencies)).isSameInstanceAs(this)
     }
 }
