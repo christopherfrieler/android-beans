@@ -57,18 +57,18 @@ android {
 dependencies {
     api(kotlin("stdlib"))
     api(kotlin("reflect"))
-    implementation("androidx.activity:activity-ktx:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    coreLibraryDesugaring(libs.android.tools.desugar.jdk.libs)
 
-    testImplementation(platform("org.junit:junit-bom:5.11.3"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.assertk.jvm)
+    testImplementation(libs.mockito.kotlin)
 
-    testImplementation("org.junit.vintage:junit-vintage-engine")
-    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation(libs.junit.vintage.engine)
+    testImplementation(libs.robolectric)
 }
 
 val kdocJar by tasks.registering(Jar::class) {
