@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
 	id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.dokka") version "2.0.0"
+    id("org.jetbrains.dokka") version "2.2.0"
     id("jacoco")
 	id("maven-publish")
 	id("signing")
