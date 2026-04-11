@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
 	id("com.android.library")
@@ -9,6 +10,11 @@ plugins {
 	id("signing")
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
+}
 android {
     sourceSets {
         maybeCreate("main").java.srcDirs("src/main/kotlin/")
@@ -23,9 +29,6 @@ android {
     }
     compileSdk = 34
     buildToolsVersion = "36.0.0"
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
 
     defaultConfig {
         minSdk = 21
@@ -64,6 +67,7 @@ dependencies {
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.assertk.jvm)
     testImplementation(libs.mockito.kotlin)
 
