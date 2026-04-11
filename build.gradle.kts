@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.logging.warnln
-
 buildscript {
     repositories {
         google()
@@ -43,7 +41,7 @@ sonar {
         when (val analysisType = System.getenv("SONAR_ANALYSIS_TYPE")) {
             "branch" -> property("sonar.branch.name", System.getenv("SONAR_BRANCH_NAME"))
             "pull_request" -> property("sonar.pullrequest.key", System.getenv("SONAR_PULLREQUEST_KEY"))
-            else -> warnln("unknown SONAR_ANALYSIS_TYPE: '%s'", analysisType)
+            else -> logger.warn("unknown SONAR_ANALYSIS_TYPE: '$analysisType'")
         }
     }
 }
