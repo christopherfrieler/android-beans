@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.internal.component.AarCreationConfig
 
 plugins {
@@ -8,7 +9,7 @@ plugins {
 	id("signing")
 }
 
-android {
+extensions.configure<LibraryExtension>("android") {
     namespace = "rocks.frieler.android.beans"
 
     compileOptions {
@@ -67,7 +68,7 @@ val kdocJar by tasks.registering(Jar::class) {
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
-    from(android.sourceSets["main"].kotlin.directories.map { file(it) })
+    from((project.extensions["android"] as LibraryExtension).sourceSets["main"].kotlin.directories.map { file(it) })
     archiveClassifier.set("sources")
 }
 
