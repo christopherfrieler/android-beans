@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      androidx:
+        patterns:
+          - androidx.*
+      junit:
+        patterns:
+          - org.junit.jupiter:*
+          - org.junit.platform:*
+          - org.junit.vintage:*
+      mockito:
+        patterns:
+          - org.mockito:*
+          - org.mockito.kotlin:*
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
