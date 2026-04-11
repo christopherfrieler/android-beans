@@ -1,25 +1,14 @@
-import com.android.build.gradle.internal.api.BaseVariantOutputImpl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.gradle.internal.component.AarCreationConfig
 
 plugins {
 	id("com.android.library")
-    id("kotlin-android")
     id("org.jetbrains.dokka") version "2.0.0"
     id("jacoco")
 	id("maven-publish")
 	id("signing")
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
 android {
-    sourceSets {
-        maybeCreate("main").java.srcDirs("src/main/kotlin/")
-        maybeCreate("test").java.srcDirs("src/test/kotlin/")
-    }
     namespace = "rocks.frieler.android.beans"
 
     compileOptions {
@@ -27,27 +16,23 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    compileSdk = 34
-    buildToolsVersion = "36.0.0"
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
 
-        // append version to android build-artifacts:
-		libraryVariants.all { outputs.all { this as BaseVariantOutputImpl
-			outputFileName = outputFileName.replace(base.archivesName.get(), "${base.archivesName.get()}-${version}")
-		}}
+        // append version to and strip "release" (which ought to be the default) qualifier from android build-artifacts:
+        androidComponents.onVariants { variant ->
+            (variant as AarCreationConfig).apply {
+                aarOutputFileName = listOfNotNull(project.name, project.version, name.takeIf { it != "release" }).joinToString("-", postfix = ".aar")
+            }
+        }
 		fileTree("proguard/").forEach(defaultConfig::consumerProguardFile)
     }
 
     buildTypes {
 		getByName("release") {
 			isMinifyEnabled = false
-
-			// strip "-release"-qualifier from artifact file-names, because release is the default:
-			android.libraryVariants.matching { name == "release" }.all { outputs.all { this as BaseVariantOutputImpl
-				outputFileName = outputFileName.replace("-release", "") }
-			}
             testBuildType = this.name
 		}
     }
@@ -82,7 +67,7 @@ val kdocJar by tasks.registering(Jar::class) {
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
-    from(android.sourceSets["main"].java.srcDirs)
+    from(android.sourceSets["main"].kotlin.directories.map { file(it) })
     archiveClassifier.set("sources")
 }
 
