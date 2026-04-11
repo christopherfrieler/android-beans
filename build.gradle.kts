@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-    id("org.sonarqube") version "6.1.0.5360"
+    id("org.sonarqube") version "7.2.3.7755"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
