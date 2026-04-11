@@ -7,7 +7,7 @@ android-tools-desugar_jdk_libs = "2.1.5"
 junit = "5.11.3"
 assertk = "0.28.1"
 mockito = "6.3.0"
-robolectric = "4.14.1"
+robolectric = "4.16.1"
 
 [plugins]
 
