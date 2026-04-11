@@ -64,6 +64,7 @@ dependencies {
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.assertk.jvm)
     testImplementation(libs.mockito.kotlin)
 
