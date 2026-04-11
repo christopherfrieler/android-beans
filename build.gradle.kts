@@ -37,6 +37,9 @@ sonar {
         property("sonar.organization", "christopherfrieler")
         property("sonar.projectName", "android-beans")
         property("sonar.projectKey", "christopherfrieler_android-beans")
+        property("sonar.issue.ignore.multicriteria", "allowLogicalDependencyGrouping")
+        property("sonar.issue.ignore.multicriteria.allowLogicalDependencyGrouping.ruleKey", "kotlin:S6629")
+        property("sonar.issue.ignore.multicriteria.allowLogicalDependencyGrouping.resourceKey" ,"**/*")
         when (val analysisType = System.getenv("SONAR_ANALYSIS_TYPE")) {
             "branch" -> property("sonar.branch.name", System.getenv("SONAR_BRANCH_NAME"))
             "pull_request" -> property("sonar.pullrequest.key", System.getenv("SONAR_PULLREQUEST_KEY"))
