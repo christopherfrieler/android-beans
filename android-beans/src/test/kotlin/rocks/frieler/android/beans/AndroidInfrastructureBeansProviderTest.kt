@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
-import assertk.assertions.isSameAs
 import assertk.assertions.isSameInstanceAs
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -64,7 +63,7 @@ class AndroidInfrastructureBeansProviderTest {
 	fun `lookUpOptionalBean by name and type provides system-service`() {
 		whenever(application.getSystemServiceName(LayoutInflater::class.java)).thenReturn(Context.LAYOUT_INFLATER_SERVICE)
 		val layoutInflater = mock<LayoutInflater>()
-		whenever(application.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).thenReturn(layoutInflater)
+		whenever(application.getSystemService(LayoutInflater::class.java)).thenReturn(layoutInflater)
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(Context.LAYOUT_INFLATER_SERVICE, LayoutInflater::class)
 
@@ -115,7 +114,7 @@ class AndroidInfrastructureBeansProviderTest {
 	fun `lookUpOptionalBean by type provides system-service`() {
 		whenever(application.getSystemServiceName(LayoutInflater::class.java)).thenReturn(Context.LAYOUT_INFLATER_SERVICE)
 		val layoutInflater = mock<LayoutInflater>()
-		whenever(application.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).thenReturn(layoutInflater)
+		whenever(application.getSystemService(LayoutInflater::class.java)).thenReturn(layoutInflater)
 
 		val bean = androidInfrastructureBeansProvider.lookUpOptionalBean(LayoutInflater::class)
 
@@ -136,7 +135,7 @@ class AndroidInfrastructureBeansProviderTest {
 	fun `lookUpBeans by type provides system-service by exact type`() {
 		whenever(application.getSystemServiceName(LayoutInflater::class.java)).thenReturn(Context.LAYOUT_INFLATER_SERVICE)
 		val layoutInflater = mock<LayoutInflater>()
-		whenever(application.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).thenReturn(layoutInflater)
+		whenever(application.getSystemService(LayoutInflater::class.java)).thenReturn(layoutInflater)
 
 		val beans = androidInfrastructureBeansProvider.lookUpBeans(LayoutInflater::class)
 
@@ -145,7 +144,7 @@ class AndroidInfrastructureBeansProviderTest {
 
 	@Test
 	fun `lookUpBeans by type provides no beans by super-type`() {
-		whenever(application.getSystemServiceName(Any::class.java)).thenReturn(Context.LAYOUT_INFLATER_SERVICE)
+		whenever(application.getSystemServiceName(Any::class.java)).thenReturn(null)
 
 		val beans = androidInfrastructureBeansProvider.lookUpBeans(Any::class)
 
