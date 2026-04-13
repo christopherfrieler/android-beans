@@ -1,8 +1,8 @@
 [versions]
 kotlin = "2.3.20"
 android-build-tools-gradle = "8.13.2"
-androidx-activity = "1.10.1"
-androidx-lifecycle = "2.8.7"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
 android-tools-desugar_jdk_libs = "2.1.5"
 junit = "5.11.3"
 assertk = "0.28.1"
