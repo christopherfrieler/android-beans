@@ -1,8 +1,9 @@
 [versions]
 kotlin = "2.3.20"
 android-build-tools-gradle = "8.13.2"
-androidx-activity = "1.10.1"
-androidx-lifecycle = "2.8.7"
+androidx-core = "1.18.0"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
 android-tools-desugar_jdk_libs = "2.1.5"
 junit = "5.11.3"
 assertk = "0.28.1"
@@ -15,6 +16,7 @@ robolectric = "4.16.1"
 kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 android-build-tools-gradle = { module = "com.android.tools.build:gradle", version.ref = "android-build-tools-gradle" }
 android-tools-desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-tools-desugar_jdk_libs" }
+androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

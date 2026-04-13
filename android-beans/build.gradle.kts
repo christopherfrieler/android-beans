@@ -27,11 +27,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    compileSdk = 35
+    compileSdk = 36
     buildToolsVersion = "36.0.0"
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
 
         // append version to android build-artifacts:
 		libraryVariants.all { outputs.all { this as BaseVariantOutputImpl
@@ -60,6 +60,7 @@ android {
 dependencies {
     api(kotlin("stdlib"))
     api(kotlin("reflect"))
+    implementation(libs.androidx.core)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
