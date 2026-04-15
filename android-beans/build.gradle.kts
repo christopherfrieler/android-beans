@@ -105,7 +105,7 @@ rootProject.tasks["sonar"].dependsOn(jacocoReport)
 mavenPublishing {
     pom {
         name = "android-beans"
-        description = "A dependency injection library for Java Android apps."
+        description = "A dependency injection library for Kotlin and Java Android apps."
         url = "https://github.com/christopherfrieler/android-beans"
         licenses {
             license {
