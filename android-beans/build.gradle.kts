@@ -1,13 +1,13 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.vanniktech.maven.publish.DeploymentValidation
 
 plugins {
 	id("com.android.library")
     id("kotlin-android")
     id("org.jetbrains.dokka") version "2.2.0"
     id("jacoco")
-	id("maven-publish")
-	id("signing")
+    id("com.vanniktech.maven.publish")
 }
 
 kotlin {
@@ -50,10 +50,6 @@ android {
 			}
             testBuildType = this.name
 		}
-    }
-
-    publishing {
-        singleVariant("release")
     }
 }
 
@@ -106,52 +102,25 @@ val jacocoReport by tasks.registering(JacocoReport::class) {
 }
 rootProject.tasks["sonar"].dependsOn(jacocoReport)
 
-publishing {
-    publications {
-        create("maven", MavenPublication::class) {
-            pom.withXml {
-				asNode().appendNode("name", "android-beans")
-				asNode().appendNode("description", "A dependency injection library for Java Android apps.")
-				asNode().appendNode("url", "https://github.com/christopherfrieler/android-beans")
-                asNode().appendNode("licenses").appendNode("license")
-                        .appendNode("name", "MIT").parent()
-                        .appendNode("url", "https://opensource.org/licenses/MIT").parent()
-                asNode().appendNode("scm")
-						.appendNode("url", "https://github.com/christopherfrieler/android-beans").parent()
-                asNode().appendNode("developers").appendNode("developer")
-                        .appendNode("name", "Christopher Frieler").parent()
-                val dependenciesNode = asNode().appendNode("dependencies")
-                configurations.getByName("api").allDependencies.configureEach {
-                    val dependencyNode = dependenciesNode.appendNode("dependency")
-                    dependencyNode.appendNode("groupId", this.group)
-                    dependencyNode.appendNode("artifactId", this.name)
-                    dependencyNode.appendNode("version", this.version)
-                    dependencyNode.appendNode("scope", "compile")
-                }
-                configurations.getByName("implementation").allDependencies.configureEach {
-                    val dependencyNode = dependenciesNode.appendNode("dependency")
-                    dependencyNode.appendNode("groupId", this.group)
-                    dependencyNode.appendNode("artifactId", this.name)
-                    dependencyNode.appendNode("version", this.version)
-                    dependencyNode.appendNode("scope", "runtime")
-                }
-            }
-
-            afterEvaluate {
-                artifact(tasks.getByName("bundleReleaseAar"))
-                artifact(sourcesJar.get())
-                artifact(kdocJar.get())
+mavenPublishing {
+    pom {
+        name = "android-beans"
+        description = "A dependency injection library for Java Android apps."
+        url = "https://github.com/christopherfrieler/android-beans"
+        licenses {
+            license {
+                name = "MIT"
+                url = "https://opensource.org/licenses/MIT"
             }
         }
+        scm {
+            url = "https://github.com/christopherfrieler/android-beans"
+        }
+        developers {
+            developer { name = "Christopher Frieler" }
+        }
     }
-}
-
-signing {
-    sign(publishing.publications)
-
-    System.getenv("SIGNING_KEY_ID")?.also { signingKeyId ->
-        project.setProperty("signing.keyId", signingKeyId)
-        project.setProperty("signing.secretKeyRingFile", rootProject.file("$signingKeyId.gpg"))
-        project.setProperty("signing.password", System.getenv("SIGNING_KEY_PASSWORD"))
-    }
+    publishToMavenCentral(
+        automaticRelease = true,
+        validateDeployment = DeploymentValidation.PUBLISHED)
 }
