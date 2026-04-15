@@ -26,6 +26,6 @@ generate kdoc-documentation (includes javadoc): `./gradlew kdocJar`
 
 ### publish
 
-publish build-artifacts to your local maven-repository: ``./gradlew publishToMavenLocal``
+publish build-artifacts to your local maven-repository: `./gradlew publishToMavenLocal`
 
 Publishing to other destinations should not be done manually, but only by the CI-build.
