@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 android-build-tools-gradle = "8.13.2"
 androidx-core = "1.18.0"
 androidx-activity = "1.13.0"
