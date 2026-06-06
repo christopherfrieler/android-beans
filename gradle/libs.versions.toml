@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.3.21"
 android-build-tools-gradle = "8.13.2"
-androidx-core = "1.18.0"
+androidx-core = "1.19.0"
 androidx-activity = "1.13.0"
 androidx-lifecycle = "2.10.0"
 android-tools-desugar_jdk_libs = "2.1.5"
