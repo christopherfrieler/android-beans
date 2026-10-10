@@ -15,7 +15,7 @@ jobs:
         run: |
           . ./.github/configureSonarAnalysis.sh
       - name: Build and check library
-        uses: christopherfrieler/gradle-wrapper-action@v0.7.0
+        uses: christopherfrieler/gradle-wrapper-action@0.7.4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -41,7 +41,7 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
       - name: Deploy to mavencentral
-        uses: christopherfrieler/gradle-wrapper-action@v0.7.0
+        uses: christopherfrieler/gradle-wrapper-action@0.7.4
         env:
           ORG_GRADLE_PROJECT_signAllPublications: true
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
